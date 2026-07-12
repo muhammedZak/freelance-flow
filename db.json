@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Zak Freelancer",
       "email": "freelancer@example.com",
       "password": "123456",
@@ -9,25 +9,36 @@
       "assignedProjectIds": []
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Client User",
       "email": "client@example.com",
       "password": "123456",
       "role": "client",
-      "assignedProjectIds": [1, 2]
+      "assignedProjectIds": [
+        1,
+        2
+      ]
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Admin User",
       "email": "admin@example.com",
       "password": "123456",
       "role": "admin",
       "assignedProjectIds": []
+    },
+    {
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "123456",
+      "role": "freelancer",
+      "assignedProjectIds": [],
+      "id": "M840HBy4UvM"
     }
   ],
   "clients": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Aarav Sharma",
       "email": "aarav@example.com",
       "phone": "9876543210",
@@ -37,7 +48,7 @@
       "createdAt": "2026-07-01"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Meera Nair",
       "email": "meera@example.com",
       "phone": "9876501234",
@@ -47,7 +58,7 @@
       "createdAt": "2026-07-02"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Rahul Verma",
       "email": "rahul@example.com",
       "phone": "9123456780",
@@ -59,7 +70,7 @@
   ],
   "projects": [
     {
-      "id": 1,
+      "id": "1",
       "clientId": 1,
       "title": "Portfolio Website",
       "description": "A personal portfolio website for showing design work.",
@@ -70,7 +81,7 @@
       "createdAt": "2026-07-05"
     },
     {
-      "id": 2,
+      "id": "2",
       "clientId": 2,
       "title": "Business Landing Page",
       "description": "A landing page for a software service business.",
@@ -81,7 +92,7 @@
       "createdAt": "2026-07-10"
     },
     {
-      "id": 3,
+      "id": "3",
       "clientId": 3,
       "title": "Marketing Dashboard UI",
       "description": "A simple dashboard UI for campaign reports.",
@@ -94,7 +105,7 @@
   ],
   "tasks": [
     {
-      "id": 1,
+      "id": "1",
       "projectId": 1,
       "title": "Create homepage layout",
       "description": "Design and code the main homepage layout.",
@@ -104,7 +115,7 @@
       "createdAt": "2026-07-05"
     },
     {
-      "id": 2,
+      "id": "2",
       "projectId": 1,
       "title": "Add projects section",
       "description": "Create section to show portfolio projects.",
@@ -114,7 +125,7 @@
       "createdAt": "2026-07-06"
     },
     {
-      "id": 3,
+      "id": "3",
       "projectId": 1,
       "title": "Make contact form",
       "description": "Create a simple contact form UI.",
@@ -124,7 +135,7 @@
       "createdAt": "2026-07-07"
     },
     {
-      "id": 4,
+      "id": "4",
       "projectId": 2,
       "title": "Collect landing page content",
       "description": "Collect text and images from the client.",
@@ -134,7 +145,7 @@
       "createdAt": "2026-07-10"
     },
     {
-      "id": 5,
+      "id": "5",
       "projectId": 3,
       "title": "Create dashboard cards",
       "description": "Create summary cards for marketing data.",
@@ -146,7 +157,7 @@
   ],
   "invoices": [
     {
-      "id": 1,
+      "id": "1",
       "clientId": 1,
       "projectId": 1,
       "invoiceNumber": "INV-001",
@@ -159,7 +170,7 @@
       "createdAt": "2026-07-10"
     },
     {
-      "id": 2,
+      "id": "2",
       "clientId": 2,
       "projectId": 2,
       "invoiceNumber": "INV-002",
@@ -172,7 +183,7 @@
       "createdAt": "2026-07-12"
     },
     {
-      "id": 3,
+      "id": "3",
       "clientId": 3,
       "projectId": 3,
       "invoiceNumber": "INV-003",
@@ -187,7 +198,7 @@
   ],
   "payments": [
     {
-      "id": 1,
+      "id": "1",
       "invoiceId": 3,
       "amount": 30000,
       "method": "bank transfer",
@@ -196,7 +207,7 @@
       "createdAt": "2026-07-02"
     },
     {
-      "id": 2,
+      "id": "2",
       "invoiceId": 1,
       "amount": 8000,
       "method": "upi",
@@ -207,34 +218,35 @@
   ],
   "activities": [
     {
-      "id": 1,
+      "id": "1",
       "message": "New client added: Aarav Sharma",
       "type": "client",
       "createdAt": "2026-07-01"
     },
     {
-      "id": 2,
+      "id": "2",
       "message": "Project created: Portfolio Website",
       "type": "project",
       "createdAt": "2026-07-05"
     },
     {
-      "id": 3,
+      "id": "3",
       "message": "Task completed: Create homepage layout",
       "type": "task",
       "createdAt": "2026-07-08"
     },
     {
-      "id": 4,
+      "id": "4",
       "message": "Invoice created: INV-001",
       "type": "invoice",
       "createdAt": "2026-07-10"
     },
     {
-      "id": 5,
+      "id": "5",
       "message": "Payment received for INV-003",
       "type": "payment",
       "createdAt": "2026-07-02"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
