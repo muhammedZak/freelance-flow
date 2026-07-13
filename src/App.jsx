@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import MainLayout from './components/layout/MainLayout';
+import ProtectedRoute from './routes/ProtectedRoute';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -28,27 +29,106 @@ function App() {
       <Route path='/login' element={<LoginPage />} />
       <Route path='/register' element={<RegisterPage />} />
 
-      <Route element={<MainLayout />}>
+      <Route
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }>
         <Route path='/dashboard' element={<DashboardPage />} />
 
-        <Route path='/clients' element={<ClientsPage />} />
-        <Route path='/clients/new' element={<ClientFormPage />} />
-        <Route path='/clients/:id' element={<ClientDetailsPage />} />
-        <Route path='/clients/:id/edit' element={<ClientFormPage />} />
+        <Route
+          path='/clients'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ClientsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/clients/new'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ClientFormPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/clients/:id'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ClientDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/clients/:id/edit'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ClientFormPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path='/projects' element={<ProjectsPage />} />
-        <Route path='/projects/new' element={<ProjectFormPage />} />
+
+        <Route
+          path='/projects/new'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ProjectFormPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path='/projects/:id' element={<ProjectDetailsPage />} />
-        <Route path='/projects/:id/edit' element={<ProjectFormPage />} />
+
+        <Route
+          path='/projects/:id/edit'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <ProjectFormPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path='/projects/:id/tasks' element={<ProjectTasksPage />} />
 
         <Route path='/invoices' element={<InvoicesPage />} />
-        <Route path='/invoices/new' element={<InvoiceFormPage />} />
+
+        <Route
+          path='/invoices/new'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <InvoiceFormPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path='/invoices/:id' element={<InvoiceDetailsPage />} />
 
-        <Route path='/payments' element={<PaymentsPage />} />
+        <Route
+          path='/payments'
+          element={
+            <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
+              <PaymentsPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path='/settings' element={<SettingsPage />} />
-        <Route path='/admin' element={<AdminPage />} />
+
+        <Route
+          path='/admin'
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       <Route path='*' element={<NotFoundPage />} />

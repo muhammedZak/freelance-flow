@@ -1,6 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../features/auth/authSlice';
+import { navigationLinks } from '../../utils/navigationLinks';
 
 function Navbar() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -8,10 +9,19 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const visibleLinks = navigationLinks.filter((link) =>
+    link.roles.includes(user?.role),
+  );
+
   function handleLogout() {
     dispatch(logoutUser());
     navigate('/login');
   }
+
+  const mobileLinkClass = ({ isActive }) =>
+    isActive
+      ? 'rounded bg-white px-3 py-1 text-slate-900'
+      : 'rounded px-3 py-1 text-slate-200 hover:bg-slate-800';
 
   return (
     <header className='bg-slate-900 text-white'>
@@ -27,10 +37,6 @@ function Navbar() {
             </span>
           )}
 
-          <Link to='/settings' className='hover:text-slate-300'>
-            Settings
-          </Link>
-
           {isAuthenticated ? (
             <button onClick={handleLogout} className='hover:text-slate-300'>
               Logout
@@ -42,6 +48,21 @@ function Navbar() {
           )}
         </nav>
       </div>
+
+      {isAuthenticated && user && (
+        <div className='border-t border-slate-700 md:hidden'>
+          <nav className='mx-auto flex max-w-7xl gap-2 overflow-x-auto p-3 text-sm'>
+            {visibleLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={mobileLinkClass}>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

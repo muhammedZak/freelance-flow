@@ -1,6 +1,14 @@
 import { NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { navigationLinks } from '../../utils/navigationLinks';
 
 function Sidebar() {
+  const { user } = useSelector((state) => state.auth);
+
+  const visibleLinks = navigationLinks.filter((link) =>
+    link.roles.includes(user?.role),
+  );
+
   const linkClass = ({ isActive }) =>
     isActive
       ? 'block rounded bg-slate-900 px-3 py-2 text-white'
@@ -9,29 +17,11 @@ function Sidebar() {
   return (
     <aside className='hidden w-56 rounded-lg bg-white p-4 shadow-sm md:block'>
       <nav className='space-y-2'>
-        <NavLink to='/dashboard' className={linkClass}>
-          Dashboard
-        </NavLink>
-
-        <NavLink to='/clients' className={linkClass}>
-          Clients
-        </NavLink>
-
-        <NavLink to='/projects' className={linkClass}>
-          Projects
-        </NavLink>
-
-        <NavLink to='/invoices' className={linkClass}>
-          Invoices
-        </NavLink>
-
-        <NavLink to='/payments' className={linkClass}>
-          Payments
-        </NavLink>
-
-        <NavLink to='/admin' className={linkClass}>
-          Admin
-        </NavLink>
+        {visibleLinks.map((link) => (
+          <NavLink key={link.path} to={link.path} className={linkClass}>
+            {link.label}
+          </NavLink>
+        ))}
       </nav>
     </aside>
   );
