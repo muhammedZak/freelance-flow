@@ -66,6 +66,16 @@
       "address": "Mumbai, Maharashtra",
       "status": "inactive",
       "createdAt": "2026-07-03"
+    },
+    {
+      "name": "Neha Joseph",
+      "email": "neha@example.com",
+      "phone": "9998877668",
+      "company": "Neha Creative Studio",
+      "address": "Calicut, Kerala",
+      "status": "active",
+      "createdAt": "2026-07-16",
+      "id": "BbJHpl64G_M"
     }
   ],
   "projects": [
@@ -246,6 +256,30 @@
       "message": "Payment received for INV-003",
       "type": "payment",
       "createdAt": "2026-07-02"
+    },
+    {
+      "message": "New client added: Neha Joseph",
+      "type": "client",
+      "createdAt": "2026-07-16",
+      "id": "iGuI-9aeWcY"
+    },
+    {
+      "message": "New client added: Neha Joseph",
+      "type": "client",
+      "createdAt": "2026-07-16",
+      "id": "Th200mpTfsk"
+    },
+    {
+      "message": "Client updated: Rahul Verma",
+      "type": "client",
+      "createdAt": "2026-07-16",
+      "id": "7D349dU4wj8"
+    },
+    {
+      "message": "Client deleted: Neha Joseph",
+      "type": "client",
+      "createdAt": "2026-07-16",
+      "id": "uWduHB6duMA"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
