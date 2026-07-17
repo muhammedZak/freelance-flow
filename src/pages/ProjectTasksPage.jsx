@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
@@ -30,9 +30,15 @@ function ProjectTasksPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchText = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const priorityFilter = searchParams.get('priority') || 'all';
+  const sortBy = searchParams.get('sort') || 'due-date';
+
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('all');
 
   const { user } = useSelector((state) => state.auth);
 
@@ -69,6 +75,24 @@ function ProjectTasksPage() {
     };
   }, [dispatch, id]);
 
+  function updateSearchParams(key, value) {
+    const newParams = new URLSearchParams(searchParams);
+
+    const isDefaultValue = !value || value === 'all' || value === 'due-date';
+
+    if (isDefaultValue) {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, value);
+    }
+
+    setSearchParams(newParams);
+  }
+
+  function clearFilters() {
+    setSearchParams({});
+  }
+
   const projectTasks = tasks.filter(
     (task) => String(task.projectId) === String(id),
   );
@@ -89,10 +113,50 @@ function ProjectTasksPage() {
       : 0;
 
   const filteredTasks = projectTasks
-    .filter((task) => statusFilter === 'all' || task.status === statusFilter)
+    .filter((task) => {
+      const searchValue = searchText.toLowerCase();
+
+      const matchesSearch =
+        task.title.toLowerCase().includes(searchValue) ||
+        task.description.toLowerCase().includes(searchValue);
+
+      const matchesStatus =
+        statusFilter === 'all' || task.status === statusFilter;
+
+      const matchesPriority =
+        priorityFilter === 'all' || task.priority === priorityFilter;
+
+      return matchesSearch && matchesStatus && matchesPriority;
+    })
     .sort((firstTask, secondTask) => {
+      if (sortBy === 'newest') {
+        return new Date(secondTask.createdAt) - new Date(firstTask.createdAt);
+      }
+
+      if (sortBy === 'title') {
+        return firstTask.title.localeCompare(secondTask.title);
+      }
+
+      if (sortBy === 'priority') {
+        const priorityOrder = {
+          high: 1,
+          medium: 2,
+          low: 3,
+        };
+
+        return (
+          priorityOrder[firstTask.priority] - priorityOrder[secondTask.priority]
+        );
+      }
+
       return new Date(firstTask.dueDate) - new Date(secondTask.dueDate);
     });
+
+  const hasActiveFilters =
+    searchText ||
+    statusFilter !== 'all' ||
+    priorityFilter !== 'all' ||
+    sortBy !== 'due-date';
 
   function openAddTaskForm() {
     dispatch(clearTaskMessages());
@@ -324,24 +388,75 @@ function ProjectTasksPage() {
         </div>
       </div>
 
-      <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
+      <div className='mb-4'>
+        <div className='mb-3'>
           <h2 className='text-xl font-bold text-slate-900'>Task List</h2>
 
           <p className='text-sm text-slate-500'>
-            Tasks are ordered by due date.
+            Search, filter, and sort project tasks.
           </p>
         </div>
 
-        <select
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value)}
-          className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-          <option value='all'>All Status</option>
-          <option value='todo'>To Do</option>
-          <option value='in-progress'>In Progress</option>
-          <option value='completed'>Completed</option>
-        </select>
+        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+          <input
+            type='text'
+            value={searchText}
+            onChange={(event) =>
+              updateSearchParams('search', event.target.value)
+            }
+            placeholder='Search tasks'
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              updateSearchParams('status', event.target.value)
+            }
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='all'>All Status</option>
+            <option value='todo'>To Do</option>
+            <option value='in-progress'>In Progress</option>
+            <option value='completed'>Completed</option>
+          </select>
+
+          <select
+            value={priorityFilter}
+            onChange={(event) =>
+              updateSearchParams('priority', event.target.value)
+            }
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='all'>All Priorities</option>
+            <option value='high'>High Priority</option>
+            <option value='medium'>Medium Priority</option>
+            <option value='low'>Low Priority</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(event) => updateSearchParams('sort', event.target.value)}
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='due-date'>Due Date</option>
+            <option value='newest'>Newest First</option>
+            <option value='title'>Title A-Z</option>
+            <option value='priority'>Priority High to Low</option>
+          </select>
+        </div>
+
+        <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+          <p className='text-slate-500'>
+            Showing {filteredTasks.length} of {projectTasks.length} tasks
+          </p>
+
+          {hasActiveFilters && (
+            <button
+              type='button'
+              onClick={clearFilters}
+              className='self-start text-blue-600 sm:self-auto'>
+              Clear Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {taskLoading && projectTasks.length === 0 ? (
@@ -349,9 +464,9 @@ function ProjectTasksPage() {
       ) : filteredTasks.length === 0 ? (
         <EmptyState
           message={
-            statusFilter === 'all'
+            projectTasks.length === 0
               ? 'No tasks have been added to this project.'
-              : 'No tasks match the selected status.'
+              : 'No tasks match the selected filters.'
           }
         />
       ) : (

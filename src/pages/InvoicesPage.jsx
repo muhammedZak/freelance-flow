@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
@@ -20,6 +20,12 @@ import { formatDate } from '../utils/formatDate';
 
 function InvoicesPage() {
   const dispatch = useDispatch();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchText = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const sortBy = searchParams.get('sort') || 'newest';
 
   const { user } = useSelector((state) => state.auth);
 
@@ -55,6 +61,24 @@ function InvoicesPage() {
       dispatch(clearInvoiceMessages());
     };
   }, [dispatch]);
+
+  function updateSearchParams(key, value) {
+    const newParams = new URLSearchParams(searchParams);
+
+    const isDefaultValue = !value || value === 'all' || value === 'newest';
+
+    if (isDefaultValue) {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, value);
+    }
+
+    setSearchParams(newParams);
+  }
+
+  function clearFilters() {
+    setSearchParams({});
+  }
 
   function getClientName(clientId) {
     const client = clients.find(
@@ -110,10 +134,44 @@ function InvoicesPage() {
         )
       : invoices;
 
-  const sortedInvoices = [...visibleInvoices].sort(
-    (firstInvoice, secondInvoice) =>
-      new Date(secondInvoice.issueDate) - new Date(firstInvoice.issueDate),
-  );
+  const filteredInvoices = visibleInvoices
+    .filter((invoice) => {
+      const searchValue = searchText.toLowerCase();
+
+      const clientName = getClientName(invoice.clientId).toLowerCase();
+
+      const projectTitle = getProjectTitle(invoice.projectId).toLowerCase();
+
+      const matchesSearch =
+        invoice.invoiceNumber.toLowerCase().includes(searchValue) ||
+        clientName.includes(searchValue) ||
+        projectTitle.includes(searchValue);
+
+      const matchesStatus =
+        statusFilter === 'all' || invoice.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((firstInvoice, secondInvoice) => {
+      if (sortBy === 'due-date') {
+        return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
+      }
+
+      if (sortBy === 'amount-high') {
+        return Number(secondInvoice.total) - Number(firstInvoice.total);
+      }
+
+      if (sortBy === 'amount-low') {
+        return Number(firstInvoice.total) - Number(secondInvoice.total);
+      }
+
+      return (
+        new Date(secondInvoice.issueDate) - new Date(firstInvoice.issueDate)
+      );
+    });
+
+  const hasActiveFilters =
+    searchText || statusFilter !== 'all' || sortBy !== 'newest';
 
   const paidAmount = visibleInvoices
     .filter((invoice) => invoice.status === 'paid')
@@ -188,11 +246,69 @@ function InvoicesPage() {
         </div>
       </div>
 
-      {sortedInvoices.length === 0 ? (
-        <EmptyState message='No invoices found.' />
+      <div className='mb-6'>
+        <div className='grid gap-3 md:grid-cols-3'>
+          <input
+            type='text'
+            value={searchText}
+            onChange={(event) =>
+              updateSearchParams('search', event.target.value)
+            }
+            placeholder='Search invoice, client, or project'
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              updateSearchParams('status', event.target.value)
+            }
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='all'>All Status</option>
+            <option value='paid'>Paid</option>
+            <option value='unpaid'>Unpaid</option>
+            <option value='overdue'>Overdue</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(event) => updateSearchParams('sort', event.target.value)}
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='newest'>Newest First</option>
+            <option value='due-date'>Due Date</option>
+            <option value='amount-high'>Amount High to Low</option>
+            <option value='amount-low'>Amount Low to High</option>
+          </select>
+        </div>
+
+        <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+          <p className='text-slate-500'>
+            Showing {filteredInvoices.length} of {visibleInvoices.length}{' '}
+            invoices
+          </p>
+
+          {hasActiveFilters && (
+            <button
+              type='button'
+              onClick={clearFilters}
+              className='self-start text-blue-600 sm:self-auto'>
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {filteredInvoices.length === 0 ? (
+        <EmptyState
+          message={
+            visibleInvoices.length === 0
+              ? 'No invoices have been added.'
+              : 'No invoices match the selected filters.'
+          }
+        />
       ) : (
         <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-          {sortedInvoices.map((invoice) => (
+          {filteredInvoices.map((invoice) => (
             <div
               key={invoice.id}
               className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>

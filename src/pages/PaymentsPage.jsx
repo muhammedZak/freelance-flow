@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import EmptyState from '../components/common/EmptyState';
@@ -23,6 +24,13 @@ import { formatDate } from '../utils/formatDate';
 
 function PaymentsPage() {
   const dispatch = useDispatch();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchText = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const methodFilter = searchParams.get('method') || 'all';
+  const sortBy = searchParams.get('sort') || 'newest';
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
@@ -68,6 +76,24 @@ function PaymentsPage() {
     };
   }, [dispatch]);
 
+  function updateSearchParams(key, value) {
+    const newParams = new URLSearchParams(searchParams);
+
+    const isDefaultValue = !value || value === 'all' || value === 'newest';
+
+    if (isDefaultValue) {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, value);
+    }
+
+    setSearchParams(newParams);
+  }
+
+  function clearFilters() {
+    setSearchParams({});
+  }
+
   const completedPayments = payments.filter(
     (payment) => payment.status === 'completed',
   );
@@ -86,12 +112,6 @@ function PaymentsPage() {
     0,
   );
 
-  const sortedPayments = [...payments].sort((firstPayment, secondPayment) => {
-    return (
-      new Date(secondPayment.paymentDate) - new Date(firstPayment.paymentDate)
-    );
-  });
-
   const pageLoading =
     paymentLoading || invoiceLoading || clientLoading || projectLoading;
 
@@ -108,6 +128,62 @@ function PaymentsPage() {
   function findProject(projectId) {
     return projects.find((project) => String(project.id) === String(projectId));
   }
+
+  const filteredPayments = payments
+    .filter((payment) => {
+      const searchValue = searchText.toLowerCase();
+
+      const invoice = findInvoice(payment.invoiceId);
+
+      const client = invoice ? findClient(invoice.clientId) : null;
+
+      const project = invoice ? findProject(invoice.projectId) : null;
+
+      const invoiceNumber = invoice?.invoiceNumber?.toLowerCase() || '';
+
+      const clientName = client?.name?.toLowerCase() || '';
+
+      const projectTitle = project?.title?.toLowerCase() || '';
+
+      const matchesSearch =
+        invoiceNumber.includes(searchValue) ||
+        clientName.includes(searchValue) ||
+        projectTitle.includes(searchValue);
+
+      const matchesStatus =
+        statusFilter === 'all' || payment.status === statusFilter;
+
+      const matchesMethod =
+        methodFilter === 'all' || payment.method === methodFilter;
+
+      return matchesSearch && matchesStatus && matchesMethod;
+    })
+    .sort((firstPayment, secondPayment) => {
+      if (sortBy === 'oldest') {
+        return (
+          new Date(firstPayment.paymentDate) -
+          new Date(secondPayment.paymentDate)
+        );
+      }
+
+      if (sortBy === 'amount-high') {
+        return Number(secondPayment.amount) - Number(firstPayment.amount);
+      }
+
+      if (sortBy === 'amount-low') {
+        return Number(firstPayment.amount) - Number(secondPayment.amount);
+      }
+
+      return (
+        new Date(secondPayment.paymentDate) - new Date(firstPayment.paymentDate)
+      );
+    });
+
+  const hasActiveFilters =
+    searchText ||
+    statusFilter !== 'all' ||
+    methodFilter !== 'all' ||
+    sortBy !== 'newest';
 
   function openPaymentForm() {
     dispatch(clearPaymentMessages());
@@ -264,6 +340,70 @@ function PaymentsPage() {
         </div>
       </div>
 
+      <div className='mb-6'>
+        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+          <input
+            type='text'
+            value={searchText}
+            onChange={(event) =>
+              updateSearchParams('search', event.target.value)
+            }
+            placeholder='Search invoice, client, or project'
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              updateSearchParams('status', event.target.value)
+            }
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='all'>All Status</option>
+            <option value='pending'>Pending</option>
+            <option value='completed'>Completed</option>
+            <option value='failed'>Failed</option>
+          </select>
+
+          <select
+            value={methodFilter}
+            onChange={(event) =>
+              updateSearchParams('method', event.target.value)
+            }
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='all'>All Methods</option>
+            <option value='cash'>Cash</option>
+            <option value='bank transfer'>Bank Transfer</option>
+            <option value='upi'>UPI</option>
+            <option value='card'>Card</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(event) => updateSearchParams('sort', event.target.value)}
+            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+            <option value='newest'>Newest First</option>
+            <option value='oldest'>Oldest First</option>
+            <option value='amount-high'>Amount High to Low</option>
+            <option value='amount-low'>Amount Low to High</option>
+          </select>
+        </div>
+
+        <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+          <p className='text-slate-500'>
+            Showing {filteredPayments.length} of {payments.length} payments
+          </p>
+
+          {hasActiveFilters && (
+            <button
+              type='button'
+              onClick={clearFilters}
+              className='self-start text-blue-600 sm:self-auto'>
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className='mb-4'>
         <h2 className='text-xl font-bold text-slate-900'>Payment List</h2>
 
@@ -272,11 +412,17 @@ function PaymentsPage() {
         </p>
       </div>
 
-      {sortedPayments.length === 0 ? (
-        <EmptyState message='No payment records have been added.' />
+      {filteredPayments.length === 0 ? (
+        <EmptyState
+          message={
+            payments.length === 0
+              ? 'No payment records have been added.'
+              : 'No payments match the selected filters.'
+          }
+        />
       ) : (
         <div className='space-y-4'>
-          {sortedPayments.map((payment) => {
+          {filteredPayments.map((payment) => {
             const invoice = findInvoice(payment.invoiceId);
 
             const client = invoice ? findClient(invoice.clientId) : null;
