@@ -68,21 +68,25 @@ function DashboardPage() {
 
   const isClient = user?.role === 'client';
 
+  const assignedProjectIds = user?.assignedProjectIds?.map((id) => String(id));
+
   const visibleProjects = isClient
     ? projects.filter((project) =>
-        user?.assignedProjectIds?.includes(project.id),
+        assignedProjectIds?.includes(String(project.id)),
       )
     : projects;
 
-  const visibleProjectIds = visibleProjects.map((project) => project.id);
+  const visibleProjectIds = visibleProjects.map((project) =>
+    String(project.id),
+  );
 
   const visibleTasks = isClient
-    ? tasks.filter((task) => visibleProjectIds.includes(task.projectId))
+    ? tasks.filter((task) => visibleProjectIds.includes(String(task.projectId)))
     : tasks;
 
   const visibleInvoices = isClient
     ? invoices.filter((invoice) =>
-        visibleProjectIds.includes(invoice.projectId),
+        visibleProjectIds.includes(String(invoice.projectId)),
       )
     : invoices;
 

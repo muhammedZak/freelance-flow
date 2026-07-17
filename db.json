@@ -14,10 +14,7 @@
       "email": "client@example.com",
       "password": "123456",
       "role": "client",
-      "assignedProjectIds": [
-        1,
-        2
-      ]
+      "assignedProjectIds": ["1", "2"]
     },
     {
       "id": "3",
@@ -26,14 +23,6 @@
       "password": "123456",
       "role": "admin",
       "assignedProjectIds": []
-    },
-    {
-      "name": "Test User",
-      "email": "test@example.com",
-      "password": "123456",
-      "role": "freelancer",
-      "assignedProjectIds": [],
-      "id": "M840HBy4UvM"
     }
   ],
   "clients": [
@@ -68,20 +57,20 @@
       "createdAt": "2026-07-03"
     },
     {
+      "id": "4",
       "name": "Neha Joseph",
       "email": "neha@example.com",
-      "phone": "9998877668",
+      "phone": "9998877665",
       "company": "Neha Creative Studio",
       "address": "Calicut, Kerala",
       "status": "active",
-      "createdAt": "2026-07-16",
-      "id": "BbJHpl64G_M"
+      "createdAt": "2026-07-04"
     }
   ],
   "projects": [
     {
       "id": "1",
-      "clientId": 1,
+      "clientId": "1",
       "title": "Portfolio Website",
       "description": "A personal portfolio website for showing design work.",
       "status": "active",
@@ -92,7 +81,7 @@
     },
     {
       "id": "2",
-      "clientId": 2,
+      "clientId": "2",
       "title": "Business Landing Page",
       "description": "A landing page for a software service business.",
       "status": "planning",
@@ -103,7 +92,7 @@
     },
     {
       "id": "3",
-      "clientId": 3,
+      "clientId": "3",
       "title": "Marketing Dashboard UI",
       "description": "A simple dashboard UI for campaign reports.",
       "status": "completed",
@@ -111,12 +100,23 @@
       "deadline": "2026-06-30",
       "budget": 30000,
       "createdAt": "2026-06-10"
+    },
+    {
+      "id": "4",
+      "clientId": "4",
+      "title": "E-commerce Website",
+      "description": "A simple online store UI for a small business.",
+      "status": "on-hold",
+      "startDate": "2026-07-18",
+      "deadline": "2026-08-10",
+      "budget": 45000,
+      "createdAt": "2026-07-17"
     }
   ],
   "tasks": [
     {
       "id": "1",
-      "projectId": 1,
+      "projectId": "1",
       "title": "Create homepage layout",
       "description": "Design and code the main homepage layout.",
       "status": "completed",
@@ -126,7 +126,7 @@
     },
     {
       "id": "2",
-      "projectId": 1,
+      "projectId": "1",
       "title": "Add projects section",
       "description": "Create section to show portfolio projects.",
       "status": "in-progress",
@@ -136,7 +136,7 @@
     },
     {
       "id": "3",
-      "projectId": 1,
+      "projectId": "1",
       "title": "Make contact form",
       "description": "Create a simple contact form UI.",
       "status": "todo",
@@ -146,7 +146,7 @@
     },
     {
       "id": "4",
-      "projectId": 2,
+      "projectId": "2",
       "title": "Collect landing page content",
       "description": "Collect text and images from the client.",
       "status": "todo",
@@ -156,20 +156,50 @@
     },
     {
       "id": "5",
-      "projectId": 3,
+      "projectId": "2",
+      "title": "Create hero section",
+      "description": "Build the hero section for the landing page.",
+      "status": "in-progress",
+      "priority": "high",
+      "dueDate": "2026-07-20",
+      "createdAt": "2026-07-12"
+    },
+    {
+      "id": "6",
+      "projectId": "3",
       "title": "Create dashboard cards",
       "description": "Create summary cards for marketing data.",
       "status": "completed",
       "priority": "high",
       "dueDate": "2026-06-20",
       "createdAt": "2026-06-12"
+    },
+    {
+      "id": "7",
+      "projectId": "4",
+      "title": "Prepare product card layout",
+      "description": "Create a simple product card design.",
+      "status": "todo",
+      "priority": "medium",
+      "dueDate": "2026-07-25",
+      "createdAt": "2026-07-17"
+    },
+    {
+      "id": "8",
+      "projectId": "4",
+      "title": "Design cart page",
+      "description": "Create a basic cart page layout.",
+      "status": "todo",
+      "priority": "medium",
+      "dueDate": "2026-07-30",
+      "createdAt": "2026-07-17"
     }
   ],
   "invoices": [
     {
       "id": "1",
-      "clientId": 1,
-      "projectId": 1,
+      "clientId": "1",
+      "projectId": "1",
       "invoiceNumber": "INV-001",
       "hoursWorked": 20,
       "hourlyRate": 800,
@@ -181,8 +211,8 @@
     },
     {
       "id": "2",
-      "clientId": 2,
-      "projectId": 2,
+      "clientId": "2",
+      "projectId": "2",
       "invoiceNumber": "INV-002",
       "hoursWorked": 10,
       "hourlyRate": 700,
@@ -194,8 +224,8 @@
     },
     {
       "id": "3",
-      "clientId": 3,
-      "projectId": 3,
+      "clientId": "3",
+      "projectId": "3",
       "invoiceNumber": "INV-003",
       "hoursWorked": 30,
       "hourlyRate": 1000,
@@ -204,12 +234,25 @@
       "issueDate": "2026-06-25",
       "dueDate": "2026-07-05",
       "createdAt": "2026-06-25"
+    },
+    {
+      "id": "4",
+      "clientId": "4",
+      "projectId": "4",
+      "invoiceNumber": "INV-004",
+      "hoursWorked": 15,
+      "hourlyRate": 900,
+      "total": 13500,
+      "status": "overdue",
+      "issueDate": "2026-07-15",
+      "dueDate": "2026-07-16",
+      "createdAt": "2026-07-15"
     }
   ],
   "payments": [
     {
       "id": "1",
-      "invoiceId": 3,
+      "invoiceId": "3",
       "amount": 30000,
       "method": "bank transfer",
       "paymentDate": "2026-07-02",
@@ -218,12 +261,21 @@
     },
     {
       "id": "2",
-      "invoiceId": 1,
+      "invoiceId": "1",
       "amount": 8000,
       "method": "upi",
       "paymentDate": "2026-07-12",
       "status": "partial",
       "createdAt": "2026-07-12"
+    },
+    {
+      "id": "3",
+      "invoiceId": "2",
+      "amount": 3000,
+      "method": "cash",
+      "paymentDate": "2026-07-14",
+      "status": "partial",
+      "createdAt": "2026-07-14"
     }
   ],
   "activities": [
@@ -235,51 +287,45 @@
     },
     {
       "id": "2",
+      "message": "New client added: Meera Nair",
+      "type": "client",
+      "createdAt": "2026-07-02"
+    },
+    {
+      "id": "3",
       "message": "Project created: Portfolio Website",
       "type": "project",
       "createdAt": "2026-07-05"
     },
     {
-      "id": "3",
+      "id": "4",
+      "message": "Project created: Business Landing Page",
+      "type": "project",
+      "createdAt": "2026-07-10"
+    },
+    {
+      "id": "5",
       "message": "Task completed: Create homepage layout",
       "type": "task",
       "createdAt": "2026-07-08"
     },
     {
-      "id": "4",
+      "id": "6",
       "message": "Invoice created: INV-001",
       "type": "invoice",
       "createdAt": "2026-07-10"
     },
     {
-      "id": "5",
+      "id": "7",
       "message": "Payment received for INV-003",
       "type": "payment",
       "createdAt": "2026-07-02"
     },
     {
-      "message": "New client added: Neha Joseph",
-      "type": "client",
-      "createdAt": "2026-07-16",
-      "id": "iGuI-9aeWcY"
-    },
-    {
-      "message": "New client added: Neha Joseph",
-      "type": "client",
-      "createdAt": "2026-07-16",
-      "id": "Th200mpTfsk"
-    },
-    {
-      "message": "Client updated: Rahul Verma",
-      "type": "client",
-      "createdAt": "2026-07-16",
-      "id": "7D349dU4wj8"
-    },
-    {
-      "message": "Client deleted: Neha Joseph",
-      "type": "client",
-      "createdAt": "2026-07-16",
-      "id": "uWduHB6duMA"
+      "id": "8",
+      "message": "Project created: E-commerce Website",
+      "type": "project",
+      "createdAt": "2026-07-17"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
