@@ -14,7 +14,10 @@
       "email": "client@example.com",
       "password": "123456",
       "role": "client",
-      "assignedProjectIds": ["1", "2"]
+      "assignedProjectIds": [
+        "1",
+        "2"
+      ]
     },
     {
       "id": "3",
@@ -131,7 +134,7 @@
       "description": "Create section to show portfolio projects.",
       "status": "in-progress",
       "priority": "medium",
-      "dueDate": "2026-07-15",
+      "dueDate": "2026-07-22",
       "createdAt": "2026-07-06"
     },
     {
@@ -139,7 +142,7 @@
       "projectId": "1",
       "title": "Make contact form",
       "description": "Create a simple contact form UI.",
-      "status": "todo",
+      "status": "in-progress",
       "priority": "medium",
       "dueDate": "2026-07-18",
       "createdAt": "2026-07-07"
@@ -192,6 +195,16 @@
       "status": "todo",
       "priority": "medium",
       "dueDate": "2026-07-30",
+      "createdAt": "2026-07-17"
+    },
+    {
+      "title": "Make website responsive",
+      "description": "Add mobile and tablet responsive styles.",
+      "status": "todo",
+      "priority": "high",
+      "dueDate": "2026-07-23",
+      "projectId": "1",
+      "id": "iR9PCHHzc1k",
       "createdAt": "2026-07-17"
     }
   ],
@@ -326,6 +339,24 @@
       "message": "Project created: E-commerce Website",
       "type": "project",
       "createdAt": "2026-07-17"
+    },
+    {
+      "message": "Task created: Make website responsive",
+      "type": "task",
+      "createdAt": "2026-07-17",
+      "id": "8JgpraWFMfo"
+    },
+    {
+      "message": "Task updated: Make contact form",
+      "type": "task",
+      "createdAt": "2026-07-17",
+      "id": "AQh0N1E9N6U"
+    },
+    {
+      "message": "Task updated: Add projects section",
+      "type": "task",
+      "createdAt": "2026-07-17",
+      "id": "9m-tmxFjg0w"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
