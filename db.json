@@ -357,6 +357,12 @@
       "type": "task",
       "createdAt": "2026-07-17",
       "id": "9m-tmxFjg0w"
+    },
+    {
+      "message": "Invoice deleted: INV-005",
+      "type": "invoice",
+      "createdAt": "2026-07-17",
+      "id": "X6-rY9oIzco"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
