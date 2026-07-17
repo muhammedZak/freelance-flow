@@ -6,6 +6,7 @@ import projectsReducer from '../features/projects/projectsSlice';
 import tasksReducer from '../features/tasks/tasksSlice';
 import invoicesReducer from '../features/invoices/invoicesSlice';
 import activitiesReducer from '../features/activities/activitiesSlice';
+import paymentsReducer from '../features/payments/paymentsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -15,5 +16,6 @@ export const store = configureStore({
     tasks: tasksReducer,
     invoices: invoicesReducer,
     activities: activitiesReducer,
+    payments: paymentsReducer,
   },
 });

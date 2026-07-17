@@ -217,7 +217,7 @@
       "hoursWorked": 20,
       "hourlyRate": 800,
       "total": 16000,
-      "status": "unpaid",
+      "status": "paid",
       "issueDate": "2026-07-10",
       "dueDate": "2026-07-20",
       "createdAt": "2026-07-10"
@@ -289,6 +289,24 @@
       "paymentDate": "2026-07-14",
       "status": "partial",
       "createdAt": "2026-07-14"
+    },
+    {
+      "invoiceId": "4",
+      "amount": 13500,
+      "method": "cash",
+      "paymentDate": "2026-07-17",
+      "status": "pending",
+      "createdAt": "2026-07-17T17:43:45.667Z",
+      "id": "1YxabArNOM8"
+    },
+    {
+      "invoiceId": "4",
+      "amount": 13500,
+      "method": "bank transfer",
+      "paymentDate": "2026-07-17",
+      "status": "pending",
+      "createdAt": "2026-07-17T17:45:33.274Z",
+      "id": "mHdIpzHclhI"
     }
   ],
   "activities": [
@@ -359,10 +377,22 @@
       "id": "9m-tmxFjg0w"
     },
     {
-      "message": "Invoice deleted: INV-005",
+      "message": "Payment added for invoice INV-004.",
+      "type": "payment",
+      "createdAt": "2026-07-17T17:43:45.688Z",
+      "id": "bR_6yfK3uH8"
+    },
+    {
+      "message": "Invoice updated: INV-001",
       "type": "invoice",
       "createdAt": "2026-07-17",
-      "id": "X6-rY9oIzco"
+      "id": "A03g-DIsLq4"
+    },
+    {
+      "message": "Payment added for invoice INV-004.",
+      "type": "payment",
+      "createdAt": "2026-07-17T17:45:33.295Z",
+      "id": "7MBKvBuh24w"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

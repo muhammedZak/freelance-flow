@@ -1,10 +1,381 @@
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import EmptyState from '../components/common/EmptyState';
+import ErrorMessage from '../components/common/ErrorMessage';
+import Loading from '../components/common/Loading';
+
+import PaymentForm from '../features/payments/PaymentForm';
+
+import { fetchClients } from '../features/clients/clientsSlice';
+import { fetchInvoices } from '../features/invoices/invoicesSlice';
+import {
+  addPayment,
+  changePaymentStatus,
+  clearPaymentMessages,
+  fetchPayments,
+  removePayment,
+} from '../features/payments/paymentsSlice';
+import { fetchProjects } from '../features/projects/projectsSlice';
+
+import { formatCurrency } from '../utils/formatCurrency';
+import { formatDate } from '../utils/formatDate';
+
 function PaymentsPage() {
+  const dispatch = useDispatch();
+
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
+
+  const {
+    payments,
+    loading: paymentLoading,
+    error: paymentError,
+    successMessage,
+  } = useSelector((state) => state.payments);
+
+  const {
+    invoices,
+    loading: invoiceLoading,
+    error: invoiceError,
+  } = useSelector((state) => state.invoices);
+
+  const {
+    clients,
+    loading: clientLoading,
+    error: clientError,
+  } = useSelector((state) => state.clients);
+
+  const {
+    projects,
+    loading: projectLoading,
+    error: projectError,
+  } = useSelector((state) => state.projects);
+
+  const canManagePayments =
+    user?.role === 'freelancer' || user?.role === 'admin';
+
+  useEffect(() => {
+    dispatch(clearPaymentMessages());
+    dispatch(fetchPayments());
+    dispatch(fetchInvoices());
+    dispatch(fetchClients());
+    dispatch(fetchProjects());
+
+    return () => {
+      dispatch(clearPaymentMessages());
+    };
+  }, [dispatch]);
+
+  const completedPayments = payments.filter(
+    (payment) => payment.status === 'completed',
+  );
+
+  const pendingPayments = payments.filter(
+    (payment) => payment.status === 'pending',
+  );
+
+  const totalReceivedAmount = completedPayments.reduce(
+    (total, payment) => total + Number(payment.amount),
+    0,
+  );
+
+  const pendingPaymentAmount = pendingPayments.reduce(
+    (total, payment) => total + Number(payment.amount),
+    0,
+  );
+
+  const sortedPayments = [...payments].sort((firstPayment, secondPayment) => {
+    return (
+      new Date(secondPayment.paymentDate) - new Date(firstPayment.paymentDate)
+    );
+  });
+
+  const pageLoading =
+    paymentLoading || invoiceLoading || clientLoading || projectLoading;
+
+  const pageError = paymentError || invoiceError || clientError || projectError;
+
+  function findInvoice(invoiceId) {
+    return invoices.find((invoice) => String(invoice.id) === String(invoiceId));
+  }
+
+  function findClient(clientId) {
+    return clients.find((client) => String(client.id) === String(clientId));
+  }
+
+  function findProject(projectId) {
+    return projects.find((project) => String(project.id) === String(projectId));
+  }
+
+  function openPaymentForm() {
+    dispatch(clearPaymentMessages());
+    setShowPaymentForm(true);
+  }
+
+  function closePaymentForm() {
+    setShowPaymentForm(false);
+  }
+
+  async function handleAddPayment(formData) {
+    try {
+      await dispatch(addPayment(formData)).unwrap();
+
+      closePaymentForm();
+
+      dispatch(fetchInvoices());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleStatusChange(payment, status) {
+    try {
+      await dispatch(
+        changePaymentStatus({
+          id: String(payment.id),
+          status,
+        }),
+      ).unwrap();
+
+      dispatch(fetchInvoices());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleDeletePayment(payment) {
+    const invoice = findInvoice(payment.invoiceId);
+
+    const invoiceNumber = invoice?.invoiceNumber || 'this invoice';
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the payment for ${invoiceNumber}?`,
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      await dispatch(removePayment(String(payment.id))).unwrap();
+
+      dispatch(fetchInvoices());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function getStatusClasses(status) {
+    if (status === 'completed') {
+      return 'bg-green-100 text-green-700';
+    }
+
+    if (status === 'failed') {
+      return 'bg-red-100 text-red-700';
+    }
+
+    return 'bg-yellow-100 text-yellow-700';
+  }
+
+  if (!canManagePayments) {
+    return (
+      <ErrorMessage message='You do not have access to payment management.' />
+    );
+  }
+
+  if (pageLoading && payments.length === 0) {
+    return <Loading />;
+  }
+
   return (
     <div>
-      <h1 className='mb-2 text-2xl font-bold'>Payments</h1>
-      <p className='text-slate-600'>
-        Payments tracker will be added in Phase 10.
-      </p>
+      <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold text-slate-900'>Payments</h1>
+
+          <p className='text-slate-600'>
+            Record invoice payments and monitor payment status.
+          </p>
+        </div>
+
+        <button
+          type='button'
+          onClick={openPaymentForm}
+          className='rounded bg-slate-900 px-4 py-2 text-white'>
+          Add Payment
+        </button>
+      </div>
+
+      {successMessage && (
+        <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
+          {successMessage}
+        </p>
+      )}
+
+      {pageError && (
+        <div className='mb-4'>
+          <ErrorMessage message={pageError} />
+        </div>
+      )}
+
+      {showPaymentForm && (
+        <PaymentForm
+          invoices={invoices}
+          payments={payments}
+          loading={paymentLoading}
+          onSubmit={handleAddPayment}
+          onCancel={closePaymentForm}
+        />
+      )}
+
+      <div className='mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Total Received</p>
+
+          <p className='mt-2 text-2xl font-bold text-green-700'>
+            {formatCurrency(totalReceivedAmount)}
+          </p>
+
+          <p className='mt-1 text-xs text-slate-500'>Completed payments only</p>
+        </div>
+
+        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Pending Amount</p>
+
+          <p className='mt-2 text-2xl font-bold text-yellow-700'>
+            {formatCurrency(pendingPaymentAmount)}
+          </p>
+
+          <p className='mt-1 text-xs text-slate-500'>
+            Pending payment records only
+          </p>
+        </div>
+
+        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:col-span-2 lg:col-span-1'>
+          <p className='text-sm text-slate-500'>Payment Records</p>
+
+          <p className='mt-2 text-2xl font-bold text-slate-900'>
+            {payments.length}
+          </p>
+
+          <p className='mt-1 text-xs text-slate-500'>All payment statuses</p>
+        </div>
+      </div>
+
+      <div className='mb-4'>
+        <h2 className='text-xl font-bold text-slate-900'>Payment List</h2>
+
+        <p className='text-sm text-slate-500'>
+          Payments are ordered by payment date.
+        </p>
+      </div>
+
+      {sortedPayments.length === 0 ? (
+        <EmptyState message='No payment records have been added.' />
+      ) : (
+        <div className='space-y-4'>
+          {sortedPayments.map((payment) => {
+            const invoice = findInvoice(payment.invoiceId);
+
+            const client = invoice ? findClient(invoice.clientId) : null;
+
+            const project = invoice ? findProject(invoice.projectId) : null;
+
+            return (
+              <div
+                key={payment.id}
+                className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
+                <div className='flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between'>
+                  <div className='flex-1'>
+                    <div className='mb-3 flex flex-wrap items-center gap-2'>
+                      <h3 className='text-lg font-bold text-slate-900'>
+                        {invoice?.invoiceNumber || 'Unknown Invoice'}
+                      </h3>
+
+                      <span
+                        className={`rounded px-2 py-1 text-xs capitalize ${getStatusClasses(
+                          payment.status,
+                        )}`}>
+                        {payment.status}
+                      </span>
+                    </div>
+
+                    <div className='grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3'>
+                      <div>
+                        <p className='text-slate-500'>Client</p>
+                        <p className='font-medium text-slate-800'>
+                          {client?.name || 'Unknown Client'}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className='text-slate-500'>Project</p>
+                        <p className='font-medium text-slate-800'>
+                          {project?.title || 'Unknown Project'}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className='text-slate-500'>Amount</p>
+                        <p className='font-medium text-slate-800'>
+                          {formatCurrency(payment.amount)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className='text-slate-500'>Payment Method</p>
+                        <p className='font-medium capitalize text-slate-800'>
+                          {payment.method}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className='text-slate-500'>Payment Date</p>
+                        <p className='font-medium text-slate-800'>
+                          {formatDate(payment.paymentDate)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className='text-slate-500'>Invoice Total</p>
+                        <p className='font-medium text-slate-800'>
+                          {invoice
+                            ? formatCurrency(invoice.total)
+                            : 'Not available'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='flex flex-col gap-3 sm:flex-row lg:w-48 lg:flex-col'>
+                    <select
+                      value={payment.status}
+                      disabled={paymentLoading}
+                      onChange={(event) =>
+                        handleStatusChange(payment, event.target.value)
+                      }
+                      className='rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900'>
+                      <option value='pending'>Pending</option>
+                      <option value='completed'>Completed</option>
+                      <option value='failed'>Failed</option>
+                    </select>
+
+                    <button
+                      type='button'
+                      disabled={paymentLoading}
+                      onClick={() => handleDeletePayment(payment)}
+                      className='rounded bg-red-600 px-3 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60'>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
