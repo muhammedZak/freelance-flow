@@ -1,13 +1,14 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { logoutUser } from '../../features/auth/authSlice';
 import { navigationLinks } from '../../utils/navigationLinks';
 
 function Navbar() {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   const visibleLinks = navigationLinks.filter((link) =>
     link.roles.includes(user?.role),
@@ -20,29 +21,38 @@ function Navbar() {
 
   const mobileLinkClass = ({ isActive }) =>
     isActive
-      ? 'rounded bg-white px-3 py-1 text-slate-900'
-      : 'rounded px-3 py-1 text-slate-200 hover:bg-slate-800';
+      ? 'shrink-0 rounded bg-white px-3 py-2 font-medium text-slate-900'
+      : 'shrink-0 rounded px-3 py-2 text-slate-200 hover:bg-slate-800';
 
   return (
-    <header className='bg-slate-900 text-white'>
-      <div className='mx-auto flex max-w-7xl items-center justify-between p-4'>
-        <Link to='/dashboard' className='text-xl font-bold'>
+    <header className='sticky top-0 z-20 bg-slate-900 text-white shadow-sm'>
+      <div className='mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3'>
+        <Link
+          to={isAuthenticated ? '/dashboard' : '/'}
+          className='shrink-0 text-lg font-bold sm:text-xl'>
           FreelanceFlow
         </Link>
 
-        <nav className='flex items-center gap-4 text-sm'>
+        <nav className='flex min-w-0 items-center gap-3 text-sm'>
           {isAuthenticated && user && (
-            <span className='hidden text-slate-300 sm:inline'>
-              {user.name} ({user.role})
-            </span>
+            <div className='hidden min-w-0 text-right sm:block'>
+              <p className='max-w-48 truncate font-medium'>{user.name}</p>
+
+              <p className='text-xs capitalize text-slate-300'>{user.role}</p>
+            </div>
           )}
 
           {isAuthenticated ? (
-            <button onClick={handleLogout} className='hover:text-slate-300'>
+            <button
+              type='button'
+              onClick={handleLogout}
+              className='shrink-0 rounded border border-slate-600 px-3 py-2 hover:bg-slate-800'>
               Logout
             </button>
           ) : (
-            <Link to='/login' className='hover:text-slate-300'>
+            <Link
+              to='/login'
+              className='rounded border border-slate-600 px-3 py-2 hover:bg-slate-800'>
               Login
             </Link>
           )}
@@ -51,7 +61,7 @@ function Navbar() {
 
       {isAuthenticated && user && (
         <div className='border-t border-slate-700 md:hidden'>
-          <nav className='mx-auto flex max-w-7xl gap-2 overflow-x-auto p-3 text-sm'>
+          <nav className='mx-auto flex max-w-7xl gap-2 overflow-x-auto px-3 py-2 text-sm'>
             {visibleLinks.map((link) => (
               <NavLink
                 key={link.path}

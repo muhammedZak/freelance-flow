@@ -59,38 +59,38 @@ This project is created to practice these React concepts:
 
 The project uses simple role-based access.
 
-| Role | Access |
-|---|---|
+| Role       | Access                                                      |
+| ---------- | ----------------------------------------------------------- |
 | freelancer | Can manage clients, projects, tasks, invoices, and payments |
-| client | Can view assigned projects and invoices |
-| admin | Can view all data and access admin page |
+| client     | Can view assigned projects and invoices                     |
+| admin      | Can view all data and access admin page                     |
 
 This role system is simple and beginner-friendly. It is not a production-level permission system.
 
 ## Main Routes
 
-| Route | Page |
-|---|---|
-| `/` | Home page |
-| `/login` | Login page |
-| `/register` | Register page |
-| `/dashboard` | Dashboard page |
-| `/clients` | Clients list |
-| `/clients/new` | Add client |
-| `/clients/:id` | Client details |
-| `/clients/:id/edit` | Edit client |
-| `/projects` | Projects list |
-| `/projects/new` | Add project |
-| `/projects/:id` | Project details |
-| `/projects/:id/edit` | Edit project |
-| `/projects/:id/tasks` | Project tasks |
-| `/invoices` | Invoices list |
-| `/invoices/new` | Add invoice |
-| `/invoices/:id` | Invoice details |
-| `/payments` | Payments page |
-| `/settings` | Settings page |
-| `/admin` | Admin page |
-| `*` | Not found page |
+| Route                 | Page            |
+| --------------------- | --------------- |
+| `/`                   | Home page       |
+| `/login`              | Login page      |
+| `/register`           | Register page   |
+| `/dashboard`          | Dashboard page  |
+| `/clients`            | Clients list    |
+| `/clients/new`        | Add client      |
+| `/clients/:id`        | Client details  |
+| `/clients/:id/edit`   | Edit client     |
+| `/projects`           | Projects list   |
+| `/projects/new`       | Add project     |
+| `/projects/:id`       | Project details |
+| `/projects/:id/edit`  | Edit project    |
+| `/projects/:id/tasks` | Project tasks   |
+| `/invoices`           | Invoices list   |
+| `/invoices/new`       | Add invoice     |
+| `/invoices/:id`       | Invoice details |
+| `/payments`           | Payments page   |
+| `/settings`           | Settings page   |
+| `/admin`              | Admin page      |
+| `*`                   | Not found page  |
 
 ## JSON Server Resources
 
@@ -205,9 +205,9 @@ npm run preview
 
 Previews the production build locally.
 
-## Current Phase Status
+## Project Status
 
-The project is being built phase by phase.
+FreelanceFlow has completed all planned student project phases.
 
 Completed phases:
 
@@ -216,18 +216,17 @@ Completed phases:
 - Phase 2 — JSON Server setup and seed data
 - Phase 3 — Fake authentication with Redux and localStorage
 - Phase 4 — Protected routes and simple role-based access
-- Phase 5 — Dashboard summary cards with Redux data
-
-Upcoming phases:
-
+- Phase 5 — Dashboard summary cards
 - Phase 6 — Clients CRUD
 - Phase 7 — Projects CRUD
 - Phase 8 — Tasks CRUD and project progress
 - Phase 9 — Invoices CRUD and invoice total calculation
-- Phase 10 — Payments tracker
-- Phase 11 — Search, filter, sort, and URL query params
-- Phase 12 — ThemeContext dark/light mode
+- Phase 10 — Payments tracker and invoice status synchronization
+- Phase 11 — Search, filter, sort, and URL query parameters
+- Phase 12 — ThemeContext light and dark mode
 - Phase 13 — Responsive UI polish and final preparation
+
+The application is ready for final testing, project submission, and viva demonstration.
 
 ## Project Folder Structure
 
