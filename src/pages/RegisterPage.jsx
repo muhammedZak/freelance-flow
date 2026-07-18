@@ -92,63 +92,66 @@ function RegisterPage() {
   }
 
   return (
-    <section className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-10 sm:px-6'>
-      <div className='pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/20 blur-3xl' />
-      <div className='relative w-full max-w-md rounded-3xl border border-white/10 bg-white p-6 shadow-2xl shadow-black/30 sm:p-8'>
-        <Link to='/' className='mb-7 inline-flex items-center gap-3 rounded-lg text-slate-950'>
-          <span className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-sm font-bold text-white'>FF</span>
-          <span className='text-lg font-bold tracking-tight'>Freelance<span className='text-blue-600'>Flow</span></span>
+    <section className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-10 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6'>
+      <div className='pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/15 blur-3xl dark:bg-blue-600/20' />
+      <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-300/50 transition-colors dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/30 sm:p-8'>
+        <Link to='/' className='mb-7 inline-flex items-center gap-3 rounded-lg text-slate-950 dark:text-white'>
+          <span className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-sm font-bold text-white dark:bg-blue-600'>FF</span>
+          <span className='text-lg font-bold tracking-tight'>Freelance<span className='text-blue-600 dark:text-blue-400'>Flow</span></span>
         </Link>
-        <h1 className='mb-2 text-2xl font-bold tracking-tight text-slate-950'>Create your account</h1>
+        <h1 className='mb-2 text-2xl font-bold tracking-tight text-slate-950 dark:text-white'>Create your account</h1>
 
-        <p className='mb-6 text-sm text-slate-600'>
+        <p className='mb-6 text-sm text-slate-600 dark:text-slate-400'>
           Set up your workspace and start organizing your freelance work.
         </p>
 
         {formError && (
-          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
+          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
             {formError}
           </p>
         )}
 
         {error && (
-          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
+          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
             {error}
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className='space-y-4 [&_input]:min-h-11 [&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-slate-300 [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:outline-none [&_input]:focus:border-blue-500 [&_input]:focus:ring-4 [&_input]:focus:ring-blue-500/10'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
-            <label className='mb-1 block text-sm font-medium'>Name</label>
+            <label htmlFor='register-name' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Name</label>
             <input
               type='text'
+              id='register-name'
               name='name'
               value={formData.name}
               onChange={handleChange}
-              className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
               placeholder='Your name'
             />
           </div>
 
           <div>
-            <label className='mb-1 block text-sm font-medium'>Email</label>
+            <label htmlFor='register-email' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Email</label>
             <input
               type='email'
+              id='register-email'
               name='email'
               value={formData.email}
               onChange={handleChange}
-              className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
               placeholder='you@example.com'
             />
           </div>
 
           <div>
-            <label className='mb-1 block text-sm font-medium'>Role</label>
+            <label htmlFor='register-role' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Role</label>
             <select
+              id='register-role'
               name='role'
               value={formData.role}
               onChange={handleChange}
-              className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
+              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white'>
               <option value='freelancer'>Freelancer</option>
               <option value='client'>Client</option>
               <option value='admin'>Admin</option>
@@ -156,27 +159,29 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label className='mb-1 block text-sm font-medium'>Password</label>
+            <label htmlFor='register-password' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Password</label>
             <input
               type='password'
+              id='register-password'
               name='password'
               value={formData.password}
               onChange={handleChange}
-              className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
               placeholder='Minimum 6 characters'
             />
           </div>
 
           <div>
-            <label className='mb-1 block text-sm font-medium'>
+            <label htmlFor='register-confirm-password' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
               Confirm Password
             </label>
             <input
               type='password'
+              id='register-confirm-password'
               name='confirmPassword'
               value={formData.confirmPassword}
               onChange={handleChange}
-              className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
               placeholder='Re-enter password'
             />
           </div>
@@ -184,14 +189,14 @@ function RegisterPage() {
           <button
             type='submit'
             disabled={loading}
-            className='min-h-11 w-full rounded-xl bg-slate-950 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-400'>
+            className='min-h-11 w-full rounded-xl bg-slate-950 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-400 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700'>
             {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
 
-        <p className='mt-6 text-center text-sm text-slate-600'>
+        <p className='mt-6 text-center text-sm text-slate-600 dark:text-slate-400'>
           Already have an account?{' '}
-          <Link to='/login' className='font-semibold text-blue-600 hover:text-blue-700'>
+          <Link to='/login' className='font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'>
             Login here
           </Link>
         </p>
