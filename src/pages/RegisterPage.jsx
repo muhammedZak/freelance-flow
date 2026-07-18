@@ -40,7 +40,7 @@ function RegisterPage() {
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!formData.name.trim()) {
@@ -76,7 +76,19 @@ function RegisterPage() {
     };
 
     setFormError('');
-    dispatch(registerUser(newUser));
+
+    try {
+      await dispatch(registerUser(newUser)).unwrap();
+
+      navigate('/login', {
+        replace: true,
+        state: {
+          message: 'Registration successful. Please log in.',
+        },
+      });
+    } catch {
+      // Redux already stores the registration error.
+    }
   }
 
   return (

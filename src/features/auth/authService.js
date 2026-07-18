@@ -13,8 +13,6 @@ async function login(userData) {
     return user.email === userData.email && user.password === userData.password;
   });
 
-  console.log(foundUser);
-
   if (!foundUser) {
     throw new Error('Invalid email or password');
   }
@@ -54,12 +52,7 @@ async function register(userData) {
     throw new Error('Registration failed');
   }
 
-  const savedUser = await response.json();
-  const safeUser = removePassword(savedUser);
-
-  localStorage.setItem('freelanceflow_user', JSON.stringify(safeUser));
-
-  return safeUser;
+  return response.json();
 }
 
 function logout() {

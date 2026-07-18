@@ -26,6 +26,22 @@
       "password": "123456",
       "role": "admin",
       "assignedProjectIds": []
+    },
+    {
+      "name": "Muhammed Zakariya",
+      "email": "zakariya.zaku018@gmail.com",
+      "password": "123456",
+      "role": "freelancer",
+      "assignedProjectIds": [],
+      "id": "qvAZQj98TcU"
+    },
+    {
+      "name": "Muhammed Zakariya",
+      "email": "zakariya.zaku018@gamail.com",
+      "password": "123456",
+      "role": "freelancer",
+      "assignedProjectIds": [],
+      "id": "vFuQVL_v_Vk"
     }
   ],
   "clients": [

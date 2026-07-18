@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAuthError, loginUser } from '../features/auth/authSlice';
 
@@ -13,6 +13,10 @@ function LoginPage() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const registrationMessage = location.state?.message;
 
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth,
@@ -73,6 +77,12 @@ function LoginPage() {
           <p className='mb-4 rounded bg-red-100 p-3 text-sm text-red-700'>
             {error}
           </p>
+        )}
+
+        {registrationMessage && (
+          <div className='mb-4 rounded-lg bg-green-100 p-3 text-sm text-green-700'>
+            {registrationMessage}
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className='space-y-4'>
