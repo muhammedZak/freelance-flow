@@ -134,8 +134,8 @@ function InvoiceDetailsPage() {
   }
 
   return (
-    <div>
-      <div className='mb-6'>
+    <div className='workspace-page'>
+      <div className='page-header'>
         <Link to='/invoices' className='text-sm text-blue-600'>
           ← Back to Invoices
         </Link>

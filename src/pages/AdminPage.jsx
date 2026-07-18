@@ -5,8 +5,8 @@ function AdminPage() {
   const { user } = useSelector((state) => state.auth);
 
   return (
-    <div>
-      <div className='mb-6'>
+    <div className='workspace-page'>
+      <div className='page-header'>
         <h1 className='text-2xl font-bold text-slate-900'>Admin</h1>
 
         <p className='text-slate-600'>
@@ -52,7 +52,7 @@ function AdminPage() {
         />
       </div>
 
-      <div className='mt-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4'>
+      <div className='mt-6 rounded-2xl border border-yellow-200 bg-yellow-50 p-5 dark:border-yellow-500/20 dark:bg-yellow-500/10'>
         <p className='font-medium text-yellow-800'>Student project notice</p>
 
         <p className='mt-1 text-sm text-yellow-700'>
@@ -68,7 +68,7 @@ function AdminLink({ to, title, description }) {
   return (
     <Link
       to={to}
-      className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md'>
+      className='group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-blue-500/30'>
       <h2 className='font-bold text-slate-900'>{title}</h2>
 
       <p className='mt-2 text-sm text-slate-600'>{description}</p>

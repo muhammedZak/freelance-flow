@@ -63,8 +63,8 @@ function ClientDetailsPage() {
   }
 
   return (
-    <div>
-      <div className='mb-6'>
+    <div className='workspace-page'>
+      <div className='page-header'>
         <Link to='/clients' className='text-sm text-blue-600'>
           ← Back to Clients
         </Link>

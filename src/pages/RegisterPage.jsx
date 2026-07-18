@@ -92,27 +92,32 @@ function RegisterPage() {
   }
 
   return (
-    <section className='flex min-h-screen items-center justify-center bg-slate-100 p-6'>
-      <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-sm'>
-        <h1 className='mb-2 text-2xl font-bold text-slate-900'>Register</h1>
+    <section className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-10 sm:px-6'>
+      <div className='pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/20 blur-3xl' />
+      <div className='relative w-full max-w-md rounded-3xl border border-white/10 bg-white p-6 shadow-2xl shadow-black/30 sm:p-8'>
+        <Link to='/' className='mb-7 inline-flex items-center gap-3 rounded-lg text-slate-950'>
+          <span className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-sm font-bold text-white'>FF</span>
+          <span className='text-lg font-bold tracking-tight'>Freelance<span className='text-blue-600'>Flow</span></span>
+        </Link>
+        <h1 className='mb-2 text-2xl font-bold tracking-tight text-slate-950'>Create your account</h1>
 
         <p className='mb-6 text-sm text-slate-600'>
-          Create a fake account for this student project.
+          Set up your workspace and start organizing your freelance work.
         </p>
 
         {formError && (
-          <p className='mb-4 rounded bg-red-100 p-3 text-sm text-red-700'>
+          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
             {formError}
           </p>
         )}
 
         {error && (
-          <p className='mb-4 rounded bg-red-100 p-3 text-sm text-red-700'>
+          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
             {error}
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-4 [&_input]:min-h-11 [&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-slate-300 [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:outline-none [&_input]:focus:border-blue-500 [&_input]:focus:ring-4 [&_input]:focus:ring-blue-500/10'>
           <div>
             <label className='mb-1 block text-sm font-medium'>Name</label>
             <input
@@ -179,14 +184,14 @@ function RegisterPage() {
           <button
             type='submit'
             disabled={loading}
-            className='w-full rounded bg-slate-900 px-4 py-2 text-white disabled:bg-slate-400'>
+            className='min-h-11 w-full rounded-xl bg-slate-950 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-400'>
             {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
 
-        <p className='mt-4 text-sm'>
+        <p className='mt-6 text-center text-sm text-slate-600'>
           Already have an account?{' '}
-          <Link to='/login' className='text-blue-600'>
+          <Link to='/login' className='font-semibold text-blue-600 hover:text-blue-700'>
             Login here
           </Link>
         </p>

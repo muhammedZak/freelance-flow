@@ -193,8 +193,8 @@ function InvoicesPage() {
   }
 
   return (
-    <div>
-      <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+    <div className='workspace-page'>
+      <div className='page-header'>
         <div>
           <h1 className='text-2xl font-bold text-slate-900'>Invoices</h1>
 

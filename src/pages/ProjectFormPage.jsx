@@ -155,8 +155,8 @@ function ProjectFormPage() {
   }
 
   return (
-    <div>
-      <div className='mb-6'>
+    <div className='workspace-page'>
+      <div className='page-header'>
         <Link to='/projects' className='text-sm text-blue-600'>
           ← Back to Projects
         </Link>
@@ -174,7 +174,7 @@ function ProjectFormPage() {
 
       {error && <ErrorMessage message={error} />}
 
-      <div className='max-w-2xl rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
+      <div className='max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
         <ProjectForm
           formData={formData}
           formError={formError}
