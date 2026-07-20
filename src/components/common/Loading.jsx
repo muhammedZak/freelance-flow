@@ -1,13 +1,18 @@
-function Loading({ message = 'Loading data...' }) {
+function Loading({ message = 'Loading...' }) {
   return (
-    <div
-      className='flex min-h-64 items-center justify-center rounded-2xl border border-slate-200/70 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60'
-      role='status'
-      aria-live='polite'>
-      <div className='text-center'>
-        <div className='mx-auto h-10 w-10 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400'></div>
+    <div className='flex min-h-40 items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/70'>
+      <div className='flex flex-col items-center gap-3 text-center'>
+        <span
+          aria-hidden='true'
+          className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400'
+        />
 
-        <p className='mt-4 text-sm font-medium text-slate-500 dark:text-slate-400'>{message}</p>
+        <p
+          role='status'
+          aria-live='polite'
+          className='text-sm font-medium text-slate-600 dark:text-slate-400'>
+          {message}
+        </p>
       </div>
     </div>
   );
