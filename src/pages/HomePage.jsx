@@ -166,7 +166,7 @@ function HomePage() {
       <main>
         {/* Hero section */}
         <section className='relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 -z-10 h-80 bg-gradient-to-b from-slate-100 to-white' />
+          <div className='absolute inset-x-0 top-0 -z-10 h-80 bg-linear-to-b from-slate-100 to-white' />
 
           <div className='mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 sm:px-6 sm:py-24 lg:grid-cols-2 lg:px-8 lg:py-32'>
             <div className='max-w-2xl'>

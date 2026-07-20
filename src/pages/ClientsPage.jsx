@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
+import MessageAlert from '../components/common/MessageAlert';
 
 import {
   clearClientMessages,
@@ -135,17 +136,14 @@ function ClientsPage() {
       </div>
 
       {successMessage && (
-        <p className='mb-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300'>
-          {successMessage}
-        </p>
+        <div className='mb-4'>
+          <MessageAlert type='success' message={successMessage} />
+        </div>
       )}
 
       {error && clients.length > 0 && (
         <div className='mb-4'>
-          <ErrorMessage
-            title='Unable to complete the request'
-            message={error}
-          />
+          <MessageAlert type='error' message={error} />
         </div>
       )}
 
