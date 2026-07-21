@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearAuthError, registerUser } from '../features/auth/authSlice';
 
+import AppLogo from '../components/common/AppLogo';
+
 function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -94,32 +96,41 @@ function RegisterPage() {
   return (
     <section className='relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-10 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6'>
       <div className='pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/15 blur-3xl dark:bg-blue-600/20' />
+
       <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-300/50 transition-colors dark:border-slate-800 dark:bg-slate-900 dark:shadow-black/30 sm:p-8'>
-        <Link to='/' className='mb-7 inline-flex items-center gap-3 rounded-lg text-slate-950 dark:text-white'>
-          <span className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-sm font-bold text-white dark:bg-blue-600'>FF</span>
-          <span className='text-lg font-bold tracking-tight'>Freelance<span className='text-blue-600 dark:text-blue-400'>Flow</span></span>
-        </Link>
-        <h1 className='mb-2 text-2xl font-bold tracking-tight text-slate-950 dark:text-white'>Create your account</h1>
+        <AppLogo className='mb-7' />
+
+        <h1 className='mb-2 text-2xl font-bold tracking-tight text-slate-950 dark:text-white'>
+          Create your account
+        </h1>
 
         <p className='mb-6 text-sm text-slate-600 dark:text-slate-400'>
           Set up your workspace and start organizing your freelance work.
         </p>
 
         {formError && (
-          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
+          <p
+            role='alert'
+            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
             {formError}
           </p>
         )}
 
         {error && (
-          <p role='alert' className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
+          <p
+            role='alert'
+            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
             {error}
           </p>
         )}
 
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
-            <label htmlFor='register-name' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Name</label>
+            <label
+              htmlFor='register-name'
+              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
+              Name
+            </label>
             <input
               type='text'
               id='register-name'
@@ -132,7 +143,11 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor='register-email' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Email</label>
+            <label
+              htmlFor='register-email'
+              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
+              Email
+            </label>
             <input
               type='email'
               id='register-email'
@@ -145,7 +160,11 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor='register-role' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Role</label>
+            <label
+              htmlFor='register-role'
+              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
+              Role
+            </label>
             <select
               id='register-role'
               name='role'
@@ -159,7 +178,11 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor='register-password' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>Password</label>
+            <label
+              htmlFor='register-password'
+              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
+              Password
+            </label>
             <input
               type='password'
               id='register-password'
@@ -172,7 +195,9 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor='register-confirm-password' className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
+            <label
+              htmlFor='register-confirm-password'
+              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
               Confirm Password
             </label>
             <input
@@ -196,7 +221,9 @@ function RegisterPage() {
 
         <p className='mt-6 text-center text-sm text-slate-600 dark:text-slate-400'>
           Already have an account?{' '}
-          <Link to='/login' className='font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'>
+          <Link
+            to='/login'
+            className='font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'>
             Login here
           </Link>
         </p>

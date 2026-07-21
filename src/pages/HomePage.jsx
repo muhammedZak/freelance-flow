@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
+import AppLogo from '../components/common/AppLogo';
+
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -16,15 +18,7 @@ function HomePage() {
       {/* Header */}
       <header className='sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950/90'>
         <div className='mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-6 lg:px-8'>
-          <Link to='/' className='flex items-center gap-2' onClick={closeMenu}>
-            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white'>
-              FF
-            </div>
-
-            <span className='text-xl font-bold tracking-tight'>
-              FreelanceFlow
-            </span>
-          </Link>
+          <AppLogo onClick={closeMenu} />
 
           {/* Desktop navigation */}
           <nav className='hidden items-center gap-8 md:flex'>
@@ -432,13 +426,7 @@ function HomePage() {
       {/* Footer */}
       <footer className='border-t border-slate-200 bg-white'>
         <div className='mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8'>
-          <div className='flex items-center gap-2'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white'>
-              FF
-            </div>
-
-            <span className='font-semibold text-slate-700'>FreelanceFlow</span>
-          </div>
+          <AppLogo size='small' />
 
           <p>Client, project, task, invoice and payment management.</p>
         </div>
