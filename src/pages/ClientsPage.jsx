@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 import MessageAlert from '../components/common/MessageAlert';
+import Button from '../components/common/Button';
+import ActionLink from '../components/common/ActionLink';
 
 import {
   clearClientMessages,
@@ -128,11 +130,7 @@ function ClientsPage() {
           </p>
         </div>
 
-        <Link
-          to='/clients/new'
-          className='rounded-xl bg-slate-950 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500'>
-          Add Client
-        </Link>
+        <ActionLink to='/clients/new'>Add Client</ActionLink>
       </div>
 
       {successMessage && (
@@ -181,12 +179,13 @@ function ClientsPage() {
         </p>
 
         {hasActiveFilters && (
-          <button
-            type='button'
+          <Button
+            variant='text'
+            size='small'
             onClick={clearFilters}
-            className='self-start font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 sm:self-auto'>
+            className='self-start sm:self-auto'>
             Clear Filters
-          </button>
+          </Button>
         )}
       </div>
 
@@ -262,25 +261,27 @@ function ClientsPage() {
                   </td>
 
                   <td className='p-3'>
-                    <div className='flex flex-wrap gap-3'>
-                      <Link
+                    <div className='flex flex-wrap gap-1'>
+                      <ActionLink
                         to={`/clients/${client.id}`}
-                        className='font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'>
+                        variant='text'
+                        size='small'>
                         View
-                      </Link>
+                      </ActionLink>
 
-                      <Link
+                      <ActionLink
                         to={`/clients/${client.id}/edit`}
-                        className='font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300'>
+                        variant='success'
+                        size='small'>
                         Edit
-                      </Link>
+                      </ActionLink>
 
-                      <button
-                        type='button'
-                        onClick={() => handleDelete(client.id)}
-                        className='font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'>
+                      <Button
+                        variant='danger'
+                        size='small'
+                        onClick={() => handleDelete(client.id)}>
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
