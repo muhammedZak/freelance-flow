@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearAuthError, loginUser } from '../features/auth/authSlice';
 
 import AppLogo from '../components/common/AppLogo';
+import Button from '../components/common/Button';
+import MessageAlert from '../components/common/MessageAlert';
+import InputField from '../components/forms/InputField';
+
+import { clearAuthError, loginUser } from '../features/auth/authSlice';
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -15,7 +19,6 @@ function LoginPage() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const location = useLocation();
 
   const registrationMessage = location.state?.message;
@@ -76,74 +79,68 @@ function LoginPage() {
         </p>
 
         {formError && (
-          <p
-            role='alert'
-            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
-            {formError}
-          </p>
+          <div className='mb-4'>
+            <MessageAlert
+              type='error'
+              title='Check your details'
+              message={formError}
+            />
+          </div>
         )}
 
         {error && (
-          <p
-            role='alert'
-            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
-            {error}
-          </p>
+          <div className='mb-4'>
+            <MessageAlert type='error' title='Login failed' message={error} />
+          </div>
         )}
 
         {registrationMessage && (
-          <div className='mb-4 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300'>
-            {registrationMessage}
+          <div className='mb-4'>
+            <MessageAlert
+              type='success'
+              title='Registration completed'
+              message={registrationMessage}
+            />
           </div>
         )}
 
         <form onSubmit={handleSubmit} className='space-y-4'>
-          <div>
-            <label
-              htmlFor='login-email'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Email
-            </label>
-            <input
-              type='email'
-              id='login-email'
-              name='email'
-              value={formData.email}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500'
-              placeholder='freelancer@example.com'
-            />
-          </div>
+          <InputField
+            label='Email'
+            id='login-email'
+            name='email'
+            type='email'
+            value={formData.email}
+            onChange={handleChange}
+            placeholder='freelancer@example.com'
+            autoComplete='email'
+          />
 
-          <div>
-            <label
-              htmlFor='login-password'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Password
-            </label>
-            <input
-              type='password'
-              id='login-password'
-              name='password'
-              value={formData.password}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500'
-              placeholder='123456'
-            />
-          </div>
+          <InputField
+            label='Password'
+            id='login-password'
+            name='password'
+            type='password'
+            value={formData.password}
+            onChange={handleChange}
+            placeholder='123456'
+            autoComplete='current-password'
+          />
 
-          <button
+          <Button
             type='submit'
             disabled={loading}
-            className='min-h-11 w-full rounded-xl bg-slate-950 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-400 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700'>
+            fullWidth
+            className='min-h-11'>
             {loading ? 'Logging in...' : 'Login'}
-          </button>
+          </Button>
         </form>
 
         <div className='mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'>
           <p className='font-semibold text-slate-800 dark:text-slate-200'>
             Demo accounts
           </p>
+
           <div className='mt-2 space-y-1 font-mono text-xs leading-5'>
             <p>freelancer@example.com / 123456</p>
             <p>client@example.com / 123456</p>

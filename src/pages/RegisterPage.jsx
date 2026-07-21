@@ -1,9 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearAuthError, registerUser } from '../features/auth/authSlice';
 
 import AppLogo from '../components/common/AppLogo';
+import Button from '../components/common/Button';
+import MessageAlert from '../components/common/MessageAlert';
+import InputField from '../components/forms/InputField';
+import SelectField from '../components/forms/SelectField';
+
+import { clearAuthError, registerUser } from '../features/auth/authSlice';
+
+const roleOptions = [
+  {
+    value: 'freelancer',
+    label: 'Freelancer',
+  },
+  {
+    value: 'client',
+    label: 'Client',
+  },
+  {
+    value: 'admin',
+    label: 'Admin',
+  },
+];
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -109,114 +129,85 @@ function RegisterPage() {
         </p>
 
         {formError && (
-          <p
-            role='alert'
-            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
-            {formError}
-          </p>
+          <div className='mb-4'>
+            <MessageAlert
+              type='error'
+              title='Check your details'
+              message={formError}
+            />
+          </div>
         )}
 
         {error && (
-          <p
-            role='alert'
-            className='mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'>
-            {error}
-          </p>
+          <div className='mb-4'>
+            <MessageAlert
+              type='error'
+              title='Registration failed'
+              message={error}
+            />
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className='space-y-4'>
-          <div>
-            <label
-              htmlFor='register-name'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Name
-            </label>
-            <input
-              type='text'
-              id='register-name'
-              name='name'
-              value={formData.name}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
-              placeholder='Your name'
-            />
-          </div>
+          <InputField
+            label='Name'
+            id='register-name'
+            name='name'
+            value={formData.name}
+            onChange={handleChange}
+            placeholder='Your name'
+            autoComplete='name'
+          />
 
-          <div>
-            <label
-              htmlFor='register-email'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Email
-            </label>
-            <input
-              type='email'
-              id='register-email'
-              name='email'
-              value={formData.email}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
-              placeholder='you@example.com'
-            />
-          </div>
+          <InputField
+            label='Email'
+            id='register-email'
+            name='email'
+            type='email'
+            value={formData.email}
+            onChange={handleChange}
+            placeholder='you@example.com'
+            autoComplete='email'
+          />
 
-          <div>
-            <label
-              htmlFor='register-role'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Role
-            </label>
-            <select
-              id='register-role'
-              name='role'
-              value={formData.role}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white'>
-              <option value='freelancer'>Freelancer</option>
-              <option value='client'>Client</option>
-              <option value='admin'>Admin</option>
-            </select>
-          </div>
+          <SelectField
+            label='Role'
+            id='register-role'
+            name='role'
+            value={formData.role}
+            onChange={handleChange}
+            options={roleOptions}
+          />
 
-          <div>
-            <label
-              htmlFor='register-password'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Password
-            </label>
-            <input
-              type='password'
-              id='register-password'
-              name='password'
-              value={formData.password}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
-              placeholder='Minimum 6 characters'
-            />
-          </div>
+          <InputField
+            label='Password'
+            id='register-password'
+            name='password'
+            type='password'
+            value={formData.password}
+            onChange={handleChange}
+            placeholder='Minimum 6 characters'
+            autoComplete='new-password'
+          />
 
-          <div>
-            <label
-              htmlFor='register-confirm-password'
-              className='mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300'>
-              Confirm Password
-            </label>
-            <input
-              type='password'
-              id='register-confirm-password'
-              name='confirmPassword'
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className='min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
-              placeholder='Re-enter password'
-            />
-          </div>
+          <InputField
+            label='Confirm Password'
+            id='register-confirm-password'
+            name='confirmPassword'
+            type='password'
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder='Re-enter password'
+            autoComplete='new-password'
+          />
 
-          <button
+          <Button
             type='submit'
             disabled={loading}
-            className='min-h-11 w-full rounded-xl bg-slate-950 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-400 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700'>
+            fullWidth
+            className='min-h-11'>
             {loading ? 'Creating account...' : 'Register'}
-          </button>
+          </Button>
         </form>
 
         <p className='mt-6 text-center text-sm text-slate-600 dark:text-slate-400'>
