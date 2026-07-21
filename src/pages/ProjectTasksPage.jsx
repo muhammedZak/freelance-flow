@@ -23,6 +23,9 @@ import {
 } from '../features/tasks/tasksSlice';
 
 import { formatDate } from '../utils/formatDate';
+import PageHeader from '../components/common/PageHeader';
+import Button from '../components/common/Button';
+import BackLink from '../components/common/BackLink';
 
 function ProjectTasksPage() {
   const { id } = useParams();
@@ -291,33 +294,14 @@ function ProjectTasksPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <div>
-          <button
-            type='button'
-            onClick={() => navigate(`/projects/${id}`)}
-            className='mb-2 text-sm text-blue-600'>
-            ← Back to Project
-          </button>
-
-          <h1 className='text-2xl font-bold text-slate-900'>
-            {selectedProject.title} Tasks
-          </h1>
-
-          <p className='text-slate-600'>
-            Manage tasks and monitor the project progress.
-          </p>
-        </div>
-
-        {canManageTasks && (
-          <button
-            type='button'
-            onClick={openAddTaskForm}
-            className='rounded bg-slate-900 px-4 py-2 text-white'>
-            Add Task
-          </button>
-        )}
+      <div className='mb-4'>
+        <BackLink to={`/projects/${id}`}>Back to Project</BackLink>
       </div>
+      <PageHeader
+        title={`${selectedProject.title} Tasks`}
+        description='Manage tasks and monitor the project progress.'>
+        {canManageTasks && <Button onClick={openAddTaskForm}>Add Task</Button>}
+      </PageHeader>
 
       {successMessage && (
         <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>

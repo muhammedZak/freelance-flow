@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import EmptyState from '../components/common/EmptyState';
 import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
+import PageHeader from '../components/common/PageHeader';
+import ActionLink from '../components/common/ActionLink';
 
 import PaymentForm from '../features/payments/PaymentForm';
 
@@ -21,6 +23,7 @@ import { fetchProjects } from '../features/projects/projectsSlice';
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
+import Button from '../components/common/Button';
 
 function PaymentsPage() {
   const dispatch = useDispatch();
@@ -267,22 +270,11 @@ function PaymentsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Payments</h1>
-
-          <p className='text-slate-600'>
-            Record invoice payments and monitor payment status.
-          </p>
-        </div>
-
-        <button
-          type='button'
-          onClick={openPaymentForm}
-          className='rounded bg-slate-900 px-4 py-2 text-white'>
-          Add Payment
-        </button>
-      </div>
+      <PageHeader
+        title='Payments'
+        description='Record invoice payments and monitor payment status.'>
+        <Button onClick={openPaymentForm}>Add Payment</Button>
+      </PageHeader>
 
       {successMessage && (
         <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>

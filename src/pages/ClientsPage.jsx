@@ -8,6 +8,7 @@ import EmptyState from '../components/common/EmptyState';
 import MessageAlert from '../components/common/MessageAlert';
 import Button from '../components/common/Button';
 import ActionLink from '../components/common/ActionLink';
+import PageHeader from '../components/common/PageHeader';
 
 import {
   clearClientMessages,
@@ -119,19 +120,11 @@ function ClientsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <div>
-          <h1 className='text-2xl font-bold text-slate-900 dark:text-white'>
-            Clients
-          </h1>
-
-          <p className='text-slate-600 dark:text-slate-400'>
-            Manage your freelance clients here.
-          </p>
-        </div>
-
+      <PageHeader
+        title='Clients'
+        description='Manage your freelance clients here.'>
         <ActionLink to='/clients/new'>Add Client</ActionLink>
-      </div>
+      </PageHeader>
 
       {successMessage && (
         <div className='mb-4'>

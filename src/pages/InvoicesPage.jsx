@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
+import PageHeader from '../components/common/PageHeader';
+import ActionLink from '../components/common/ActionLink';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 import { fetchProjects } from '../features/projects/projectsSlice';
@@ -182,6 +184,7 @@ function InvoicesPage() {
     .reduce((total, invoice) => total + Number(invoice.total), 0);
 
   const loading = invoicesLoading || clientsLoading || projectsLoading;
+
   const error = invoicesError || clientsError || projectsError;
 
   if (loading && invoices.length === 0) {
@@ -192,27 +195,18 @@ function InvoicesPage() {
     return <ErrorMessage message={error} />;
   }
 
+  const pageDescription =
+    user?.role === 'client'
+      ? 'View invoices for your assigned projects.'
+      : 'Create and manage your freelance invoices.';
+
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Invoices</h1>
-
-          <p className='text-slate-600'>
-            {user?.role === 'client'
-              ? 'View invoices for your assigned projects.'
-              : 'Create and manage your freelance invoices.'}
-          </p>
-        </div>
-
+      <PageHeader title='Invoices' description={pageDescription}>
         {canManageInvoices && (
-          <Link
-            to='/invoices/new'
-            className='rounded bg-slate-900 px-4 py-2 text-center text-white'>
-            Add Invoice
-          </Link>
+          <ActionLink to='/invoices/new'>Add Invoice</ActionLink>
         )}
-      </div>
+      </PageHeader>
 
       {successMessage && (
         <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>

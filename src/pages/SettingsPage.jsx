@@ -1,3 +1,5 @@
+import PageHeader from '../components/common/PageHeader';
+
 import useTheme from '../context/useTheme';
 
 function SettingsPage() {
@@ -7,17 +9,18 @@ function SettingsPage() {
 
   return (
     <div className='workspace-page max-w-3xl'>
-      <div className='page-header'>
-        <h1 className='text-2xl font-bold text-slate-900'>Settings</h1>
-
-        <p className='text-slate-600'>Manage your application appearance.</p>
-      </div>
+      <PageHeader
+        title='Settings'
+        description='Manage your application appearance.'
+      />
 
       <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
         <div className='mb-5'>
-          <h2 className='text-lg font-bold text-slate-900'>Appearance</h2>
+          <h2 className='text-lg font-bold text-slate-900 dark:text-white'>
+            Appearance
+          </h2>
 
-          <p className='text-sm text-slate-500'>
+          <p className='text-sm text-slate-500 dark:text-slate-400'>
             Select the theme you prefer while using FreelanceFlow.
           </p>
         </div>
@@ -73,9 +76,13 @@ function SettingsPage() {
         <div className='mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/60'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
             <div>
-              <p className='font-medium text-slate-900'>Current theme</p>
+              <p className='font-medium text-slate-900 dark:text-white'>
+                Current theme
+              </p>
 
-              <p className='text-sm capitalize text-slate-500'>{theme} mode</p>
+              <p className='text-sm capitalize text-slate-500 dark:text-slate-400'>
+                {theme} mode
+              </p>
             </div>
 
             <button
@@ -87,7 +94,7 @@ function SettingsPage() {
           </div>
         </div>
 
-        <p className='mt-4 text-sm text-slate-500'>
+        <p className='mt-4 text-sm text-slate-500 dark:text-slate-400'>
           Your theme preference is saved automatically and remains selected
           after refreshing the page.
         </p>

@@ -15,6 +15,8 @@ import {
 } from '../features/invoices/invoicesSlice';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
+import PageHeader from '../components/common/PageHeader';
+import BackLink from '../components/common/BackLink';
 
 function InvoiceFormPage() {
   const [formData, setFormData] = useState({
@@ -191,19 +193,11 @@ function InvoiceFormPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/invoices' className='text-sm text-blue-600'>
-          ← Back to Invoices
-        </Link>
-
-        <h1 className='mt-2 text-2xl font-bold text-slate-900'>
-          Create Invoice
-        </h1>
-
-        <p className='text-slate-600'>
-          Create an invoice and automatically calculate its total.
-        </p>
-      </div>
+      <PageHeader
+        title='Create Invoice'
+        description='Create an invoice and automatically calculate its total.'>
+        <BackLink to='/invoices'>Back to Invoices</BackLink>
+      </PageHeader>
 
       {invoiceError && <ErrorMessage message={invoiceError} />}
 

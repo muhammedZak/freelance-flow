@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import ClientForm from '../features/clients/ClientForm';
+import PageHeader from '../components/common/PageHeader';
+import BackLink from '../components/common/BackLink';
 
 import {
   addClient,
@@ -140,25 +142,20 @@ function ClientFormPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/clients' className='text-sm text-blue-600'>
-          ← Back to Clients
-        </Link>
-
-        <h1 className='mt-2 text-2xl font-bold text-slate-900'>
-          {isEditMode ? 'Edit Client' : 'Add Client'}
-        </h1>
-
-        <p className='text-slate-600'>
-          {isEditMode
-            ? 'Update the selected client details.'
-            : 'Create a new client record.'}
-        </p>
+      <div className='mb-4'>
+        <BackLink to='/clients'>Back to Clients</BackLink>
       </div>
 
-      {error && <ErrorMessage message={error} />}
+      <PageHeader
+        title={isEditMode ? 'Edit Client' : 'Add Client'}
+        description={
+          isEditMode
+            ? 'Update the selected client information.'
+            : 'Enter the details of your new client.'
+        }
+      />
 
-      <div className='max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
+      <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-6'>
         <ClientForm
           formData={formData}
           formError={formError}

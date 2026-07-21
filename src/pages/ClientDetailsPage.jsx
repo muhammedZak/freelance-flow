@@ -4,6 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
+import PageHeader from '../components/common/PageHeader';
+import BackLink from '../components/common/BackLink';
+import ActionLink from '../components/common/ActionLink';
+import Button from '../components/common/Button';
 
 import {
   clearClientMessages,
@@ -64,34 +68,22 @@ function ClientDetailsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/clients' className='text-sm text-blue-600'>
-          ← Back to Clients
-        </Link>
-
-        <div className='mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div>
-            <h1 className='text-2xl font-bold text-slate-900'>
-              {selectedClient.name}
-            </h1>
-            <p className='text-slate-600'>{selectedClient.company}</p>
-          </div>
-
-          <div className='flex gap-2'>
-            <Link
-              to={`/clients/${selectedClient.id}/edit`}
-              className='rounded bg-green-600 px-4 py-2 text-white'>
-              Edit
-            </Link>
-
-            <button
-              onClick={handleDelete}
-              className='rounded bg-red-600 px-4 py-2 text-white'>
-              Delete
-            </button>
-          </div>
-        </div>
+      <div className='mb-4'>
+        <BackLink to='/clients'>Back to Clients</BackLink>
       </div>
+
+      <PageHeader
+        title={selectedClient.name}
+        company={selectedClient.company}
+        description='View the client information and manage this client.'>
+        <ActionLink to={`/clients/${selectedClient.id}/edit`} variant='success'>
+          Edit Client
+        </ActionLink>
+
+        <Button type='button' variant='danger' onClick={handleDelete}>
+          Delete Client
+        </Button>
+      </PageHeader>
 
       <div className='grid gap-4 md:grid-cols-2'>
         <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>

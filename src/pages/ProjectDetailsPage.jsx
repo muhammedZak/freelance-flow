@@ -4,6 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
+import BackLink from '../components/common/BackLink';
+import PageHeader from '../components/common/PageHeader';
+import Button from '../components/common/Button';
+import ActionLink from '../components/common/ActionLink';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 import { fetchTasks } from '../features/tasks/tasksSlice';
@@ -25,7 +29,9 @@ function ProjectDetailsPage() {
   const navigate = useNavigate();
 
   const { user } = useSelector((state) => state.auth);
+
   const { clients } = useSelector((state) => state.clients);
+
   const { tasks } = useSelector((state) => state.tasks);
 
   const { selectedProject, loading, error } = useSelector(
@@ -91,6 +97,10 @@ function ProjectDetailsPage() {
     (task) => task.status === 'completed',
   );
 
+  const inProgressTasks = projectTasks.filter(
+    (task) => task.status === 'in-progress',
+  );
+
   const progress =
     projectTasks.length > 0
       ? Math.round((completedTasks.length / projectTasks.length) * 100)
@@ -98,46 +108,35 @@ function ProjectDetailsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/projects' className='text-sm text-blue-600'>
-          ← Back to Projects
+      <div className='mb-4'>
+        <BackLink to='/projects'>Back to Projects</BackLink>
+      </div>
+
+      <PageHeader
+        title={selectedProject.title}
+        description={`Client: ${getClientName(selectedProject.clientId)}`}>
+        <Link
+          to={`/projects/${selectedProject.id}/tasks`}
+          className='rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-500'>
+          View Tasks
         </Link>
 
-        <div className='mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div>
-            <h1 className='text-2xl font-bold text-slate-900'>
-              {selectedProject.title}
-            </h1>
-            <p className='text-slate-600'>
-              Client: {getClientName(selectedProject.clientId)}
-            </p>
-          </div>
-
-          <div className='flex flex-wrap gap-2'>
-            <Link
-              to={`/projects/${selectedProject.id}/tasks`}
-              className='rounded bg-purple-600 px-4 py-2 text-white'>
-              View Tasks
+        {canManageProjects && (
+          <>
+            <ActionLink
+              to={`/projects/${selectedProject.id}/edit`}
+              variant='secondary'>
+              Edit
+            </ActionLink>
+            <Link className='rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-500'>
+              Edit
             </Link>
-
-            {canManageProjects && (
-              <>
-                <Link
-                  to={`/projects/${selectedProject.id}/edit`}
-                  className='rounded bg-green-600 px-4 py-2 text-white'>
-                  Edit
-                </Link>
-
-                <button
-                  onClick={handleDelete}
-                  className='rounded bg-red-600 px-4 py-2 text-white'>
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+            <Button variant='danger' onClick={handleDelete}>
+              Delete
+            </Button>
+          </>
+        )}
+      </PageHeader>
 
       <div className='grid gap-4 lg:grid-cols-2'>
         <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
@@ -184,28 +183,29 @@ function ProjectDetailsPage() {
             <span className='text-slate-600'>
               {completedTasks.length} of {projectTasks.length} tasks completed
             </span>
+
             <span className='font-bold text-slate-900'>{progress}%</span>
           </div>
 
           <div className='h-3 overflow-hidden rounded bg-slate-200'>
             <div
               className='h-full bg-slate-900'
-              style={{ width: `${progress}%` }}></div>
+              style={{ width: `${progress}%` }}
+            />
           </div>
 
           <div className='mt-4 grid grid-cols-3 gap-3 text-center text-sm'>
             <div className='rounded bg-slate-100 p-3'>
               <p className='font-bold text-slate-900'>{projectTasks.length}</p>
+
               <p className='text-slate-500'>Total</p>
             </div>
 
             <div className='rounded bg-slate-100 p-3'>
               <p className='font-bold text-slate-900'>
-                {
-                  projectTasks.filter((task) => task.status === 'in-progress')
-                    .length
-                }
+                {inProgressTasks.length}
               </p>
+
               <p className='text-slate-500'>Progress</p>
             </div>
 
@@ -213,6 +213,7 @@ function ProjectDetailsPage() {
               <p className='font-bold text-slate-900'>
                 {completedTasks.length}
               </p>
+
               <p className='text-slate-500'>Done</p>
             </div>
           </div>

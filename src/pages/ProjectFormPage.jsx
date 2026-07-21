@@ -15,6 +15,8 @@ import {
   editProject,
   fetchProjectById,
 } from '../features/projects/projectsSlice';
+import PageHeader from '../components/common/PageHeader';
+import BackLink from '../components/common/BackLink';
 
 function ProjectFormPage() {
   const { id } = useParams();
@@ -154,23 +156,16 @@ function ProjectFormPage() {
     return <ErrorMessage message={error} />;
   }
 
+  const title = isEditMode ? 'Edit project' : 'Add Project';
+  const description = isEditMode
+    ? 'Update the selected project details.'
+    : 'Create a new project and connect it to a client.';
+
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/projects' className='text-sm text-blue-600'>
-          ← Back to Projects
-        </Link>
-
-        <h1 className='mt-2 text-2xl font-bold text-slate-900'>
-          {isEditMode ? 'Edit Project' : 'Add Project'}
-        </h1>
-
-        <p className='text-slate-600'>
-          {isEditMode
-            ? 'Update the selected project details.'
-            : 'Create a new project and connect it to a client.'}
-        </p>
-      </div>
+      <PageHeader title={title} description={description}>
+        <BackLink to='/projects'>Back to Projects</BackLink>
+      </PageHeader>
 
       {error && <ErrorMessage message={error} />}
 

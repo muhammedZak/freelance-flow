@@ -5,8 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
+import PageHeader from '../components/common/PageHeader';
+import ActionLink from '../components/common/ActionLink';
 
 import { fetchClients } from '../features/clients/clientsSlice';
+
 import {
   clearProjectMessages,
   fetchProjects,
@@ -18,6 +21,7 @@ import { formatDate } from '../utils/formatDate';
 
 function ProjectsPage() {
   const dispatch = useDispatch();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchText = searchParams.get('search') || '';
@@ -86,6 +90,7 @@ function ProjectsPage() {
   const filteredProjects = visibleProjects
     .filter((project) => {
       const searchValue = searchText.toLowerCase();
+
       const clientName = getClientName(project.clientId).toLowerCase();
 
       const matchesSearch =
@@ -98,24 +103,28 @@ function ProjectsPage() {
 
       return matchesSearch && matchesStatus;
     })
-    .sort((a, b) => {
+    .sort((firstProject, secondProject) => {
       if (sortBy === 'title') {
-        return a.title.localeCompare(b.title);
+        return firstProject.title.localeCompare(secondProject.title);
       }
 
       if (sortBy === 'deadline') {
-        return new Date(a.deadline) - new Date(b.deadline);
+        return (
+          new Date(firstProject.deadline) - new Date(secondProject.deadline)
+        );
       }
 
       if (sortBy === 'budget-high') {
-        return Number(b.budget) - Number(a.budget);
+        return Number(secondProject.budget) - Number(firstProject.budget);
       }
 
       if (sortBy === 'budget-low') {
-        return Number(a.budget) - Number(b.budget);
+        return Number(firstProject.budget) - Number(secondProject.budget);
       }
 
-      return new Date(b.createdAt) - new Date(a.createdAt);
+      return (
+        new Date(secondProject.createdAt) - new Date(firstProject.createdAt)
+      );
     });
 
   if (loading && projects.length === 0) {
@@ -128,22 +137,13 @@ function ProjectsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Projects</h1>
-          <p className='text-slate-600'>
-            Manage your freelance projects and deadlines.
-          </p>
-        </div>
-
+      <PageHeader
+        title='Projects'
+        description='Manage your freelance projects and deadlines.'>
         {canManageProjects && (
-          <Link
-            to='/projects/new'
-            className='rounded bg-slate-900 px-4 py-2 text-center text-white'>
-            Add Project
-          </Link>
+          <ActionLink to='/projects/new'>Add Project</ActionLink>
         )}
-      </div>
+      </PageHeader>
 
       {successMessage && (
         <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
@@ -196,6 +196,7 @@ function ProjectsPage() {
                   <h2 className='text-lg font-bold text-slate-900'>
                     {project.title}
                   </h2>
+
                   <p className='text-sm text-slate-500'>
                     {getClientName(project.clientId)}
                   </p>
@@ -242,6 +243,7 @@ function ProjectsPage() {
                     </Link>
 
                     <button
+                      type='button'
                       onClick={() => handleDelete(project.id)}
                       className='text-red-600'>
                       Delete
