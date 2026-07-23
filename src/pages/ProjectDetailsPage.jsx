@@ -8,6 +8,8 @@ import BackLink from '../components/common/BackLink';
 import PageHeader from '../components/common/PageHeader';
 import Button from '../components/common/Button';
 import ActionLink from '../components/common/ActionLink';
+import ProgressBar from '../components/common/ProgressBar';
+import SectionCard from '../components/common/SectionCard';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 import { fetchTasks } from '../features/tasks/tasksSlice';
@@ -21,7 +23,7 @@ import {
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-import ProgressBar from '../components/common/ProgressBar';
+
 
 function ProjectDetailsPage() {
   const { id } = useParams();
@@ -126,12 +128,10 @@ function ProjectDetailsPage() {
           <>
             <ActionLink
               to={`/projects/${selectedProject.id}/edit`}
-              variant='secondary'>
+              variant='success'
+              className='bg-green-600 text-white hover:bg-green-500 hover:text-white'>
               Edit
             </ActionLink>
-            <Link className='rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-500'>
-              Edit
-            </Link>
             <Button variant='danger' onClick={handleDelete}>
               Delete
             </Button>
@@ -140,11 +140,7 @@ function ProjectDetailsPage() {
       </PageHeader>
 
       <div className='grid gap-4 lg:grid-cols-2'>
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>
-            Project Details
-          </h2>
-
+        <SectionCard title='Project Details'>
           <div className='space-y-3 text-sm'>
             <p>
               <span className='font-medium text-slate-700'>Description:</span>{' '}
@@ -173,13 +169,9 @@ function ProjectDetailsPage() {
               {formatDate(selectedProject.deadline)}
             </p>
           </div>
-        </div>
+        </SectionCard>
 
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>
-            Project Progress
-          </h2>
-
+        <SectionCard title='Project Progress'>
           <div className='mb-3 flex items-center justify-between text-sm'>
             <span className='text-slate-600'>
               {completedTasks.length} of {projectTasks.length} tasks completed
@@ -211,7 +203,7 @@ function ProjectDetailsPage() {
               <p className='text-slate-500'>Done</p>
             </div>
           </div>
-        </div>
+        </SectionCard>
       </div>
     </div>
   );

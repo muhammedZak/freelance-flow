@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
+import SectionCard from '../components/common/SectionCard';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 import { fetchProjects } from '../features/projects/projectsSlice';
@@ -184,11 +185,7 @@ function InvoiceDetailsPage() {
       )}
 
       <div className='grid gap-6 lg:grid-cols-2'>
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>
-            Invoice Information
-          </h2>
-
+        <SectionCard title='Invoice Information'>
           <div className='space-y-4 text-sm'>
             <div>
               <p className='text-slate-500'>Client</p>
@@ -239,13 +236,9 @@ function InvoiceDetailsPage() {
               </div>
             )}
           </div>
-        </div>
+        </SectionCard>
 
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>
-            Invoice Calculation
-          </h2>
-
+        <SectionCard title='Invoice Calculation'>
           <div className='space-y-4'>
             <div className='flex items-center justify-between border-b border-slate-200 pb-3'>
               <span className='text-slate-600'>Hours Worked</span>
@@ -277,7 +270,7 @@ function InvoiceDetailsPage() {
               {formatCurrency(selectedInvoice.total)}
             </p>
           </div>
-        </div>
+        </SectionCard>
       </div>
 
       {loading && selectedInvoice && (

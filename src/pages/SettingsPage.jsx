@@ -1,4 +1,5 @@
 import PageHeader from '../components/common/PageHeader';
+import SectionCard from '../components/common/SectionCard';
 
 import useTheme from '../context/useTheme';
 
@@ -14,17 +15,9 @@ function SettingsPage() {
         description='Manage your application appearance.'
       />
 
-      <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
-        <div className='mb-5'>
-          <h2 className='text-lg font-bold text-slate-900 dark:text-white'>
-            Appearance
-          </h2>
-
-          <p className='text-sm text-slate-500 dark:text-slate-400'>
-            Select the theme you prefer while using FreelanceFlow.
-          </p>
-        </div>
-
+      <SectionCard
+        title=' Appearance'
+        description='Select the theme you prefer while using FreelanceFlow.'>
         <div className='grid gap-4 sm:grid-cols-2'>
           <button
             type='button'
@@ -98,7 +91,7 @@ function SettingsPage() {
           Your theme preference is saved automatically and remains selected
           after refreshing the page.
         </p>
-      </div>
+      </SectionCard>
     </div>
   );
 }

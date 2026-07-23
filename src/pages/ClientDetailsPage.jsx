@@ -8,6 +8,7 @@ import PageHeader from '../components/common/PageHeader';
 import BackLink from '../components/common/BackLink';
 import ActionLink from '../components/common/ActionLink';
 import Button from '../components/common/Button';
+import SectionCard from '../components/common/SectionCard';
 
 import {
   clearClientMessages,
@@ -86,11 +87,9 @@ function ClientDetailsPage() {
       </PageHeader>
 
       <div className='grid gap-4 md:grid-cols-2'>
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>
-            Contact Details
-          </h2>
-
+        <SectionCard
+          title='Contact Details'
+          description='Primary contact information for this client.'>
           <div className='space-y-3 text-sm'>
             <p>
               <span className='font-medium text-slate-700'>Email:</span>{' '}
@@ -107,11 +106,9 @@ function ClientDetailsPage() {
               {selectedClient.address}
             </p>
           </div>
-        </div>
+        </SectionCard>
 
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <h2 className='mb-4 text-lg font-bold text-slate-900'>Client Info</h2>
-
+        <SectionCard title='Client Info'>
           <div className='space-y-3 text-sm'>
             <p>
               <span className='font-medium text-slate-700'>Status:</span>{' '}
@@ -130,7 +127,7 @@ function ClientDetailsPage() {
               {formatDate(selectedClient.createdAt)}
             </p>
           </div>
-        </div>
+        </SectionCard>
       </div>
     </div>
   );
