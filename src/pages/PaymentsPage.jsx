@@ -396,7 +396,7 @@ function PaymentsPage() {
       </div>
 
       <div className='mb-6'>
-        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-2'>
           <SearchInput
             value={searchText}
             onChange={(event) =>
