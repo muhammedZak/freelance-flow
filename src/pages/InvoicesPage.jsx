@@ -7,6 +7,8 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 import PageHeader from '../components/common/PageHeader';
 import ActionLink from '../components/common/ActionLink';
+import SearchInput from '../components/forms/SearchInput';
+import FilterSelect from '../components/forms/FilterSelect';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 import { fetchProjects } from '../features/projects/projectsSlice';
@@ -19,6 +21,48 @@ import {
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
+
+const invoiceStatusOptions = [
+  {
+    value: 'all',
+    label: 'All Statuses',
+  },
+  {
+    value: 'paid',
+    label: 'Paid',
+  },
+  {
+    value: 'unpaid',
+    label: 'Unpaid',
+  },
+  {
+    value: 'overdue',
+    label: 'Overdue',
+  },
+];
+
+const invoiceSortOptions = [
+  {
+    value: 'newest',
+    label: 'Newest First',
+  },
+  {
+    value: 'oldest',
+    label: 'Oldest First',
+  },
+  {
+    value: 'amount-high',
+    label: 'Amount: High to Low',
+  },
+  {
+    value: 'amount-low',
+    label: 'Amount: Low to High',
+  },
+  {
+    value: 'due-date',
+    label: 'Due Date',
+  },
+];
 
 function InvoicesPage() {
   const dispatch = useDispatch();
@@ -241,38 +285,35 @@ function InvoicesPage() {
       </div>
 
       <div className='mb-6'>
-        <div className='grid gap-3 md:grid-cols-3'>
-          <input
-            type='text'
-            value={searchText}
-            onChange={(event) =>
-              updateSearchParams('search', event.target.value)
-            }
-            placeholder='Search invoice, client, or project'
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
-          />
+        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-4'>
+          <div className='sm:col-span-2'>
+            <SearchInput
+              value={searchText}
+              onChange={(event) =>
+                updateSearchParams('search', event.target.value)
+              }
+              placeholder='Search invoice number or client'
+              ariaLabel='Search invoices'
+            />
+          </div>
 
-          <select
+          <FilterSelect
             value={statusFilter}
             onChange={(event) =>
-              updateSearchParams('status', event.target.value)
+              updateSearchParams('status', event.target.value, 'all')
             }
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='all'>All Status</option>
-            <option value='paid'>Paid</option>
-            <option value='unpaid'>Unpaid</option>
-            <option value='overdue'>Overdue</option>
-          </select>
+            options={invoiceStatusOptions}
+            ariaLabel='Filter invoices by status'
+          />
 
-          <select
+          <FilterSelect
             value={sortBy}
-            onChange={(event) => updateSearchParams('sort', event.target.value)}
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='newest'>Newest First</option>
-            <option value='due-date'>Due Date</option>
-            <option value='amount-high'>Amount High to Low</option>
-            <option value='amount-low'>Amount Low to High</option>
-          </select>
+            onChange={(event) =>
+              updateSearchParams('sort', event.target.value, 'newest')
+            }
+            options={invoiceSortOptions}
+            ariaLabel='Sort invoices'
+          />
         </div>
 
         <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>

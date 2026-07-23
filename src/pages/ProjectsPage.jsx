@@ -7,6 +7,8 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 import PageHeader from '../components/common/PageHeader';
 import ActionLink from '../components/common/ActionLink';
+import SearchInput from '../components/forms/SearchInput';
+import FilterSelect from '../components/forms/FilterSelect';
 
 import { fetchClients } from '../features/clients/clientsSlice';
 
@@ -18,6 +20,49 @@ import {
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
+import Button from '../components/common/Button';
+
+const projectStatusOptions = [
+  {
+    value: 'all',
+    label: 'All Statuses',
+  },
+  {
+    value: 'planning',
+    label: 'Planning',
+  },
+  {
+    value: 'active',
+    label: 'Active',
+  },
+  {
+    value: 'on-hold',
+    label: 'On Hold',
+  },
+  {
+    value: 'completed',
+    label: 'Completed',
+  },
+];
+
+const projectSortOptions = [
+  {
+    value: 'newest',
+    label: 'Newest First',
+  },
+  {
+    value: 'deadline',
+    label: 'Deadline',
+  },
+  {
+    value: 'title-asc',
+    label: 'Title: A to Z',
+  },
+  {
+    value: 'budget-high',
+    label: 'Highest Budget',
+  },
+];
 
 function ProjectsPage() {
   const dispatch = useDispatch();
@@ -58,6 +103,10 @@ function ProjectsPage() {
     }
 
     setSearchParams(newParams);
+  }
+
+  function clearFilters() {
+    setSearchParams({});
   }
 
   function handleDelete(id) {
@@ -127,6 +176,9 @@ function ProjectsPage() {
       );
     });
 
+  const hasActiveFilters =
+    searchText || statusFilter !== 'all' || sortBy !== 'newest';
+
   if (loading && projects.length === 0) {
     return <Loading />;
   }
@@ -151,36 +203,47 @@ function ProjectsPage() {
         </p>
       )}
 
-      <div className='mb-4 grid gap-3 md:grid-cols-3'>
-        <input
-          type='text'
-          value={searchText}
-          onChange={(event) => updateSearchParams('search', event.target.value)}
-          className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
-          placeholder='Search projects or clients'
-        />
+      <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-4'>
+        <div className='sm:col-span-2'>
+          <SearchInput
+            value={searchText}
+            onChange={(event) =>
+              updateSearchParams('search', event.target.value)
+            }
+            placeholder='Search projects or clients'
+            ariaLabel='Search projects'
+          />
+        </div>
 
-        <select
+        <FilterSelect
           value={statusFilter}
           onChange={(event) => updateSearchParams('status', event.target.value)}
-          className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-          <option value='all'>All Status</option>
-          <option value='planning'>Planning</option>
-          <option value='active'>Active</option>
-          <option value='completed'>Completed</option>
-          <option value='on-hold'>On Hold</option>
-        </select>
+          options={projectStatusOptions}
+          ariaLabel='Filter projects by status'
+        />
 
-        <select
+        <FilterSelect
           value={sortBy}
           onChange={(event) => updateSearchParams('sort', event.target.value)}
-          className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-          <option value='newest'>Newest First</option>
-          <option value='title'>Title A-Z</option>
-          <option value='deadline'>Deadline</option>
-          <option value='budget-high'>Budget High to Low</option>
-          <option value='budget-low'>Budget Low to High</option>
-        </select>
+          options={projectSortOptions}
+          ariaLabel='Sort projects'
+        />
+      </div>
+
+      <div className='mb-4 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+        <p className='text-slate-500 dark:text-slate-400'>
+          Showing {filteredProjects.length} of {projects.length} clients
+        </p>
+
+        {hasActiveFilters && (
+          <Button
+            variant='text'
+            size='small'
+            onClick={clearFilters}
+            className='self-start sm:self-auto'>
+            Clear Filters
+          </Button>
+        )}
       </div>
 
       {filteredProjects.length === 0 ? (

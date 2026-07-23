@@ -6,6 +6,8 @@ import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 import ProgressBar from '../components/common/ProgressBar';
+import SearchInput from '../components/forms/SearchInput';
+import FilterSelect from '../components/forms/FilterSelect';
 
 import TaskForm from '../features/tasks/TaskForm';
 
@@ -27,6 +29,63 @@ import { formatDate } from '../utils/formatDate';
 import PageHeader from '../components/common/PageHeader';
 import Button from '../components/common/Button';
 import BackLink from '../components/common/BackLink';
+
+const taskStatusOptions = [
+  {
+    value: 'all',
+    label: 'All Statuses',
+  },
+  {
+    value: 'todo',
+    label: 'To Do',
+  },
+  {
+    value: 'in-progress',
+    label: 'In Progress',
+  },
+  {
+    value: 'completed',
+    label: 'Completed',
+  },
+];
+
+const taskPriorityOptions = [
+  {
+    value: 'all',
+    label: 'All Priorities',
+  },
+  {
+    value: 'low',
+    label: 'Low',
+  },
+  {
+    value: 'medium',
+    label: 'Medium',
+  },
+  {
+    value: 'high',
+    label: 'High',
+  },
+];
+
+const taskSortOptions = [
+  {
+    value: 'due-date',
+    label: 'Due Date',
+  },
+  {
+    value: 'newest',
+    label: 'Newest First',
+  },
+  {
+    value: 'title',
+    label: 'Title A-Z',
+  },
+  {
+    value: 'priority',
+    label: 'Priority High to Low',
+  },
+];
 
 function ProjectTasksPage() {
   const { id } = useParams();
@@ -376,50 +435,40 @@ function ProjectTasksPage() {
           </p>
         </div>
 
-        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
-          <input
-            type='text'
+        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-2 xl:grid'>
+          <SearchInput
             value={searchText}
             onChange={(event) =>
               updateSearchParams('search', event.target.value)
             }
             placeholder='Search tasks'
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+            ariaLabel='Search project tasks'
           />
 
-          <select
+          <FilterSelect
             value={statusFilter}
             onChange={(event) =>
               updateSearchParams('status', event.target.value)
             }
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='all'>All Status</option>
-            <option value='todo'>To Do</option>
-            <option value='in-progress'>In Progress</option>
-            <option value='completed'>Completed</option>
-          </select>
+            options={taskStatusOptions}
+            ariaLabel='Filter tasks by status'
+          />
 
-          <select
+          <FilterSelect
             value={priorityFilter}
             onChange={(event) =>
               updateSearchParams('priority', event.target.value)
             }
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='all'>All Priorities</option>
-            <option value='high'>High Priority</option>
-            <option value='medium'>Medium Priority</option>
-            <option value='low'>Low Priority</option>
-          </select>
+            options={taskPriorityOptions}
+            ariaLabel='Filter tasks by priority'
+          />
 
-          <select
+          <FilterSelect
             value={sortBy}
             onChange={(event) => updateSearchParams('sort', event.target.value)}
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='due-date'>Due Date</option>
-            <option value='newest'>Newest First</option>
-            <option value='title'>Title A-Z</option>
-            <option value='priority'>Priority High to Low</option>
-          </select>
+            options={taskSortOptions}
+            ariaLabel='Sort tasks'
+          />
         </div>
 
         <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>

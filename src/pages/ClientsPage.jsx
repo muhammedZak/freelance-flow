@@ -9,6 +9,8 @@ import MessageAlert from '../components/common/MessageAlert';
 import Button from '../components/common/Button';
 import ActionLink from '../components/common/ActionLink';
 import PageHeader from '../components/common/PageHeader';
+import SearchInput from '../components/forms/SearchInput';
+import FilterSelect from '../components/forms/FilterSelect';
 
 import {
   clearClientMessages,
@@ -17,6 +19,40 @@ import {
 } from '../features/clients/clientsSlice';
 
 import { formatDate } from '../utils/formatDate';
+
+const clientStatusOptions = [
+  {
+    value: 'all',
+    label: 'All Statuses',
+  },
+  {
+    value: 'active',
+    label: 'Active',
+  },
+  {
+    value: 'inactive',
+    label: 'Inactive',
+  },
+];
+
+const clientSortOptions = [
+  {
+    value: 'newest',
+    label: 'Newest First',
+  },
+  {
+    value: 'oldest',
+    label: 'Oldest First',
+  },
+  {
+    value: 'name-asc',
+    label: 'Name: A to Z',
+  },
+  {
+    value: 'name-desc',
+    label: 'Name: Z to A',
+  },
+];
 
 function ClientsPage() {
   const dispatch = useDispatch();
@@ -74,21 +110,32 @@ function ClientsPage() {
 
   const filteredClients = clients
     .filter((client) => {
-      const searchValue = searchText.toLowerCase();
+      const searchValue = searchText.trim().toLowerCase();
 
-      const matchesSearch =
-        client.name.toLowerCase().includes(searchValue) ||
-        client.email.toLowerCase().includes(searchValue) ||
-        client.company.toLowerCase().includes(searchValue);
+      if (!searchValue) {
+        return true;
+      }
 
-      const matchesStatus =
-        statusFilter === 'all' || client.status === statusFilter;
+      return (
+        client.name?.toLowerCase().includes(searchValue) ||
+        client.email?.toLowerCase().includes(searchValue) ||
+        client.company?.toLowerCase().includes(searchValue)
+      );
+    })
+    .filter((client) => {
+      if (statusFilter === 'all') {
+        return true;
+      }
 
-      return matchesSearch && matchesStatus;
+      return client.status === statusFilter;
     })
     .sort((firstClient, secondClient) => {
-      if (sortBy === 'name') {
+      if (sortBy === 'name-asc') {
         return firstClient.name.localeCompare(secondClient.name);
+      }
+
+      if (sortBy === 'name-desc') {
+        return secondClient.name.localeCompare(firstClient.name);
       }
 
       if (sortBy === 'oldest') {
@@ -138,32 +185,31 @@ function ClientsPage() {
         </div>
       )}
 
-      <div className='mb-4 grid gap-3 md:grid-cols-3'>
-        <input
-          type='text'
-          value={searchText}
-          onChange={(event) => updateSearchParams('search', event.target.value)}
-          className='rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500'
-          placeholder='Search name, email, or company'
-        />
+      <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-4'>
+        <div className='sm:col-span-2'>
+          <SearchInput
+            value={searchText}
+            onChange={(event) =>
+              updateSearchParams('search', event.target.value)
+            }
+            placeholder='Search clients by name, email or company'
+            ariaLabel='Search clients'
+          />
+        </div>
 
-        <select
+        <FilterSelect
           value={statusFilter}
           onChange={(event) => updateSearchParams('status', event.target.value)}
-          className='rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white'>
-          <option value='all'>All Status</option>
-          <option value='active'>Active</option>
-          <option value='inactive'>Inactive</option>
-        </select>
+          options={clientStatusOptions}
+          ariaLabel='Filter clients by status'
+        />
 
-        <select
+        <FilterSelect
           value={sortBy}
           onChange={(event) => updateSearchParams('sort', event.target.value)}
-          className='rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:text-white'>
-          <option value='newest'>Newest First</option>
-          <option value='oldest'>Oldest First</option>
-          <option value='name'>Name A-Z</option>
-        </select>
+          options={clientSortOptions}
+          ariaLabel='Sort clients'
+        />
       </div>
 
       <div className='mb-4 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>

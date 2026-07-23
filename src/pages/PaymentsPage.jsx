@@ -7,6 +7,8 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
 import PageHeader from '../components/common/PageHeader';
 import ActionLink from '../components/common/ActionLink';
+import SearchInput from '../components/forms/SearchInput';
+import FilterSelect from '../components/forms/FilterSelect';
 
 import PaymentForm from '../features/payments/PaymentForm';
 
@@ -24,6 +26,67 @@ import { fetchProjects } from '../features/projects/projectsSlice';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
 import Button from '../components/common/Button';
+
+const paymentStatusOptions = [
+  {
+    value: 'all',
+    label: 'All Statuses',
+  },
+  {
+    value: 'completed',
+    label: 'Completed',
+  },
+  {
+    value: 'pending',
+    label: 'Pending',
+  },
+  {
+    value: 'failed',
+    label: 'Failed',
+  },
+];
+
+const paymentMethodOptions = [
+  {
+    value: 'all',
+    label: 'All Methods',
+  },
+  {
+    value: 'cash',
+    label: 'Cash',
+  },
+  {
+    value: 'bank transfer',
+    label: 'Bank Transfer',
+  },
+  {
+    value: 'upi',
+    label: 'UPI',
+  },
+  {
+    value: 'card',
+    label: 'Card',
+  },
+];
+
+const paymentSortOptions = [
+  {
+    value: 'newest',
+    label: 'Newest First',
+  },
+  {
+    value: 'oldest',
+    label: 'Oldest First',
+  },
+  {
+    value: 'amount-high',
+    label: 'Amount: High to Low',
+  },
+  {
+    value: 'amount-low',
+    label: 'Amount: Low to High',
+  },
+];
 
 function PaymentsPage() {
   const dispatch = useDispatch();
@@ -333,51 +396,40 @@ function PaymentsPage() {
       </div>
 
       <div className='mb-6'>
-        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
-          <input
-            type='text'
+        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-3'>
+          <SearchInput
             value={searchText}
             onChange={(event) =>
               updateSearchParams('search', event.target.value)
             }
-            placeholder='Search invoice, client, or project'
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
+            placeholder='Search invoice number or payment method'
+            ariaLabel='Search payments'
           />
 
-          <select
+          <FilterSelect
             value={statusFilter}
             onChange={(event) =>
               updateSearchParams('status', event.target.value)
             }
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='all'>All Status</option>
-            <option value='pending'>Pending</option>
-            <option value='completed'>Completed</option>
-            <option value='failed'>Failed</option>
-          </select>
+            options={paymentStatusOptions}
+            ariaLabel='Filter payments by status'
+          />
 
-          <select
+          <FilterSelect
             value={methodFilter}
             onChange={(event) =>
               updateSearchParams('method', event.target.value)
             }
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='all'>All Methods</option>
-            <option value='cash'>Cash</option>
-            <option value='bank transfer'>Bank Transfer</option>
-            <option value='upi'>UPI</option>
-            <option value='card'>Card</option>
-          </select>
+            options={paymentMethodOptions}
+            ariaLabel='Filter payments by method'
+          />
 
-          <select
+          <FilterSelect
             value={sortBy}
             onChange={(event) => updateSearchParams('sort', event.target.value)}
-            className='rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='newest'>Newest First</option>
-            <option value='oldest'>Oldest First</option>
-            <option value='amount-high'>Amount High to Low</option>
-            <option value='amount-low'>Amount Low to High</option>
-          </select>
+            options={paymentSortOptions}
+            ariaLabel='Sort payments'
+          />
         </div>
 
         <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
