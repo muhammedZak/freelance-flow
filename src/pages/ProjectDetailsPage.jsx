@@ -21,6 +21,7 @@ import {
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
+import ProgressBar from '../components/common/ProgressBar';
 
 function ProjectDetailsPage() {
   const { id } = useParams();
@@ -183,16 +184,9 @@ function ProjectDetailsPage() {
             <span className='text-slate-600'>
               {completedTasks.length} of {projectTasks.length} tasks completed
             </span>
-
-            <span className='font-bold text-slate-900'>{progress}%</span>
           </div>
 
-          <div className='h-3 overflow-hidden rounded bg-slate-200'>
-            <div
-              className='h-full bg-slate-900'
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <ProgressBar value={progress} height='large' showLabel />
 
           <div className='mt-4 grid grid-cols-3 gap-3 text-center text-sm'>
             <div className='rounded bg-slate-100 p-3'>

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
+import ProgressBar from '../components/common/ProgressBar';
 
 import TaskForm from '../features/tasks/TaskForm';
 
@@ -327,15 +328,9 @@ function ProjectTasksPage() {
       <div className='mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
         <div className='mb-3 flex items-center justify-between gap-3'>
           <h2 className='text-lg font-bold text-slate-900'>Project Progress</h2>
-
-          <span className='text-lg font-bold text-slate-900'>{progress}%</span>
         </div>
 
-        <div className='h-3 overflow-hidden rounded bg-slate-200'>
-          <div
-            className='h-full bg-slate-900'
-            style={{ width: `${progress}%` }}></div>
-        </div>
+        <ProgressBar value={progress} height='medium' showLabel />
 
         <p className='mt-2 text-sm text-slate-500'>
           {completedTasks.length} of {projectTasks.length} tasks completed
