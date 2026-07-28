@@ -1,24 +1,19 @@
 import API_URL from '../../services/api';
 import activitiesService from '../activities/activitiesService';
+import apiClient from '../../api/apiClient';
+
+const CLIENTS_ENDPOINT = '/clients';
 
 async function getClients() {
-  const response = await fetch(`${API_URL}/clients`);
+  const { data } = await apiClient.get(CLIENTS_ENDPOINT);
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch clients');
-  }
-
-  return await response.json();
+  return data;
 }
 
 async function getClientById(id) {
-  const response = await fetch(`${API_URL}/clients/${id}`);
+  const { data } = await apiClient.get(`${CLIENTS_ENDPOINT}/${id}`);
 
-  if (!response.ok) {
-    throw new Error('Client not found');
-  }
-
-  return await response.json();
+  return data;
 }
 
 async function createClient(clientData) {
@@ -27,19 +22,9 @@ async function createClient(clientData) {
     createdAt: new Date().toISOString().split('T')[0],
   };
 
-  const response = await fetch(`${API_URL}/clients`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newClient),
-  });
+  const { data } = await apiClient.post(CLIENTS_ENDPOINT, newClient);
 
-  if (!response.ok) {
-    throw new Error('Failed to create client');
-  }
-
-  const savedClient = await response.json();
+  const savedClient = await data;
 
   await activitiesService.addActivity({
     message: `New client added: ${savedClient.name}`,
@@ -51,19 +36,12 @@ async function createClient(clientData) {
 }
 
 async function updateClient(id, clientData) {
-  const response = await fetch(`${API_URL}/clients/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(clientData),
-  });
+  const response = await apiClient.patch(
+    `${CLIENTS_ENDPOINT}/${id}`,
+    clientData,
+  );
 
-  if (!response.ok) {
-    throw new Error('Failed to update client');
-  }
-
-  const updatedClient = await response.json();
+  const updatedClient = response.data;
 
   await activitiesService.addActivity({
     message: `Client updated: ${updatedClient.name}`,
@@ -77,13 +55,7 @@ async function updateClient(id, clientData) {
 async function deleteClient(id) {
   const client = await getClientById(id);
 
-  const response = await fetch(`${API_URL}/clients/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to delete client');
-  }
+  const response = await apiClient.delete(`${CLIENTS_ENDPOINT}/${id}`);
 
   await activitiesService.addActivity({
     message: `Client deleted: ${client.name}`,
@@ -91,7 +63,7 @@ async function deleteClient(id) {
     createdAt: new Date().toISOString().split('T')[0],
   });
 
-  return Number(id);
+  return id;
 }
 
 const clientsService = {
