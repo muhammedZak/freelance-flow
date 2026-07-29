@@ -19,15 +19,21 @@ import {
 
 import { formatDate } from '@/utils/formatDate';
 
+import {
+  selectClientsError,
+  selectClientsLoading,
+  selectSelectedClient,
+} from '../clientsSelectors';
+
 function ClientDetailsPage() {
   const { id } = useParams();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { selectedClient, loading, error } = useSelector(
-    (state) => state.clients,
-  );
+  const selectedClient = useSelector(selectSelectedClient);
+  const loading = useSelector(selectClientsLoading);
+  const error = useSelector(selectClientsError);
 
   useEffect(() => {
     dispatch(clearClientMessages());

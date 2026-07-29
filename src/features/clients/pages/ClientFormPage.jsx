@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '@/components/common/Loading';
@@ -15,6 +15,12 @@ import {
   editClient,
   fetchClientById,
 } from '../clientsSlice';
+
+import {
+  selectClientsError,
+  selectClientsLoading,
+  selectSelectedClient,
+} from '../clientsSelectors';
 
 function ClientFormPage() {
   const { id } = useParams();
@@ -34,9 +40,9 @@ function ClientFormPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { selectedClient, loading, error } = useSelector(
-    (state) => state.clients,
-  );
+  const selectedClient = useSelector(selectSelectedClient);
+  const loading = useSelector(selectClientsLoading);
+  const error = useSelector(selectClientsError);
 
   useEffect(() => {
     dispatch(clearClientMessages());

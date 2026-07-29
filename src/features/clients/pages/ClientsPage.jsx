@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-// import { useSearchParams } from 'react-router-dom';
-
 import { useDispatch, useSelector } from 'react-redux';
 
 import ActionLink from '@components/common/ActionLink';
@@ -16,6 +14,13 @@ import ClientsTable from '../components/ClientsTable';
 import useClientFilters from '../hooks/useClientFilters';
 
 import {
+  selectAllClients,
+  selectClientsError,
+  selectClientsLoading,
+  selectClientsSuccessMessage,
+} from '../clientsSelectors';
+
+import {
   clearClientMessages,
   fetchClients,
   removeClient,
@@ -24,9 +29,10 @@ import {
 function ClientsPage() {
   const dispatch = useDispatch();
 
-  const { clients, loading, error, successMessage } = useSelector(
-    (state) => state.clients,
-  );
+  const clients = useSelector(selectAllClients);
+  const loading = useSelector(selectClientsLoading);
+  const error = useSelector(selectClientsError);
+  const successMessage = useSelector(selectClientsSuccessMessage);
 
   const {
     searchText,
