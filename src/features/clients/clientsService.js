@@ -1,4 +1,3 @@
-import API_URL from '../../services/api';
 import activitiesService from '../activities/activitiesService';
 import apiClient from '../../api/apiClient';
 
@@ -24,15 +23,13 @@ async function createClient(clientData) {
 
   const { data } = await apiClient.post(CLIENTS_ENDPOINT, newClient);
 
-  const savedClient = await data;
-
   await activitiesService.addActivity({
-    message: `New client added: ${savedClient.name}`,
+    message: `New client added: ${data.name}`,
     type: 'client',
     createdAt: new Date().toISOString().split('T')[0],
   });
 
-  return savedClient;
+  return data;
 }
 
 async function updateClient(id, clientData) {
@@ -41,21 +38,19 @@ async function updateClient(id, clientData) {
     clientData,
   );
 
-  const updatedClient = response.data;
-
   await activitiesService.addActivity({
-    message: `Client updated: ${updatedClient.name}`,
+    message: `Client updated: ${response.data.name}`,
     type: 'client',
     createdAt: new Date().toISOString().split('T')[0],
   });
 
-  return updatedClient;
+  return response.data;
 }
 
 async function deleteClient(id) {
   const client = await getClientById(id);
 
-  const response = await apiClient.delete(`${CLIENTS_ENDPOINT}/${id}`);
+  await apiClient.delete(`${CLIENTS_ENDPOINT}/${id}`);
 
   await activitiesService.addActivity({
     message: `Client deleted: ${client.name}`,

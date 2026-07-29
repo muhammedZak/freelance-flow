@@ -67,7 +67,7 @@
       "phone": "9876543210",
       "company": "Sharma Designs",
       "address": "Kochi, Kerala",
-      "status": "active",
+      "status": "inactive",
       "createdAt": "2026-07-01"
     },
     {
@@ -99,16 +99,6 @@
       "address": "Calicut, Kerala",
       "status": "active",
       "createdAt": "2026-07-04"
-    },
-    {
-      "name": "zakariya zaku",
-      "email": "zakariya.zaku018@gmail.com",
-      "phone": "9645019798222",
-      "company": "Sharma Designs",
-      "address": "Maliyekkal Perunthalloor\nSchool Padi",
-      "status": "active",
-      "createdAt": "2026-07-29",
-      "id": "UzAI5xU"
     }
   ],
   "projects": [
@@ -452,6 +442,24 @@
       "type": "client",
       "createdAt": "2026-07-29",
       "id": "hGGGBLS"
+    },
+    {
+      "message": "Client updated: Aarav Sharma",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "oUj87sC"
+    },
+    {
+      "message": "Client updated: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "ItCLQCE"
+    },
+    {
+      "message": "Client deleted: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "doNORIO"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
