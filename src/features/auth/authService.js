@@ -1,4 +1,7 @@
 import API_URL from '../../services/api';
+import apiClient from '../../api/apiClient';
+
+const USERS_ENDPOINT = '/users';
 
 function removePassword(user) {
   const { password, ...safeUser } = user;
@@ -6,18 +9,28 @@ function removePassword(user) {
 }
 
 async function login(userData) {
-  const response = await fetch(`${API_URL}/users?email=${userData.email}`);
-  const users = await response.json();
+  const response = await apiClient.get(
+    // `${USERS_ENDPOINT}?email=${userData.email}`,
+    USERS_ENDPOINT,
+    {
+      params: { email: userData.email, password: userData.password },
+    },
+  );
 
-  const foundUser = users.find((user) => {
-    return user.email === userData.email && user.password === userData.password;
-  });
+  // console.log(response.data);
+  // const users = response.data;
 
-  if (!foundUser) {
+  // const foundUser = users.find((user) => {
+  //   return user.email === userData.email && user.password === userData.password;
+  // });
+
+  if (response.data.length === 0) {
     throw new Error('Invalid email or password');
+  } else {
+    console.log('Login successful! User data:', response.data[0]);
   }
 
-  const safeUser = removePassword(foundUser);
+  const safeUser = removePassword(response.data[0]);
 
   localStorage.setItem('freelanceflow_user', JSON.stringify(safeUser));
 

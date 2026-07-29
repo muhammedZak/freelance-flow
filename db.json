@@ -42,6 +42,21 @@
       "role": "freelancer",
       "assignedProjectIds": [],
       "id": "vFuQVL_v_Vk"
+    },
+    {
+      "id": "m-hkd2N"
+    },
+    {
+      "id": "O_Cw_y-"
+    },
+    {
+      "id": "NxYPG3e"
+    },
+    {
+      "id": "kY1JtZO"
+    },
+    {
+      "id": "_SvUSas"
     }
   ],
   "clients": [
@@ -84,6 +99,16 @@
       "address": "Calicut, Kerala",
       "status": "active",
       "createdAt": "2026-07-04"
+    },
+    {
+      "name": "zakariya zaku",
+      "email": "zakariya.zaku018@gmail.com",
+      "phone": "9645019798222",
+      "company": "Sharma Designs",
+      "address": "Maliyekkal Perunthalloor\nSchool Padi",
+      "status": "active",
+      "createdAt": "2026-07-29",
+      "id": "UzAI5xU"
     }
   ],
   "projects": [
@@ -409,6 +434,24 @@
       "type": "payment",
       "createdAt": "2026-07-17T17:45:33.295Z",
       "id": "7MBKvBuh24w"
+    },
+    {
+      "message": "New client added: New Client",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "00sLoW3"
+    },
+    {
+      "message": "Client deleted: New Client",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "cGuG07U"
+    },
+    {
+      "message": "New client added: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-29",
+      "id": "hGGGBLS"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

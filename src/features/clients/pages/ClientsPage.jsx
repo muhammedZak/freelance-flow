@@ -2,23 +2,23 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '../components/common/Loading';
-import ErrorMessage from '../components/common/ErrorMessage';
-import EmptyState from '../components/common/EmptyState';
-import MessageAlert from '../components/common/MessageAlert';
-import Button from '../components/common/Button';
-import ActionLink from '../components/common/ActionLink';
-import PageHeader from '../components/common/PageHeader';
-import SearchInput from '../components/forms/SearchInput';
-import FilterSelect from '../components/forms/FilterSelect';
+import Loading from '@components/common/Loading';
+import ErrorMessage from '@components/common/ErrorMessage';
+import EmptyState from '@components/common/EmptyState';
+import MessageAlert from '@components/common/MessageAlert';
+import Button from '@components/common/Button';
+import ActionLink from '@components/common/ActionLink';
+import PageHeader from '@components/common/PageHeader';
+import SearchInput from '@components/forms/SearchInput';
+import FilterSelect from '@components/forms/FilterSelect';
 
 import {
   clearClientMessages,
   fetchClients,
   removeClient,
-} from '../features/clients/clientsSlice';
+} from '../clientsSlice';
 
-import { formatDate } from '../utils/formatDate';
+import { formatDate } from '@/utils/formatDate';
 
 const clientStatusOptions = [
   {

@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '../components/common/Loading';
-import ErrorMessage from '../components/common/ErrorMessage';
-import ClientForm from '../features/clients/ClientForm';
-import PageHeader from '../components/common/PageHeader';
-import BackLink from '../components/common/BackLink';
+import Loading from '@/components/common/Loading';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import ClientForm from '../components/ClientForm';
+import PageHeader from '@/components/common/PageHeader';
+import BackLink from '@/components/common/BackLink';
 
 import {
   addClient,
@@ -14,7 +14,7 @@ import {
   clearSelectedClient,
   editClient,
   fetchClientById,
-} from '../features/clients/clientsSlice';
+} from '../clientsSlice';
 
 function ClientFormPage() {
   const { id } = useParams();
@@ -64,10 +64,10 @@ function ClientFormPage() {
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prevState) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   }
 
   function validateForm() {
