@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+// import { useSearchParams } from 'react-router-dom';
+
 import { useDispatch, useSelector } from 'react-redux';
 
 import ActionLink from '@components/common/ActionLink';
@@ -12,6 +13,8 @@ import PageHeader from '@components/common/PageHeader';
 import ClientFilters from '../components/ClientFilters';
 import ClientsTable from '../components/ClientsTable';
 
+import useClientFilters from '../hooks/useClientFilters';
+
 import {
   clearClientMessages,
   fetchClients,
@@ -21,15 +24,27 @@ import {
 function ClientsPage() {
   const dispatch = useDispatch();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const searchText = searchParams.get('search') || '';
-  const statusFilter = searchParams.get('status') || 'all';
-  const sortBy = searchParams.get('sort') || 'newest';
-
   const { clients, loading, error, successMessage } = useSelector(
     (state) => state.clients,
   );
+
+  const {
+    searchText,
+    statusFilter,
+    sortBy,
+
+    filteredClients,
+    filteredCount,
+    totalCount,
+
+    hasActiveFilters,
+    emptyMessage,
+
+    updateSearchText,
+    updateStatusFilter,
+    updateSortBy,
+    clearFilters,
+  } = useClientFilters(clients);
 
   useEffect(() => {
     dispatch(fetchClients());
@@ -38,24 +53,6 @@ function ClientsPage() {
       dispatch(clearClientMessages());
     };
   }, [dispatch]);
-
-  function updateSearchParams(key, value) {
-    const newParams = new URLSearchParams(searchParams);
-
-    const isDefaultValue = !value || value === 'all' || value === 'newest';
-
-    if (isDefaultValue) {
-      newParams.delete(key);
-    } else {
-      newParams.set(key, value);
-    }
-
-    setSearchParams(newParams);
-  }
-
-  function clearFilters() {
-    setSearchParams({});
-  }
 
   function handleRetry() {
     dispatch(clearClientMessages());
@@ -71,54 +68,6 @@ function ClientsPage() {
       dispatch(removeClient(String(id)));
     }
   }
-
-  const filteredClients = clients
-    .filter((client) => {
-      const searchValue = searchText.trim().toLowerCase();
-
-      if (!searchValue) {
-        return true;
-      }
-
-      return (
-        client.name?.toLowerCase().includes(searchValue) ||
-        client.email?.toLowerCase().includes(searchValue) ||
-        client.company?.toLowerCase().includes(searchValue)
-      );
-    })
-    .filter((client) => {
-      if (statusFilter === 'all') {
-        return true;
-      }
-
-      return client.status === statusFilter;
-    })
-    .sort((firstClient, secondClient) => {
-      if (sortBy === 'name-asc') {
-        return firstClient.name.localeCompare(secondClient.name);
-      }
-
-      if (sortBy === 'name-desc') {
-        return secondClient.name.localeCompare(firstClient.name);
-      }
-
-      if (sortBy === 'oldest') {
-        return (
-          new Date(firstClient.createdAt) - new Date(secondClient.createdAt)
-        );
-      }
-
-      return new Date(secondClient.createdAt) - new Date(firstClient.createdAt);
-    });
-
-  const hasActiveFilters = Boolean(
-    searchText || statusFilter !== 'all' || sortBy !== 'newest',
-  );
-
-  const emptyMessage =
-    clients.length === 0
-      ? 'No clients have been added.'
-      : 'No clients match the selected filters.';
 
   if (loading && clients.length === 0) {
     return <Loading message='Loading clients.' />;
@@ -159,12 +108,12 @@ function ClientsPage() {
         searchText={searchText}
         statusFilter={statusFilter}
         sortBy={sortBy}
-        filteredCount={filteredClients.length}
-        totalCount={clients.length}
+        filteredCount={filteredCount}
+        totalCount={totalCount}
         hasActiveFilters={hasActiveFilters}
-        onSearchChange={(value) => updateSearchParams('search', value)}
-        onStatusChange={(value) => updateSearchParams('status', value)}
-        onSortChange={(value) => updateSearchParams('sort', value)}
+        onSearchChange={updateSearchText}
+        onStatusChange={updateStatusFilter}
+        onSortChange={updateSortBy}
         onClearFilters={clearFilters}
       />
 
