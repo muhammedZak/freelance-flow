@@ -2,39 +2,10 @@ import Button from '@components/common/Button';
 import FilterSelect from '@/components/forms/FilterSelect';
 import SearchInput from '@/components/forms/SearchInput';
 
-const clientStatusOptions = [
-  {
-    value: 'all',
-    label: 'All Statuses',
-  },
-  {
-    value: 'active',
-    label: 'Active',
-  },
-  {
-    value: 'inactive',
-    label: 'Inactive',
-  },
-];
-
-const clientSortOptions = [
-  {
-    value: 'newest',
-    label: 'Newest First',
-  },
-  {
-    value: 'oldest',
-    label: 'Oldest First',
-  },
-  {
-    value: 'name-asc',
-    label: 'Name: A to Z',
-  },
-  {
-    value: 'name-desc',
-    label: 'Name: Z to A',
-  },
-];
+import {
+  CLIENT_SORT_OPTIONS,
+  CLIENT_FILTER_STATUS_OPTIONS,
+} from '../clients.constants';
 
 function ClientFilters({
   searchText,
@@ -63,14 +34,14 @@ function ClientFilters({
         <FilterSelect
           value={statusFilter}
           onChange={(event) => onStatusChange(event.target.value)}
-          options={clientStatusOptions}
+          options={CLIENT_FILTER_STATUS_OPTIONS}
           ariaLabel='Filter clients by status'
         />
 
         <FilterSelect
           value={sortBy}
           onChange={(event) => onSortChange(event.target.value)}
-          options={clientSortOptions}
+          options={CLIENT_SORT_OPTIONS}
           ariaLabel='Sort clients'
         />
       </div>

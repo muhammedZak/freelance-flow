@@ -22,18 +22,21 @@ import {
   selectSelectedClient,
 } from '../clientsSelectors';
 
+import { INITIAL_CLIENT_FORM_VALUES } from '../clients.constants';
+
+import {
+  getFirstValidationError,
+  hasValidationErrors,
+  validateClientForm,
+} from '../clientsValidation';
+
 function ClientFormPage() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    address: '',
-    status: 'active',
-  });
+  const [formData, setFormData] = useState(() => ({
+    ...INITIAL_CLIENT_FORM_VALUES,
+  }));
 
   const [formError, setFormError] = useState('');
 
@@ -57,12 +60,14 @@ function ClientFormPage() {
   useEffect(() => {
     if (isEditMode && selectedClient) {
       setFormData({
+        ...INITIAL_CLIENT_FORM_VALUES,
+
         name: selectedClient.name || '',
         email: selectedClient.email || '',
         phone: selectedClient.phone || '',
         company: selectedClient.company || '',
         address: selectedClient.address || '',
-        status: selectedClient.status || 'active',
+        status: selectedClient.status ?? INITIAL_CLIENT_FORM_VALUES.status,
       });
     }
   }, [isEditMode, selectedClient]);
@@ -74,54 +79,31 @@ function ClientFormPage() {
       ...prevState,
       [name]: value,
     }));
-  }
 
-  function validateForm() {
-    if (!formData.name.trim()) {
-      return 'Client name is required';
+    if (formError) {
+      setFormError('');
     }
-
-    if (!formData.email.trim()) {
-      return 'Email is required';
-    }
-
-    if (!formData.email.includes('@')) {
-      return 'Enter a valid email';
-    }
-
-    if (!formData.phone.trim()) {
-      return 'Phone number is required';
-    }
-
-    if (!formData.company.trim()) {
-      return 'Company name is required';
-    }
-
-    if (!formData.address.trim()) {
-      return 'Address is required';
-    }
-
-    return '';
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationError = validateForm();
+    setFormError('');
 
-    if (validationError) {
-      setFormError(validationError);
+    const validationErrors = validateClientForm(formData);
+
+    if (hasValidationErrors(validationErrors)) {
+      setFormError(getFirstValidationError(validationErrors));
+
       return;
     }
 
-    setFormError('');
-
     const clientData = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      company: formData.company,
-      address: formData.address,
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim(),
+      company: formData.company.trim(),
+      address: formData.address.trim(),
       status: formData.status,
     };
 
@@ -134,7 +116,9 @@ function ClientFormPage() {
 
       navigate('/clients');
     } catch (error) {
-      setFormError(error);
+      setFormError(
+        typeof error === 'string' ? error : 'Unable to save the client.',
+      );
     }
   }
 

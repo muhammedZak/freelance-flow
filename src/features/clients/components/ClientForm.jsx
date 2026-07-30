@@ -3,10 +3,7 @@ import InputField from '@/components/forms/InputField';
 import SelectField from '@/components/forms/SelectField';
 import TextareaField from '@/components/forms/TextareaField';
 
-const clientStatus = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-];
+import { CLIENT_STATUS_OPTIONS } from '../clients.constants';
 
 function ClientForm({
   formData,
@@ -84,7 +81,7 @@ function ClientForm({
         name='status'
         value={formData.status}
         onChange={onChange}
-        options={clientStatus}
+        options={CLIENT_STATUS_OPTIONS}
       />
 
       <Button type='submit' disabled={loading}>

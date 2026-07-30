@@ -1,25 +1,29 @@
 import { useSearchParams } from 'react-router-dom';
 
-const DEFAULT_FILTER_VALUES = {
-  search: '',
-  status: 'all',
-  sort: 'new',
-};
+import {
+  CLIENT_FILTER_DEFAULTS,
+  CLIENT_FILTER_PARAMS,
+  CLIENT_SORT,
+} from '../clients.constants';
 
 function useClientFilters(clients = []) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const searchText = searchParams.get('search') || DEFAULT_FILTER_VALUES.search;
+  const searchText =
+    searchParams.get(CLIENT_FILTER_PARAMS.SEARCH) ||
+    CLIENT_FILTER_DEFAULTS.search;
 
   const statusFilter =
-    searchParams.get('status') || DEFAULT_FILTER_VALUES.status;
+    searchParams.get(CLIENT_FILTER_PARAMS.STATUS) ||
+    CLIENT_FILTER_DEFAULTS.status;
 
-  const sortBy = searchParams.get('sort') || DEFAULT_FILTER_VALUES.sort;
+  const sortBy =
+    searchParams.get(CLIENT_FILTER_PARAMS.SORT) || CLIENT_FILTER_DEFAULTS.sort;
 
   function updateFilter(parameterName, value) {
     const nextSearchParams = new URLSearchParams(searchParams);
 
-    const defaultValue = DEFAULT_FILTER_VALUES[parameterName];
+    const defaultValue = CLIENT_FILTER_DEFAULTS[parameterName];
 
     if (!value || value === defaultValue) {
       nextSearchParams.delete(parameterName);
@@ -31,23 +35,23 @@ function useClientFilters(clients = []) {
   }
 
   function updateSearchText(value) {
-    updateFilter('search', value);
+    updateFilter(CLIENT_FILTER_PARAMS.SEARCH, value);
   }
 
   function updateStatusFilter(value) {
-    updateFilter('status', value);
+    updateFilter(CLIENT_FILTER_PARAMS.STATUS, value);
   }
 
   function updateSortBy(value) {
-    updateFilter('sort', value);
+    updateFilter(CLIENT_FILTER_PARAMS.SORT, value);
   }
 
   function clearFilters() {
     const params = new URLSearchParams(searchParams);
 
-    params.delete('search');
-    params.delete('status');
-    params.delete('sort');
+    params.delete(CLIENT_FILTER_PARAMS.SEARCH);
+    params.delete(CLIENT_FILTER_PARAMS.STATUS);
+    params.delete(CLIENT_FILTER_PARAMS.SORT);
 
     setSearchParams(params);
   }
@@ -71,22 +75,22 @@ function useClientFilters(clients = []) {
       );
     })
     .filter((client) => {
-      if (statusFilter === DEFAULT_FILTER_VALUES.status) {
+      if (statusFilter === CLIENT_FILTER_DEFAULTS.status) {
         return true;
       }
 
       return client.status === statusFilter;
     })
     .sort((firstClient, secondClient) => {
-      if (sortBy === 'name-asc') {
+      if (sortBy === CLIENT_SORT.NAME_ASCENDING) {
         return (firstClient.name || '').localeCompare(secondClient.name || '');
       }
 
-      if (sortBy === 'name-desc') {
+      if (sortBy === CLIENT_SORT.NAME_DESCENDING) {
         return (secondClient.name || '').localeCompare(firstClient.name || '');
       }
 
-      if (sortBy === 'oldest') {
+      if (sortBy === CLIENT_SORT.OLDEST) {
         return (
           new Date(firstClient.createdAt).getTime() -
           new Date(secondClient.createdAt).getTime()
@@ -100,9 +104,9 @@ function useClientFilters(clients = []) {
     });
 
   const hasActiveFilters =
-    searchText !== DEFAULT_FILTER_VALUES.search ||
-    statusFilter !== DEFAULT_FILTER_VALUES.status ||
-    sortBy !== DEFAULT_FILTER_VALUES.sort;
+    searchText !== CLIENT_FILTER_DEFAULTS.search ||
+    statusFilter !== CLIENT_FILTER_DEFAULTS.status ||
+    sortBy !== CLIENT_FILTER_DEFAULTS.sort;
 
   const emptyMessage =
     clients.length === 0

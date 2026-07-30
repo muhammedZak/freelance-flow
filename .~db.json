@@ -488,6 +488,12 @@
       "type": "client",
       "createdAt": "2026-07-30",
       "id": "MUUI_Bs"
+    },
+    {
+      "message": "Client updated: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-30",
+      "id": "LtuV8zx"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
