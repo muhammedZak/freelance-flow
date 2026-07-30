@@ -2,27 +2,27 @@ import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '../components/common/Loading';
-import ErrorMessage from '../components/common/ErrorMessage';
-import BackLink from '../components/common/BackLink';
-import PageHeader from '../components/common/PageHeader';
-import Button from '../components/common/Button';
-import ActionLink from '../components/common/ActionLink';
-import ProgressBar from '../components/common/ProgressBar';
-import SectionCard from '../components/common/SectionCard';
+import Loading from '@components/common/Loading';
+import ErrorMessage from '@components/common/ErrorMessage';
+import BackLink from '@components/common/BackLink';
+import PageHeader from '@components/common/PageHeader';
+import Button from '@components/common/Button';
+import ActionLink from '@components/common/ActionLink';
+import ProgressBar from '@components/common/ProgressBar';
+import SectionCard from '@components/common/SectionCard';
 
 import { fetchClients } from '@features/clients';
-import { fetchTasks } from '../features/tasks/tasksSlice';
+import { fetchTasks } from '@features/tasks/tasksSlice';
 
 import {
   clearProjectMessages,
   clearSelectedProject,
   fetchProjectById,
   removeProject,
-} from '../features/projects/projectsSlice';
+} from '../projectsSlice';
 
-import { formatCurrency } from '../utils/formatCurrency';
-import { formatDate } from '../utils/formatDate';
+import { formatCurrency } from '@/utils/formatCurrency';
+import { formatDate } from '@/utils/formatDate';
 
 function ProjectDetailsPage() {
   const { id } = useParams();
