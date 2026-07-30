@@ -6,7 +6,7 @@ import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import InvoiceForm from '../features/invoices/InvoiceForm';
 
-import { fetchClients } from '../features/clients/clientsSlice';
+import { fetchClients } from '@features/clients';
 import { fetchProjects } from '../features/projects/projectsSlice';
 
 import {

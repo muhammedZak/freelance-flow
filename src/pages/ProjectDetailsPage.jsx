@@ -11,7 +11,7 @@ import ActionLink from '../components/common/ActionLink';
 import ProgressBar from '../components/common/ProgressBar';
 import SectionCard from '../components/common/SectionCard';
 
-import { fetchClients } from '../features/clients/clientsSlice';
+import { fetchClients } from '@features/clients';
 import { fetchTasks } from '../features/tasks/tasksSlice';
 
 import {
@@ -23,7 +23,6 @@ import {
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-
 
 function ProjectDetailsPage() {
   const { id } = useParams();

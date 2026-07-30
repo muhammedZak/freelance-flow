@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import authReducer from '../features/auth/authSlice';
-import clientsReducer from '../features/clients/clientsSlice';
+import { clientsReducer } from '@features/clients';
 import projectsReducer from '../features/projects/projectsSlice';
 import tasksReducer from '../features/tasks/tasksSlice';
 import invoicesReducer from '../features/invoices/invoicesSlice';

@@ -25,7 +25,7 @@ import {
   selectSelectedClient,
 } from '../clientsSelectors';
 
-function ClientDetailsPage() {
+function ClientDetailesPage() {
   const { id } = useParams();
 
   const dispatch = useDispatch();
@@ -139,4 +139,4 @@ function ClientDetailsPage() {
   );
 }
 
-export default ClientDetailsPage;
+export default ClientDetailesPage;

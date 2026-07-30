@@ -6,7 +6,7 @@ import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 
-import { fetchClients } from '../features/clients/clientsSlice';
+import { fetchClients } from '@features/clients';
 import { fetchProjects } from '../features/projects/projectsSlice';
 import { fetchTasks } from '../features/tasks/tasksSlice';
 import { fetchInvoices } from '../features/invoices/invoicesSlice';

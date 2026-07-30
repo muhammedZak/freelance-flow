@@ -10,7 +10,7 @@ import ActionLink from '../components/common/ActionLink';
 import SearchInput from '../components/forms/SearchInput';
 import FilterSelect from '../components/forms/FilterSelect';
 
-import { fetchClients } from '../features/clients/clientsSlice';
+import { fetchClients } from '@features/clients';
 
 import {
   clearProjectMessages,

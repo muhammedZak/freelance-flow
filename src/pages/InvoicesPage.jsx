@@ -10,7 +10,12 @@ import ActionLink from '../components/common/ActionLink';
 import SearchInput from '../components/forms/SearchInput';
 import FilterSelect from '../components/forms/FilterSelect';
 
-import { fetchClients } from '../features/clients/clientsSlice';
+import {
+  fetchClients,
+  selectAllClients,
+  selectClientsLoading,
+  selectClientsError,
+} from '@features/clients';
 import { fetchProjects } from '../features/projects/projectsSlice';
 
 import {
@@ -82,11 +87,9 @@ function InvoicesPage() {
     successMessage,
   } = useSelector((state) => state.invoices);
 
-  const {
-    clients,
-    loading: clientsLoading,
-    error: clientsError,
-  } = useSelector((state) => state.clients);
+  const clients = useSelector(selectAllClients);
+  const clientsLoading = useSelector(selectClientsLoading);
+  const clientsError = useSelector(selectClientsError);
 
   const {
     projects,

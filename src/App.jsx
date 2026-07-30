@@ -7,9 +7,11 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
-import ClientsPage from '@features/clients/pages/ClientsPage';
-import ClientFormPage from '@features/clients/pages/ClientFormPage';
-import ClientDetailsPage from '@features/clients/pages/ClientDetailsPage';
+import {
+  ClientsPage,
+  ClientDetailesPage,
+  ClientFormPage,
+} from '@features/clients';
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectFormPage from './pages/ProjectFormPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
@@ -59,7 +61,7 @@ function App() {
           path='/clients/:id'
           element={
             <ProtectedRoute allowedRoles={['freelancer', 'admin']}>
-              <ClientDetailsPage />
+              <ClientDetailesPage />
             </ProtectedRoute>
           }
         />
