@@ -1,139 +1,98 @@
-import { useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Loading from '@components/common/Loading';
 import ErrorMessage from '@components/common/ErrorMessage';
 import PageHeader from '@components/common/PageHeader';
 import BackLink from '@components/common/BackLink';
-import ActionLink from '@components/common/ActionLink';
-import Button from '@components/common/Button';
-import SectionCard from '@components/common/SectionCard';
+import EmptyState from '@/components/common/EmptyState';
 
-import {
-  clearClientMessages,
-  clearSelectedClient,
-  fetchClientById,
-  removeClient,
-} from '../clientsSlice';
+import ClientContactCard from '../components/ClientContactCard';
+import ClientDetailsActions from '../components/ClientDetailsActions';
+import ClientMetadataCard from '../components/ClientMetadataCard';
+import ClientOverviewCard from '../components/ClientOverviewCard';
 
-import { formatDate } from '@/utils/formatDate';
-
-import {
-  selectClientsError,
-  selectClientsLoading,
-  selectSelectedClient,
-} from '../clientsSelectors';
+import useClientDetails from '../hooks/useClientDetails';
 
 function ClientDetailesPage() {
   const { id } = useParams();
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const selectedClient = useSelector(selectSelectedClient);
-  const loading = useSelector(selectClientsLoading);
-  const error = useSelector(selectClientsError);
+  const {
+    client,
+    error,
 
-  useEffect(() => {
-    dispatch(clearClientMessages());
-    dispatch(fetchClientById(id));
+    isInitialLoading,
+    isDeleting,
+    hasLoadError,
 
-    return () => {
-      dispatch(clearSelectedClient());
-    };
-  }, [dispatch, id]);
+    retry,
+    deleteCurrentClient,
+  } = useClientDetails(id);
 
   async function handleDelete() {
-    const confirmDelete = window.confirm(
+    const confirmed = window.confirm(
       'Are you sure you want to delete this client?',
     );
 
-    if (!confirmDelete) {
+    if (!confirmed) {
       return;
     }
 
-    try {
-      await dispatch(removeClient(id)).unwrap();
+    const deleted = await deleteCurrentClient();
+
+    if (deleted) {
       navigate('/clients');
-    } catch (error) {
-      console.log(error);
     }
   }
 
-  if (loading && !selectedClient) {
-    return <Loading />;
+  if (isInitialLoading) {
+    return <Loading message='Loading client details.' />;
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
+  if (hasLoadError) {
+    return (
+      <ErrorMessage
+        title='Unable to load client'
+        message={error}
+        onRetry={retry}
+        retryText='Reload Client'
+      />
+    );
   }
 
-  if (!selectedClient) {
-    return <ErrorMessage message='Client not found' />;
+  if (!client) {
+    return <EmptyState message='Client not found.' />;
   }
 
   return (
     <div className='workspace-page'>
-      <div className='mb-4'>
-        <BackLink to='/clients'>Back to Clients</BackLink>
-      </div>
+      <BackLink to='/clients'>Back to Clients</BackLink>
 
       <PageHeader
-        title={selectedClient.name}
-        company={selectedClient.company}
-        description='View the client information and manage this client.'>
-        <ActionLink to={`/clients/${selectedClient.id}/edit`} variant='success'>
-          Edit Client
-        </ActionLink>
-
-        <Button type='button' variant='danger' onClick={handleDelete}>
-          Delete Client
-        </Button>
+        title={client.name}
+        description={client.company || 'View and manage this client.'}>
+        <ClientDetailsActions
+          clientId={client.id}
+          deleting={isDeleting}
+          onDelete={handleDelete}
+        />
       </PageHeader>
 
-      <div className='grid gap-4 md:grid-cols-2'>
-        <SectionCard
-          title='Contact Details'
-          description='Primary contact information for this client.'>
-          <div className='space-y-3 text-sm'>
-            <p>
-              <span className='font-medium text-slate-700'>Email:</span>{' '}
-              {selectedClient.email}
-            </p>
+      {error && (
+        <div className='mb-4'>
+          <MessageAlert type='error' message={error} />
+        </div>
+      )}
 
-            <p>
-              <span className='font-medium text-slate-700'>Phone:</span>{' '}
-              {selectedClient.phone}
-            </p>
+      <div className='grid gap-4 lg:grid-cols-2'>
+        <ClientOverviewCard client={client} />
 
-            <p>
-              <span className='font-medium text-slate-700'>Address:</span>{' '}
-              {selectedClient.address}
-            </p>
-          </div>
-        </SectionCard>
+        <ClientContactCard client={client} />
 
-        <SectionCard title='Client Info'>
-          <div className='space-y-3 text-sm'>
-            <p>
-              <span className='font-medium text-slate-700'>Status:</span>{' '}
-              <span
-                className={
-                  selectedClient.status === 'active'
-                    ? 'rounded bg-green-100 px-2 py-1 text-xs text-green-700'
-                    : 'rounded bg-slate-200 px-2 py-1 text-xs text-slate-700'
-                }>
-                {selectedClient.status}
-              </span>
-            </p>
-
-            <p>
-              <span className='font-medium text-slate-700'>Created At:</span>{' '}
-              {formatDate(selectedClient.createdAt)}
-            </p>
-          </div>
-        </SectionCard>
+        <div className='lg:col-span-2'>
+          <ClientMetadataCard client={client} />
+        </div>
       </div>
     </div>
   );
