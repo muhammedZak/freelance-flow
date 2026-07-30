@@ -12,9 +12,9 @@ import {
   ClientDetailesPage,
   ClientFormPage,
 } from '@features/clients';
-import ProjectsPage from './pages/ProjectsPage';
-import ProjectFormPage from './pages/ProjectFormPage';
-import ProjectDetailsPage from './pages/ProjectDetailsPage';
+import ProjectsPage from '@features/projects/pages/ProjectsPage';
+import ProjectFormPage from '@features/projects/pages/ProjectFormPage';
+import ProjectDetailsPage from '@features/projects/pages/ProjectDetailsPage';
 import ProjectTasksPage from './pages/ProjectTasksPage';
 import InvoicesPage from './pages/InvoicesPage';
 import InvoiceFormPage from './pages/InvoiceFormPage';

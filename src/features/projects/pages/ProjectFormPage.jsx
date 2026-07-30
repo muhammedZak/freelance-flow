@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '@components/common/Loading';
 import ErrorMessage from '@components/common/ErrorMessage';
-import ProjectForm from '@features/projects/ProjectForm';
+import PageHeader from '@components/common/PageHeader';
+import BackLink from '@components/common/BackLink';
+
+import ProjectForm from '../components/ProjectForm';
 
 import { fetchClients, selectAllClients } from '@features/clients';
 
@@ -14,9 +17,7 @@ import {
   clearSelectedProject,
   editProject,
   fetchProjectById,
-} from '@features/projects/projectsSlice';
-import PageHeader from '@components/common/PageHeader';
-import BackLink from '@components/common/BackLink';
+} from '../projectsSlice';
 
 function ProjectFormPage() {
   const { id } = useParams();
