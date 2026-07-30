@@ -1,7 +1,5 @@
 import { CLIENT_STATUS } from '../clients.constants';
 
-CLIENT_STATUS_OPTIONS;
-
 function ClientStatusBadge({ status }) {
   const statusClasses =
     status === CLIENT_STATUS.ACTIVE

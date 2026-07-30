@@ -99,16 +99,6 @@
       "address": "Calicut, Kerala",
       "status": "active",
       "createdAt": "2026-07-04"
-    },
-    {
-      "name": "zakariya zaku",
-      "email": "zakariya.zaku018@gmail.com",
-      "phone": "9645019798",
-      "company": "Zak Designs",
-      "address": "Maliyekkal Perunthalloor\nSchool Padi",
-      "status": "inactive",
-      "createdAt": "2026-07-30",
-      "id": "FuOvG54"
     }
   ],
   "projects": [
@@ -488,6 +478,30 @@
       "type": "client",
       "createdAt": "2026-07-30",
       "id": "MUUI_Bs"
+    },
+    {
+      "message": "New client added: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-30",
+      "id": "lykHE5A"
+    },
+    {
+      "message": "Client deleted: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-30",
+      "id": "S33vSM6"
+    },
+    {
+      "message": "Client updated: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-30",
+      "id": "Yf2Vd_H"
+    },
+    {
+      "message": "Client deleted: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-30",
+      "id": "i6UXGux"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
