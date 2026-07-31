@@ -193,7 +193,7 @@
       "projectId": "2",
       "title": "Create hero section",
       "description": "Build the hero section for the landing page.",
-      "status": "in-progress",
+      "status": "completed",
       "priority": "high",
       "dueDate": "2026-07-20",
       "createdAt": "2026-07-12"
@@ -214,7 +214,7 @@
       "title": "Prepare product card layout",
       "description": "Create a simple product card design.",
       "status": "todo",
-      "priority": "medium",
+      "priority": "high",
       "dueDate": "2026-07-25",
       "createdAt": "2026-07-17"
     },
@@ -616,6 +616,48 @@
       "type": "project",
       "createdAt": "2026-07-31",
       "id": "c9u0dx4"
+    },
+    {
+      "message": "Task updated: Create hero section",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "PoZCFnA"
+    },
+    {
+      "message": "Task updated: Collect landing page content",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "S0B5YcT"
+    },
+    {
+      "message": "Task created: aaaaaaaaaaaaaaaa",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "SeuKz9k"
+    },
+    {
+      "message": "Task updated: aaaaaaaaaaaaaaaa",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "OHD3AhM"
+    },
+    {
+      "message": "Task updated: Prepare product card layout",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "jN_8MQD"
+    },
+    {
+      "message": "Task updated: aaaaaaaaaaaaaaaa",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "1wAXEJW"
+    },
+    {
+      "message": "Task deleted: aaaaaaaaaaaaaaaa",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "EVr4yje"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

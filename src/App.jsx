@@ -17,7 +17,7 @@ import {
   ProjectDetailsPage,
   ProjectFormPage,
 } from '@features/projects';
-import ProjectTasksPage from './pages/ProjectTasksPage';
+import { ProjectTasksPage } from '@features/tasks';
 import InvoicesPage from './pages/InvoicesPage';
 import InvoiceFormPage from './pages/InvoiceFormPage';
 import InvoiceDetailsPage from './pages/InvoiceDetailsPage';

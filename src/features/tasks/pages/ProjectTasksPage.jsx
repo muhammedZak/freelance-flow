@@ -2,36 +2,35 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '../components/common/Loading';
-import ErrorMessage from '../components/common/ErrorMessage';
-import EmptyState from '../components/common/EmptyState';
-import ProgressBar from '../components/common/ProgressBar';
-import SearchInput from '../components/forms/SearchInput';
-import FilterSelect from '../components/forms/FilterSelect';
-
-import TaskForm from '../features/tasks/TaskForm';
+import BackLink from '@components/common/BackLink';
+import Button from '@components/common/Button';
+import EmptyState from '@components/common/EmptyState';
+import ErrorMessage from '@components/common/ErrorMessage';
+import Loading from '@components/common/Loading';
+import PageHeader from '@components/common/PageHeader';
+import ProgressBar from '@components/common/ProgressBar';
+import FilterSelect from '@components/forms/FilterSelect';
+import SearchInput from '@components/forms/SearchInput';
 
 import {
   clearProjectMessages,
   clearSelectedProject,
   fetchProjectById,
-  selectSelectedProject,
   selectIsProjectDetailsLoading,
   selectProjectDetailsError,
+  selectSelectedProject,
 } from '@features/projects';
 
+import { formatDate } from '@/utils/formatDate';
+
+import TaskForm from '../components/TaskForm';
 import {
   addTask,
   clearTaskMessages,
   editTask,
   fetchTasksByProject,
   removeTask,
-} from '../features/tasks/tasksSlice';
-
-import { formatDate } from '../utils/formatDate';
-import PageHeader from '../components/common/PageHeader';
-import Button from '../components/common/Button';
-import BackLink from '../components/common/BackLink';
+} from '../tasksSlice';
 
 const taskStatusOptions = [
   {
@@ -99,11 +98,15 @@ function ProjectTasksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchText = searchParams.get('search') || '';
+
   const statusFilter = searchParams.get('status') || 'all';
+
   const priorityFilter = searchParams.get('priority') || 'all';
+
   const sortBy = searchParams.get('sort') || 'due-date';
 
   const [showTaskForm, setShowTaskForm] = useState(false);
+
   const [editingTask, setEditingTask] = useState(null);
 
   const { user } = useSelector((state) => state.auth);
@@ -360,6 +363,7 @@ function ProjectTasksPage() {
       <div className='mb-4'>
         <BackLink to={`/projects/${id}`}>Back to Project</BackLink>
       </div>
+
       <PageHeader
         title={`${selectedProject.title} Tasks`}
         description='Manage tasks and monitor the project progress.'>
@@ -403,6 +407,7 @@ function ProjectTasksPage() {
             <p className='text-xl font-bold text-slate-900'>
               {projectTasks.length}
             </p>
+
             <p className='text-sm text-slate-500'>Total</p>
           </div>
 
@@ -410,6 +415,7 @@ function ProjectTasksPage() {
             <p className='text-xl font-bold text-slate-900'>
               {todoTasks.length}
             </p>
+
             <p className='text-sm text-slate-500'>To Do</p>
           </div>
 
@@ -417,6 +423,7 @@ function ProjectTasksPage() {
             <p className='text-xl font-bold text-slate-900'>
               {inProgressTasks.length}
             </p>
+
             <p className='text-sm text-slate-500'>In Progress</p>
           </div>
 
@@ -424,6 +431,7 @@ function ProjectTasksPage() {
             <p className='text-xl font-bold text-slate-900'>
               {completedTasks.length}
             </p>
+
             <p className='text-sm text-slate-500'>Completed</p>
           </div>
         </div>
@@ -557,7 +565,9 @@ function ProjectTasksPage() {
                       disabled={taskLoading}
                       className='rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900 disabled:opacity-60'>
                       <option value='todo'>To Do</option>
+
                       <option value='in-progress'>In Progress</option>
+
                       <option value='completed'>Completed</option>
                     </select>
 

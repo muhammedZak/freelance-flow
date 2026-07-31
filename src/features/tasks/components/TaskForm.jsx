@@ -10,6 +10,7 @@ const emptyFormData = {
 
 function TaskForm({ task, loading, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(emptyFormData);
+
   const [formErrors, setFormErrors] = useState({});
 
   const isEditing = Boolean(task);
@@ -164,7 +165,9 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             onChange={handleChange}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
             <option value='todo'>To Do</option>
+
             <option value='in-progress'>In Progress</option>
+
             <option value='completed'>Completed</option>
           </select>
         </div>
@@ -183,7 +186,9 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             onChange={handleChange}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
             <option value='low'>Low</option>
+
             <option value='medium'>Medium</option>
+
             <option value='high'>High</option>
           </select>
         </div>
