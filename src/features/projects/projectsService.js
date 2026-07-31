@@ -75,9 +75,10 @@ async function updateProject(id, projectData) {
 }
 
 async function deleteProject(id) {
-  const project = await getProjectById(id);
+  const deletedProjectId = String(id);
+  const project = await getProjectById(deletedProjectId);
 
-  const response = await fetch(`${API_URL}/projects/${id}`, {
+  const response = await fetch(`${API_URL}/projects/${deletedProjectId}`, {
     method: 'DELETE',
   });
 
@@ -85,13 +86,20 @@ async function deleteProject(id) {
     throw new Error('Failed to delete project');
   }
 
-  await activitiesService.addActivity({
-    message: `Project deleted: ${project.title}`,
-    type: 'project',
-    createdAt: new Date().toISOString().split('T')[0],
-  });
+  try {
+    await activitiesService.addActivity({
+      message: `Project deleted: ${project.title}`,
+      type: 'project',
+      createdAt: new Date().toISOString().split('T')[0],
+    });
+  } catch (activityError) {
+    console.error(
+      'Activity logging failed after Project deletion:',
+      activityError,
+    );
+  }
 
-  return Number(id);
+  return deletedProjectId;
 }
 
 const projectsService = {

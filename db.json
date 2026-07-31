@@ -502,6 +502,72 @@
       "type": "client",
       "createdAt": "2026-07-30",
       "id": "i6UXGux"
+    },
+    {
+      "message": "Project created: Kanban Dashboard",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "iZqtkON"
+    },
+    {
+      "message": "Project updated: Business Landing Page",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "ff61Ve-"
+    },
+    {
+      "message": "Project deleted: Kanban Dashboard",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "4__n91a"
+    },
+    {
+      "message": "Project created: aaaaaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "qcQcUGM"
+    },
+    {
+      "message": "Project deleted: aaaaaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "hDC4R2f"
+    },
+    {
+      "message": "Client deleted: zakariya zaku",
+      "type": "client",
+      "createdAt": "2026-07-31",
+      "id": "UWAhNGB"
+    },
+    {
+      "message": "Project created: aaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "0ZkWWgQ"
+    },
+    {
+      "message": "Project updated: aaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "ZTCF-mR"
+    },
+    {
+      "message": "Project deleted: aaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "25_ZtMW"
+    },
+    {
+      "message": "Project created: aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "j-Y6goA"
+    },
+    {
+      "message": "Project deleted: aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "d-3znZ0"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

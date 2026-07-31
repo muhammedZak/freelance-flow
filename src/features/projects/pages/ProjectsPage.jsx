@@ -12,6 +12,14 @@ import ProjectFilters from '../components/ProjectFilters';
 import ProjectsGrid from '../components/ProjectsGrid';
 import useProjectFilters from '../hooks/useProjectFilters';
 import {
+  selectAllProjects,
+  selectIsProjectDeleting,
+  selectIsProjectsListLoading,
+  selectProjectDeleteError,
+  selectProjectsListError,
+  selectProjectsSuccessMessage,
+} from '../projectsSelectors';
+import {
   clearProjectMessages,
   fetchProjects,
   removeProject,
@@ -21,10 +29,12 @@ function ProjectsPage() {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
-
-  const { projects, loading, error, successMessage } =
-    useSelector((state) => state.projects);
-
+  const projects = useSelector(selectAllProjects);
+  const isListLoading = useSelector(selectIsProjectsListLoading);
+  const listError = useSelector(selectProjectsListError);
+  const isDeleting = useSelector(selectIsProjectDeleting);
+  const deleteError = useSelector(selectProjectDeleteError);
+  const successMessage = useSelector(selectProjectsSuccessMessage);
   const { clients } = useSelector((state) => state.clients);
 
   const canManageProjects =
@@ -67,12 +77,12 @@ function ProjectsPage() {
     }
   }
 
-  if (loading && projects.length === 0) {
+  if (isListLoading && projects.length === 0) {
     return <Loading />;
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
+  if (listError) {
+    return <ErrorMessage message={listError} />;
   }
 
   return (
@@ -89,6 +99,12 @@ function ProjectsPage() {
         <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
           {successMessage}
         </p>
+      )}
+
+      {deleteError && (
+        <div className='mb-4'>
+          <ErrorMessage message={deleteError} />
+        </div>
       )}
 
       <ProjectFilters
@@ -108,7 +124,7 @@ function ProjectsPage() {
         projects={filteredProjects}
         getClientName={getClientName}
         canManageProjects={canManageProjects}
-        isUpdating={loading}
+        isUpdating={isDeleting}
         onDelete={handleDelete}
       />
     </div>

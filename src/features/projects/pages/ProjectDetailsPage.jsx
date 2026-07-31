@@ -2,18 +2,25 @@ import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '@components/common/Loading';
-import ErrorMessage from '@components/common/ErrorMessage';
-import BackLink from '@components/common/BackLink';
-import PageHeader from '@components/common/PageHeader';
-import Button from '@components/common/Button';
 import ActionLink from '@components/common/ActionLink';
+import BackLink from '@components/common/BackLink';
+import Button from '@components/common/Button';
+import ErrorMessage from '@components/common/ErrorMessage';
+import Loading from '@components/common/Loading';
+import PageHeader from '@components/common/PageHeader';
 import ProgressBar from '@components/common/ProgressBar';
 import SectionCard from '@components/common/SectionCard';
 
 import { fetchClients } from '@features/clients';
 import { fetchTasks } from '@features/tasks/tasksSlice';
 
+import {
+  selectIsProjectDeleting,
+  selectIsProjectDetailsLoading,
+  selectProjectDeleteError,
+  selectProjectDetailsError,
+  selectSelectedProject,
+} from '../projectsSelectors';
 import {
   clearProjectMessages,
   clearSelectedProject,
@@ -31,14 +38,14 @@ function ProjectDetailsPage() {
   const navigate = useNavigate();
 
   const { user } = useSelector((state) => state.auth);
-
   const { clients } = useSelector((state) => state.clients);
-
   const { tasks } = useSelector((state) => state.tasks);
 
-  const { selectedProject, loading, error } = useSelector(
-    (state) => state.projects,
-  );
+  const selectedProject = useSelector(selectSelectedProject);
+  const isDetailsLoading = useSelector(selectIsProjectDetailsLoading);
+  const detailsError = useSelector(selectProjectDetailsError);
+  const isDeleting = useSelector(selectIsProjectDeleting);
+  const deleteError = useSelector(selectProjectDeleteError);
 
   const canManageProjects =
     user?.role === 'freelancer' || user?.role === 'admin';
@@ -55,19 +62,17 @@ function ProjectDetailsPage() {
   }, [dispatch, id]);
 
   function getClientName(clientId) {
-    const client = clients.find(
-      (client) => String(client.id) === String(clientId),
-    );
+    const client = clients.find((item) => String(item.id) === String(clientId));
 
     return client ? client.name : 'Unknown Client';
   }
 
   async function handleDelete() {
-    const confirmDelete = window.confirm(
+    const confirmed = window.confirm(
       'Are you sure you want to delete this project?',
     );
 
-    if (!confirmDelete) {
+    if (!confirmed) {
       return;
     }
 
@@ -75,16 +80,16 @@ function ProjectDetailsPage() {
       await dispatch(removeProject(id)).unwrap();
       navigate('/projects');
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
-  if (loading && !selectedProject) {
+  if (isDetailsLoading && !selectedProject) {
     return <Loading />;
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
+  if (detailsError) {
+    return <ErrorMessage message={detailsError} />;
   }
 
   if (!selectedProject) {
@@ -131,12 +136,22 @@ function ProjectDetailsPage() {
               className='bg-green-600 text-white hover:bg-green-500 hover:text-white'>
               Edit
             </ActionLink>
-            <Button variant='danger' onClick={handleDelete}>
-              Delete
+
+            <Button
+              variant='danger'
+              disabled={isDeleting}
+              onClick={handleDelete}>
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </>
         )}
       </PageHeader>
+
+      {deleteError && (
+        <div className='mb-4'>
+          <ErrorMessage message={deleteError} />
+        </div>
+      )}
 
       <div className='grid gap-4 lg:grid-cols-2'>
         <SectionCard title='Project Details'>
@@ -182,7 +197,6 @@ function ProjectDetailsPage() {
           <div className='mt-4 grid grid-cols-3 gap-3 text-center text-sm'>
             <div className='rounded bg-slate-100 p-3'>
               <p className='font-bold text-slate-900'>{projectTasks.length}</p>
-
               <p className='text-slate-500'>Total</p>
             </div>
 
@@ -190,7 +204,6 @@ function ProjectDetailsPage() {
               <p className='font-bold text-slate-900'>
                 {inProgressTasks.length}
               </p>
-
               <p className='text-slate-500'>Progress</p>
             </div>
 
@@ -198,7 +211,6 @@ function ProjectDetailsPage() {
               <p className='font-bold text-slate-900'>
                 {completedTasks.length}
               </p>
-
               <p className='text-slate-500'>Done</p>
             </div>
           </div>
