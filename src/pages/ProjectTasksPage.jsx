@@ -15,7 +15,10 @@ import {
   clearProjectMessages,
   clearSelectedProject,
   fetchProjectById,
-} from '../features/projects/projectsSlice';
+  selectSelectedProject,
+  selectIsProjectDetailsLoading,
+  selectProjectDetailsError,
+} from '@features/projects';
 
 import {
   addTask,
@@ -105,11 +108,11 @@ function ProjectTasksPage() {
 
   const { user } = useSelector((state) => state.auth);
 
-  const {
-    selectedProject,
-    loading: projectLoading,
-    error: projectError,
-  } = useSelector((state) => state.projects);
+  const selectedProject = useSelector(selectSelectedProject);
+
+  const projectLoading = useSelector(selectIsProjectDetailsLoading);
+
+  const projectError = useSelector(selectProjectDetailsError);
 
   const {
     tasks,

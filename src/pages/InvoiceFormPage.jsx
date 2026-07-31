@@ -7,7 +7,12 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import InvoiceForm from '../features/invoices/InvoiceForm';
 
 import { fetchClients } from '@features/clients';
-import { fetchProjects } from '../features/projects/projectsSlice';
+import {
+  fetchProjects,
+  selectAllProjects,
+  selectIsProjectsListLoading,
+  selectProjectsListError,
+} from '@features/projects';
 
 import {
   addInvoice,
@@ -41,11 +46,11 @@ function InvoiceFormPage() {
     error: clientsError,
   } = useSelector((state) => state.clients);
 
-  const {
-    projects,
-    loading: projectsLoading,
-    error: projectsError,
-  } = useSelector((state) => state.projects);
+  const projects = useSelector(selectAllProjects);
+
+  const projectsLoading = useSelector(selectIsProjectsListLoading);
+
+  const projectsError = useSelector(selectProjectsListError);
 
   const { loading: invoiceLoading, error: invoiceError } = useSelector(
     (state) => state.invoices,

@@ -21,7 +21,12 @@ import {
   fetchPayments,
   removePayment,
 } from '../features/payments/paymentsSlice';
-import { fetchProjects } from '../features/projects/projectsSlice';
+import {
+  fetchProjects,
+  selectAllProjects,
+  selectIsProjectsListLoading,
+  selectProjectsListError,
+} from '@features/projects';
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
@@ -121,11 +126,11 @@ function PaymentsPage() {
     error: clientError,
   } = useSelector((state) => state.clients);
 
-  const {
-    projects,
-    loading: projectLoading,
-    error: projectError,
-  } = useSelector((state) => state.projects);
+  const projects = useSelector(selectAllProjects);
+
+  const projectLoading = useSelector(selectIsProjectsListLoading);
+
+  const projectError = useSelector(selectProjectsListError);
 
   const canManagePayments =
     user?.role === 'freelancer' || user?.role === 'admin';

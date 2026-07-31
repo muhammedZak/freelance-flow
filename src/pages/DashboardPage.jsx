@@ -7,7 +7,12 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 
 import { fetchClients } from '@features/clients';
-import { fetchProjects } from '../features/projects/projectsSlice';
+import {
+  fetchProjects,
+  selectAllProjects,
+  selectIsProjectsListLoading,
+  selectProjectsListError,
+} from '@features/projects';
 import { fetchTasks } from '../features/tasks/tasksSlice';
 import { fetchInvoices } from '../features/invoices/invoicesSlice';
 import { fetchActivities } from '../features/activities/activitiesSlice';
@@ -26,11 +31,11 @@ function DashboardPage() {
     error: clientsError,
   } = useSelector((state) => state.clients);
 
-  const {
-    projects,
-    loading: projectsLoading,
-    error: projectsError,
-  } = useSelector((state) => state.projects);
+ const projects = useSelector(selectAllProjects);
+
+ const projectsLoading = useSelector(selectIsProjectsListLoading);
+
+ const projectsError = useSelector(selectProjectsListError);
 
   const {
     tasks,

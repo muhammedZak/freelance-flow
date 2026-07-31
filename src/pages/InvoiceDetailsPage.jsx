@@ -7,7 +7,7 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import SectionCard from '../components/common/SectionCard';
 
 import { fetchClients } from '@features/clients';
-import { fetchProjects } from '../features/projects/projectsSlice';
+import { fetchProjects, selectAllProjects } from '@features/projects';
 
 import {
   clearInvoiceMessages,
@@ -28,7 +28,7 @@ function InvoiceDetailsPage() {
 
   const { user } = useSelector((state) => state.auth);
   const { clients } = useSelector((state) => state.clients);
-  const { projects } = useSelector((state) => state.projects);
+  const projects = useSelector(selectAllProjects);
 
   const { selectedInvoice, loading, error, successMessage } = useSelector(
     (state) => state.invoices,

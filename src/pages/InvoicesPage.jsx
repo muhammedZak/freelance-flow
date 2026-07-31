@@ -16,7 +16,12 @@ import {
   selectClientsLoading,
   selectClientsError,
 } from '@features/clients';
-import { fetchProjects } from '../features/projects/projectsSlice';
+import {
+  fetchProjects,
+  selectAllProjects,
+  selectIsProjectsListLoading,
+  selectProjectsListError,
+} from '@features/projects';
 
 import {
   clearInvoiceMessages,
@@ -91,11 +96,11 @@ function InvoicesPage() {
   const clientsLoading = useSelector(selectClientsLoading);
   const clientsError = useSelector(selectClientsError);
 
-  const {
-    projects,
-    loading: projectsLoading,
-    error: projectsError,
-  } = useSelector((state) => state.projects);
+  const projects = useSelector(selectAllProjects);
+
+  const projectsLoading = useSelector(selectIsProjectsListLoading);
+
+  const projectsError = useSelector(selectProjectsListError);
 
   const canManageInvoices =
     user?.role === 'freelancer' || user?.role === 'admin';
