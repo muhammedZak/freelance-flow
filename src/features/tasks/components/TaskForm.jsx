@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 
+import InputField from '@components/forms/InputField';
+import SelectField from '@components/forms/SelectField';
+import TextareaField from '@components/forms/TextareaField';
+
+import TaskFormHeader from './TaskFormHeader';
 import {
   INITIAL_TASK_FORM_VALUES,
   TASK_PRIORITY_OPTIONS,
@@ -36,13 +41,9 @@ function mapTaskToFormValues(task) {
 
   return {
     title: typeof task.title === 'string' ? task.title : '',
-
     description: typeof task.description === 'string' ? task.description : '',
-
     status: normalizedStatus,
-
     priority: normalizedPriority,
-
     dueDate: typeof task.dueDate === 'string' ? task.dueDate : '',
   };
 }
@@ -57,14 +58,12 @@ function prepareTaskFormData(formData) {
 
 function TaskForm({ task, loading, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(() => mapTaskToFormValues(task));
-
   const [errors, setErrors] = useState({});
 
   const isEditing = Boolean(task);
 
   useEffect(() => {
     setFormData(mapTaskToFormValues(task));
-
     setErrors({});
   }, [task]);
 
@@ -113,180 +112,73 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
       onSubmit={handleSubmit}
       noValidate
       className='mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-      <div className='mb-5 flex items-center justify-between gap-3'>
-        <div>
-          <h2 className='text-lg font-bold text-slate-900'>
-            {isEditing ? 'Edit Task' : 'Add Task'}
-          </h2>
-
-          <p className='text-sm text-slate-500'>
-            {isEditing
-              ? 'Update the selected task details.'
-              : 'Create a new task for this project.'}
-          </p>
-        </div>
-
-        <button
-          type='button'
-          onClick={onCancel}
-          disabled={loading}
-          className='text-sm text-slate-600 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60'>
-          Close
-        </button>
-      </div>
+      <TaskFormHeader
+        isEditing={isEditing}
+        loading={loading}
+        onCancel={onCancel}
+      />
 
       <div className='grid gap-4 md:grid-cols-2'>
         <div className='md:col-span-2'>
-          <label
-            htmlFor='title'
-            className='mb-1 block text-sm font-medium text-slate-700'>
-            Task Title
-          </label>
-
-          <input
+          <InputField
+            label='Task Title'
             id='title'
             name='title'
             type='text'
             value={formData.title}
             onChange={handleChange}
-            aria-invalid={Boolean(errors.title)}
-            aria-describedby={errors.title ? 'title-error' : undefined}
-            className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
             placeholder='Example: Create login page'
+            required
+            error={errors.title}
           />
-
-          {errors.title && (
-            <p
-              id='title-error'
-              role='alert'
-              className='mt-1 text-sm text-red-600'>
-              {errors.title}
-            </p>
-          )}
         </div>
 
         <div className='md:col-span-2'>
-          <label
-            htmlFor='description'
-            className='mb-1 block text-sm font-medium text-slate-700'>
-            Description
-          </label>
-
-          <textarea
+          <TextareaField
+            label='Description'
             id='description'
             name='description'
-            rows='3'
             value={formData.description}
             onChange={handleChange}
-            aria-invalid={Boolean(errors.description)}
-            aria-describedby={
-              errors.description ? 'description-error' : undefined
-            }
-            className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
             placeholder='Enter a short task description'
+            rows={3}
+            required
+            error={errors.description}
           />
-
-          {errors.description && (
-            <p
-              id='description-error'
-              role='alert'
-              className='mt-1 text-sm text-red-600'>
-              {errors.description}
-            </p>
-          )}
         </div>
 
-        <div>
-          <label
-            htmlFor='status'
-            className='mb-1 block text-sm font-medium text-slate-700'>
-            Status
-          </label>
+        <SelectField
+          label='Status'
+          id='status'
+          name='status'
+          value={formData.status}
+          onChange={handleChange}
+          options={TASK_STATUS_OPTIONS}
+          required
+          error={errors.status}
+        />
 
-          <select
-            id='status'
-            name='status'
-            value={formData.status}
-            onChange={handleChange}
-            aria-invalid={Boolean(errors.status)}
-            aria-describedby={errors.status ? 'status-error' : undefined}
-            className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            {TASK_STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+        <SelectField
+          label='Priority'
+          id='priority'
+          name='priority'
+          value={formData.priority}
+          onChange={handleChange}
+          options={TASK_PRIORITY_OPTIONS}
+          required
+          error={errors.priority}
+        />
 
-          {errors.status && (
-            <p
-              id='status-error'
-              role='alert'
-              className='mt-1 text-sm text-red-600'>
-              {errors.status}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor='priority'
-            className='mb-1 block text-sm font-medium text-slate-700'>
-            Priority
-          </label>
-
-          <select
-            id='priority'
-            name='priority'
-            value={formData.priority}
-            onChange={handleChange}
-            aria-invalid={Boolean(errors.priority)}
-            aria-describedby={errors.priority ? 'priority-error' : undefined}
-            className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            {TASK_PRIORITY_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          {errors.priority && (
-            <p
-              id='priority-error'
-              role='alert'
-              className='mt-1 text-sm text-red-600'>
-              {errors.priority}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor='dueDate'
-            className='mb-1 block text-sm font-medium text-slate-700'>
-            Due Date
-          </label>
-
-          <input
-            id='dueDate'
-            name='dueDate'
-            type='date'
-            value={formData.dueDate}
-            onChange={handleChange}
-            aria-invalid={Boolean(errors.dueDate)}
-            aria-describedby={errors.dueDate ? 'due-date-error' : undefined}
-            className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
-          />
-
-          {errors.dueDate && (
-            <p
-              id='due-date-error'
-              role='alert'
-              className='mt-1 text-sm text-red-600'>
-              {errors.dueDate}
-            </p>
-          )}
-        </div>
+        <InputField
+          label='Due Date'
+          id='dueDate'
+          name='dueDate'
+          type='date'
+          value={formData.dueDate}
+          onChange={handleChange}
+          required
+          error={errors.dueDate}
+        />
       </div>
 
       <div className='mt-5 flex gap-3'>
