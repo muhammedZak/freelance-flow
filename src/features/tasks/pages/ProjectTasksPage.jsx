@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
 import BackLink from '@components/common/BackLink';
 import Button from '@components/common/Button';
@@ -8,38 +6,15 @@ import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
 import PageHeader from '@components/common/PageHeader';
 
-import {
-  clearProjectMessages,
-  clearSelectedProject,
-  fetchProjectById,
-  selectIsProjectDetailsLoading,
-  selectProjectDetailsError,
-  selectSelectedProject,
-} from '@features/projects';
-
 import TaskFilters from '../components/TaskFilters';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import TaskProgressCard from '../components/TaskProgressCard';
+import useProjectTasks from '../hooks/useProjectTasks';
 import useTaskFilters from '../hooks/useTaskFilters';
-import {
-  selectFilteredAndSortedTasks,
-  selectProjectTasks,
-  selectTaskProgressStats,
-  selectTasksState,
-} from '../tasksSelectors';
-import {
-  addTask,
-  clearTaskMessages,
-  editTask,
-  fetchTasksByProject,
-  removeTask,
-} from '../tasksSlice';
 
 function ProjectTasksPage() {
   const { id } = useParams();
-
-  const dispatch = useDispatch();
 
   const {
     searchText,
@@ -55,149 +30,51 @@ function ProjectTasksPage() {
     clearFilters,
   } = useTaskFilters();
 
-  const [showTaskForm, setShowTaskForm] = useState(false);
-
-  const [editingTask, setEditingTask] = useState(null);
-
-  const { user } = useSelector((state) => state.auth);
-
-  const selectedProject = useSelector(selectSelectedProject);
-
-  const projectLoading = useSelector(selectIsProjectDetailsLoading);
-
-  const projectError = useSelector(selectProjectDetailsError);
-
   const {
-    loading: taskLoading,
-    error: taskError,
+    project,
+
+    clientHasAccess,
+    canManageTasks,
+
+    isProjectLoading,
+    isProjectNotFound,
+    projectError,
+
+    taskMutationLoading,
+    isInitialTaskLoading,
+    taskError,
     successMessage,
-  } = useSelector(selectTasksState);
 
-  const projectTasks = useSelector((state) => selectProjectTasks(state, id));
+    filteredTasks,
 
-  const filteredTasks = useSelector((state) =>
-    selectFilteredAndSortedTasks(
-      state,
-      id,
-      searchText,
-      statusFilter,
-      priorityFilter,
-      sortBy,
-    ),
-  );
-
-  const {
-    total: totalTasks,
-    todo: todoTasks,
-    inProgress: inProgressTasks,
-    completed: completedTasks,
+    totalTasks,
+    todoTasks,
+    inProgressTasks,
+    completedTasks,
     progressPercentage,
-  } = useSelector((state) => selectTaskProgressStats(state, id));
 
-  const canManageTasks = user?.role === 'freelancer' || user?.role === 'admin';
+    showTaskForm,
+    editingTask,
 
-  const clientHasAccess =
-    user?.role !== 'client' ||
-    user?.assignedProjectIds
-      ?.map((projectId) => String(projectId))
-      .includes(String(id));
+    openAddTaskForm,
+    openEditTaskForm,
+    closeTaskForm,
 
-  useEffect(() => {
-    dispatch(clearTaskMessages());
-    dispatch(clearProjectMessages());
-    dispatch(fetchProjectById(id));
-    dispatch(fetchTasksByProject(id));
-
-    return () => {
-      dispatch(clearTaskMessages());
-      dispatch(clearSelectedProject());
-    };
-  }, [dispatch, id]);
-
-  function openAddTaskForm() {
-    dispatch(clearTaskMessages());
-    setEditingTask(null);
-    setShowTaskForm(true);
-  }
-
-  function openEditTaskForm(task) {
-    dispatch(clearTaskMessages());
-    setEditingTask(task);
-    setShowTaskForm(true);
-  }
-
-  function closeTaskForm() {
-    setEditingTask(null);
-    setShowTaskForm(false);
-  }
-
-  async function handleSaveTask(formData) {
-    try {
-      if (editingTask) {
-        await dispatch(
-          editTask({
-            id: String(editingTask.id),
-            taskData: {
-              ...formData,
-              projectId: String(id),
-            },
-          }),
-        ).unwrap();
-      } else {
-        await dispatch(
-          addTask({
-            ...formData,
-            projectId: String(id),
-          }),
-        ).unwrap();
-      }
-
-      closeTaskForm();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function handleStatusChange(task, newStatus) {
-    try {
-      await dispatch(
-        editTask({
-          id: String(task.id),
-          taskData: {
-            status: newStatus,
-          },
-        }),
-      ).unwrap();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function handleDeleteTask(task) {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${task.title}"?`,
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
-    try {
-      await dispatch(removeTask(String(task.id))).unwrap();
-
-      if (editingTask && String(editingTask.id) === String(task.id)) {
-        closeTaskForm();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    saveTask,
+    changeTaskStatus,
+    deleteTask,
+  } = useProjectTasks(id, {
+    searchText,
+    statusFilter,
+    priorityFilter,
+    sortBy,
+  });
 
   if (!clientHasAccess) {
     return <ErrorMessage message='You do not have access to this project.' />;
   }
 
-  if (projectLoading && !selectedProject) {
+  if (isProjectLoading) {
     return <Loading />;
   }
 
@@ -205,7 +82,7 @@ function ProjectTasksPage() {
     return <ErrorMessage message={projectError} />;
   }
 
-  if (!selectedProject) {
+  if (isProjectNotFound || !project) {
     return <ErrorMessage message='Project not found' />;
   }
 
@@ -216,7 +93,7 @@ function ProjectTasksPage() {
       </div>
 
       <PageHeader
-        title={`${selectedProject.title} Tasks`}
+        title={`${project.title} Tasks`}
         description='Manage tasks and monitor the project progress.'>
         {canManageTasks && <Button onClick={openAddTaskForm}>Add Task</Button>}
       </PageHeader>
@@ -236,8 +113,8 @@ function ProjectTasksPage() {
       {showTaskForm && canManageTasks && (
         <TaskForm
           task={editingTask}
-          loading={taskLoading}
-          onSubmit={handleSaveTask}
+          loading={taskMutationLoading}
+          onSubmit={saveTask}
           onCancel={closeTaskForm}
         />
       )}
@@ -268,12 +145,12 @@ function ProjectTasksPage() {
       <TaskList
         tasks={filteredTasks}
         totalTaskCount={totalTasks}
-        isInitialLoading={taskLoading && projectTasks.length === 0}
+        isInitialLoading={isInitialTaskLoading}
         canManageTasks={canManageTasks}
-        isUpdating={taskLoading}
+        isUpdating={taskMutationLoading}
         onEdit={openEditTaskForm}
-        onDelete={handleDeleteTask}
-        onStatusChange={handleStatusChange}
+        onDelete={deleteTask}
+        onStatusChange={changeTaskStatus}
       />
     </div>
   );
