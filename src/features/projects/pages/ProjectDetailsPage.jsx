@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import BackLink from '@components/common/BackLink';
 import ErrorMessage from '@components/common/ErrorMessage';
@@ -13,13 +13,7 @@ import { fetchTasks } from '@features/tasks/tasksSlice';
 import ProjectDetailsActions from '../components/ProjectDetailsActions';
 import ProjectOverviewCard from '../components/ProjectOverviewCard';
 import ProjectProgressCard from '../components/ProjectProgressCard';
-import {
-  selectIsProjectDeleting,
-  selectIsProjectDetailsLoading,
-  selectProjectDeleteError,
-  selectProjectDetailsError,
-  selectSelectedProject,
-} from '../projectsSelectors';
+import useProjectDetails from '../hooks/useProjectDetails';
 import {
   clearProjectMessages,
   clearSelectedProject,
@@ -33,22 +27,24 @@ function ProjectDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user } = useSelector((state) => state.auth);
-  const { clients } = useSelector((state) => state.clients);
-  const { tasks } = useSelector((state) => state.tasks);
+  const {
+    project,
+    clientName,
 
-  const selectedProject = useSelector(selectSelectedProject);
+    hasAccess,
+    canManageProjects,
+    isCurrentProject,
 
-  const isDetailsLoading = useSelector(selectIsProjectDetailsLoading);
+    totalTaskCount,
+    completedTaskCount,
+    inProgressTaskCount,
+    progressPercentage,
 
-  const detailsError = useSelector(selectProjectDetailsError);
-
-  const isDeleting = useSelector(selectIsProjectDeleting);
-
-  const deleteError = useSelector(selectProjectDeleteError);
-
-  const canManageProjects =
-    user?.role === 'freelancer' || user?.role === 'admin';
+    isLoading,
+    detailsError,
+    isDeleting,
+    deleteError,
+  } = useProjectDetails(id);
 
   useEffect(() => {
     dispatch(clearProjectMessages());
@@ -60,12 +56,6 @@ function ProjectDetailsPage() {
       dispatch(clearSelectedProject());
     };
   }, [dispatch, id]);
-
-  function getClientName(clientId) {
-    const client = clients.find((item) => String(item.id) === String(clientId));
-
-    return client ? client.name : 'Unknown Client';
-  }
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -84,7 +74,11 @@ function ProjectDetailsPage() {
     }
   }
 
-  if (isDetailsLoading && !selectedProject) {
+  if (!hasAccess) {
+    return <ErrorMessage message='You do not have access to this project.' />;
+  }
+
+  if (isLoading) {
     return <Loading />;
   }
 
@@ -92,26 +86,9 @@ function ProjectDetailsPage() {
     return <ErrorMessage message={detailsError} />;
   }
 
-  if (!selectedProject) {
+  if (!isCurrentProject || !project) {
     return <ErrorMessage message='Project not found' />;
   }
-
-  const projectTasks = tasks.filter(
-    (task) => String(task.projectId) === String(selectedProject.id),
-  );
-
-  const completedTasks = projectTasks.filter(
-    (task) => task.status === 'completed',
-  );
-
-  const inProgressTasks = projectTasks.filter(
-    (task) => task.status === 'in-progress',
-  );
-
-  const progressPercentage =
-    projectTasks.length > 0
-      ? Math.round((completedTasks.length / projectTasks.length) * 100)
-      : 0;
 
   return (
     <div className='workspace-page'>
@@ -119,11 +96,9 @@ function ProjectDetailsPage() {
         <BackLink to='/projects'>Back to Projects</BackLink>
       </div>
 
-      <PageHeader
-        title={selectedProject.title}
-        description={`Client: ${getClientName(selectedProject.clientId)}`}>
+      <PageHeader title={project.title} description={`Client: ${clientName}`}>
         <ProjectDetailsActions
-          projectId={selectedProject.id}
+          projectId={project.id}
           canManageProjects={canManageProjects}
           isDeleting={isDeleting}
           onDelete={handleDelete}
@@ -137,12 +112,12 @@ function ProjectDetailsPage() {
       )}
 
       <div className='grid gap-4 lg:grid-cols-2'>
-        <ProjectOverviewCard project={selectedProject} />
+        <ProjectOverviewCard project={project} />
 
         <ProjectProgressCard
-          totalTasks={projectTasks.length}
-          completedTasks={completedTasks.length}
-          inProgressTasks={inProgressTasks.length}
+          totalTasks={totalTaskCount}
+          completedTasks={completedTaskCount}
+          inProgressTasks={inProgressTaskCount}
           progressPercentage={progressPercentage}
         />
       </div>
