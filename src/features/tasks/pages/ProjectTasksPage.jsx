@@ -95,20 +95,30 @@ function ProjectTasksPage() {
       <PageHeader
         title={`${project.title} Tasks`}
         description='Manage tasks and monitor the project progress.'>
-        {canManageTasks && <Button onClick={openAddTaskForm}>Add Task</Button>}
+        {canManageTasks && (
+          <Button type='button' onClick={openAddTaskForm}>
+            Add Task
+          </Button>
+        )}
       </PageHeader>
 
-      {successMessage && (
-        <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
-          {successMessage}
-        </p>
-      )}
+      <div aria-live='polite' aria-atomic='true'>
+        {successMessage && (
+          <p
+            role='status'
+            className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
+            {successMessage}
+          </p>
+        )}
+      </div>
 
-      {taskError && (
-        <div className='mb-4'>
-          <ErrorMessage message={taskError} />
-        </div>
-      )}
+      <div aria-live='assertive' aria-atomic='true'>
+        {taskError && (
+          <div className='mb-4'>
+            <ErrorMessage message={taskError} />
+          </div>
+        )}
+      </div>
 
       {showTaskForm && canManageTasks && (
         <TaskForm
