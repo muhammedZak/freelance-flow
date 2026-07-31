@@ -22,7 +22,12 @@ import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import TaskProgressCard from '../components/TaskProgressCard';
 import useTaskFilters from '../hooks/useTaskFilters';
-import { TASK_PRIORITY, TASK_STATUS } from '../tasks.constants';
+import {
+  selectFilteredAndSortedTasks,
+  selectProjectTasks,
+  selectTaskProgressStats,
+  selectTasksState,
+} from '../tasksSelectors';
 import {
   addTask,
   clearTaskMessages,
@@ -63,11 +68,31 @@ function ProjectTasksPage() {
   const projectError = useSelector(selectProjectDetailsError);
 
   const {
-    tasks,
     loading: taskLoading,
     error: taskError,
     successMessage,
-  } = useSelector((state) => state.tasks);
+  } = useSelector(selectTasksState);
+
+  const projectTasks = useSelector((state) => selectProjectTasks(state, id));
+
+  const filteredTasks = useSelector((state) =>
+    selectFilteredAndSortedTasks(
+      state,
+      id,
+      searchText,
+      statusFilter,
+      priorityFilter,
+      sortBy,
+    ),
+  );
+
+  const {
+    total: totalTasks,
+    todo: todoTasks,
+    inProgress: inProgressTasks,
+    completed: completedTasks,
+    progressPercentage,
+  } = useSelector((state) => selectTaskProgressStats(state, id));
 
   const canManageTasks = user?.role === 'freelancer' || user?.role === 'admin';
 
@@ -88,67 +113,6 @@ function ProjectTasksPage() {
       dispatch(clearSelectedProject());
     };
   }, [dispatch, id]);
-
-  const projectTasks = tasks.filter(
-    (task) => String(task.projectId) === String(id),
-  );
-
-  const completedTasks = projectTasks.filter(
-    (task) => task.status === TASK_STATUS.COMPLETED,
-  );
-
-  const inProgressTasks = projectTasks.filter(
-    (task) => task.status === TASK_STATUS.IN_PROGRESS,
-  );
-
-  const todoTasks = projectTasks.filter(
-    (task) => task.status === TASK_STATUS.TODO,
-  );
-
-  const progress =
-    projectTasks.length > 0
-      ? Math.round((completedTasks.length / projectTasks.length) * 100)
-      : 0;
-
-  const filteredTasks = projectTasks
-    .filter((task) => {
-      const searchValue = searchText.toLowerCase();
-
-      const matchesSearch =
-        task.title.toLowerCase().includes(searchValue) ||
-        task.description.toLowerCase().includes(searchValue);
-
-      const matchesStatus =
-        statusFilter === 'all' || task.status === statusFilter;
-
-      const matchesPriority =
-        priorityFilter === 'all' || task.priority === priorityFilter;
-
-      return matchesSearch && matchesStatus && matchesPriority;
-    })
-    .sort((firstTask, secondTask) => {
-      if (sortBy === 'newest') {
-        return new Date(secondTask.createdAt) - new Date(firstTask.createdAt);
-      }
-
-      if (sortBy === 'title') {
-        return firstTask.title.localeCompare(secondTask.title);
-      }
-
-      if (sortBy === 'priority') {
-        const priorityOrder = {
-          [TASK_PRIORITY.HIGH]: 1,
-          [TASK_PRIORITY.MEDIUM]: 2,
-          [TASK_PRIORITY.LOW]: 3,
-        };
-
-        return (
-          priorityOrder[firstTask.priority] - priorityOrder[secondTask.priority]
-        );
-      }
-
-      return new Date(firstTask.dueDate) - new Date(secondTask.dueDate);
-    });
 
   function openAddTaskForm() {
     dispatch(clearTaskMessages());
@@ -279,11 +243,11 @@ function ProjectTasksPage() {
       )}
 
       <TaskProgressCard
-        totalTasks={projectTasks.length}
-        todoTasks={todoTasks.length}
-        inProgressTasks={inProgressTasks.length}
-        completedTasks={completedTasks.length}
-        progressPercentage={progress}
+        totalTasks={totalTasks}
+        todoTasks={todoTasks}
+        inProgressTasks={inProgressTasks}
+        completedTasks={completedTasks}
+        progressPercentage={progressPercentage}
       />
 
       <TaskFilters
@@ -292,7 +256,7 @@ function ProjectTasksPage() {
         priorityFilter={priorityFilter}
         sortBy={sortBy}
         filteredCount={filteredTasks.length}
-        totalCount={projectTasks.length}
+        totalCount={totalTasks}
         hasActiveFilters={hasActiveFilters}
         onSearchChange={setSearchText}
         onStatusChange={setStatusFilter}
@@ -303,7 +267,7 @@ function ProjectTasksPage() {
 
       <TaskList
         tasks={filteredTasks}
-        totalTaskCount={projectTasks.length}
+        totalTaskCount={totalTasks}
         isInitialLoading={taskLoading && projectTasks.length === 0}
         canManageTasks={canManageTasks}
         isUpdating={taskLoading}
