@@ -1,28 +1,34 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-const DEFAULT_STATUS_FILTER = 'all';
-const DEFAULT_SORT = 'newest';
+import {
+  PROJECT_FILTER_DEFAULTS,
+  PROJECT_FILTER_PARAMS,
+  PROJECT_SORT,
+} from '../projects.constants';
 
 function useProjectFilters({ projects = [], clients = [], user }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const searchText = searchParams.get('search') || '';
+  const searchText =
+    searchParams.get(PROJECT_FILTER_PARAMS.SEARCH) ??
+    PROJECT_FILTER_DEFAULTS.search;
+
   const statusFilter =
-    searchParams.get('status') || DEFAULT_STATUS_FILTER;
-  const sortBy = searchParams.get('sort') || DEFAULT_SORT;
+    searchParams.get(PROJECT_FILTER_PARAMS.STATUS) ??
+    PROJECT_FILTER_DEFAULTS.status;
+
+  const sortBy =
+    searchParams.get(PROJECT_FILTER_PARAMS.SORT) ??
+    PROJECT_FILTER_DEFAULTS.sort;
 
   const clientNamesById = useMemo(
-    () =>
-      new Map(
-        clients.map((client) => [String(client.id), client.name]),
-      ),
+    () => new Map(clients.map((client) => [String(client.id), client.name])),
     [clients],
   );
 
   const getClientName = useCallback(
-    (clientId) =>
-      clientNamesById.get(String(clientId)) || 'Unknown Client',
+    (clientId) => clientNamesById.get(String(clientId)) || 'Unknown Client',
     [clientNamesById],
   );
 
@@ -46,12 +52,10 @@ function useProjectFilters({ projects = [], clients = [], user }) {
     return visibleProjects
       .filter((project) => {
         const title = String(project.title || '').toLowerCase();
-        const description = String(
-          project.description || '',
-        ).toLowerCase();
-        const clientName = getClientName(
-          project.clientId,
-        ).toLowerCase();
+
+        const description = String(project.description || '').toLowerCase();
+
+        const clientName = getClientName(project.clientId).toLowerCase();
 
         const matchesSearch =
           title.includes(normalizedSearchText) ||
@@ -59,44 +63,31 @@ function useProjectFilters({ projects = [], clients = [], user }) {
           clientName.includes(normalizedSearchText);
 
         const matchesStatus =
-          statusFilter === DEFAULT_STATUS_FILTER ||
+          statusFilter === PROJECT_FILTER_DEFAULTS.status ||
           project.status === statusFilter;
 
         return matchesSearch && matchesStatus;
       })
       .sort((firstProject, secondProject) => {
-        if (sortBy === 'title-asc') {
-          return firstProject.title.localeCompare(
-            secondProject.title,
+        if (sortBy === PROJECT_SORT.TITLE_ASCENDING) {
+          return firstProject.title.localeCompare(secondProject.title);
+        }
+
+        if (sortBy === PROJECT_SORT.DEADLINE) {
+          return (
+            new Date(firstProject.deadline) - new Date(secondProject.deadline)
           );
         }
 
-        if (sortBy === 'deadline') {
-          return (
-            new Date(firstProject.deadline) -
-            new Date(secondProject.deadline)
-          );
-        }
-
-        if (sortBy === 'budget-high') {
-          return (
-            Number(secondProject.budget) -
-            Number(firstProject.budget)
-          );
+        if (sortBy === PROJECT_SORT.BUDGET_HIGH) {
+          return Number(secondProject.budget) - Number(firstProject.budget);
         }
 
         return (
-          new Date(secondProject.createdAt) -
-          new Date(firstProject.createdAt)
+          new Date(secondProject.createdAt) - new Date(firstProject.createdAt)
         );
       });
-  }, [
-    getClientName,
-    searchText,
-    sortBy,
-    statusFilter,
-    visibleProjects,
-  ]);
+  }, [getClientName, searchText, sortBy, statusFilter, visibleProjects]);
 
   const updateSearchParam = useCallback(
     (key, value, defaultValue = '') => {
@@ -114,23 +105,32 @@ function useProjectFilters({ projects = [], clients = [], user }) {
   );
 
   const setSearchText = useCallback(
-    (value) => updateSearchParam('search', value),
+    (value) =>
+      updateSearchParam(
+        PROJECT_FILTER_PARAMS.SEARCH,
+        value,
+        PROJECT_FILTER_DEFAULTS.search,
+      ),
     [updateSearchParam],
   );
 
   const setStatusFilter = useCallback(
     (value) =>
       updateSearchParam(
-        'status',
+        PROJECT_FILTER_PARAMS.STATUS,
         value,
-        DEFAULT_STATUS_FILTER,
+        PROJECT_FILTER_DEFAULTS.status,
       ),
     [updateSearchParam],
   );
 
   const setSortBy = useCallback(
     (value) =>
-      updateSearchParam('sort', value, DEFAULT_SORT),
+      updateSearchParam(
+        PROJECT_FILTER_PARAMS.SORT,
+        value,
+        PROJECT_FILTER_DEFAULTS.sort,
+      ),
     [updateSearchParam],
   );
 
@@ -140,8 +140,8 @@ function useProjectFilters({ projects = [], clients = [], user }) {
 
   const hasActiveFilters =
     Boolean(searchText) ||
-    statusFilter !== DEFAULT_STATUS_FILTER ||
-    sortBy !== DEFAULT_SORT;
+    statusFilter !== PROJECT_FILTER_DEFAULTS.status ||
+    sortBy !== PROJECT_FILTER_DEFAULTS.sort;
 
   return {
     searchText,

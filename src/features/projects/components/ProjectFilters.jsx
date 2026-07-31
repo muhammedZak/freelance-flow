@@ -2,20 +2,10 @@ import Button from '@components/common/Button';
 import FilterSelect from '@components/forms/FilterSelect';
 import SearchInput from '@components/forms/SearchInput';
 
-const projectStatusOptions = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'planning', label: 'Planning' },
-  { value: 'active', label: 'Active' },
-  { value: 'on-hold', label: 'On Hold' },
-  { value: 'completed', label: 'Completed' },
-];
-
-const projectSortOptions = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'deadline', label: 'Deadline' },
-  { value: 'title-asc', label: 'Title: A to Z' },
-  { value: 'budget-high', label: 'Highest Budget' },
-];
+import {
+  PROJECT_FILTER_STATUS_OPTIONS,
+  PROJECT_SORT_OPTIONS,
+} from '../projects.constants';
 
 function ProjectFilters({
   searchText,
@@ -35,9 +25,7 @@ function ProjectFilters({
         <div className='sm:col-span-2'>
           <SearchInput
             value={searchText}
-            onChange={(event) =>
-              onSearchChange(event.target.value)
-            }
+            onChange={(event) => onSearchChange(event.target.value)}
             placeholder='Search projects or clients'
             ariaLabel='Search projects'
           />
@@ -45,17 +33,15 @@ function ProjectFilters({
 
         <FilterSelect
           value={statusFilter}
-          onChange={(event) =>
-            onStatusChange(event.target.value)
-          }
-          options={projectStatusOptions}
+          onChange={(event) => onStatusChange(event.target.value)}
+          options={PROJECT_FILTER_STATUS_OPTIONS}
           ariaLabel='Filter projects by status'
         />
 
         <FilterSelect
           value={sortBy}
           onChange={(event) => onSortChange(event.target.value)}
-          options={projectSortOptions}
+          options={PROJECT_SORT_OPTIONS}
           ariaLabel='Sort projects'
         />
       </div>

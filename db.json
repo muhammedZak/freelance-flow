@@ -141,7 +141,7 @@
       "title": "E-commerce Website",
       "description": "A simple online store UI for a small business.",
       "status": "on-hold",
-      "startDate": "2026-07-18",
+      "startDate": "2026-07-01",
       "deadline": "2026-08-10",
       "budget": 45000,
       "createdAt": "2026-07-17"
@@ -580,6 +580,30 @@
       "type": "project",
       "createdAt": "2026-07-31",
       "id": "DtPvwgB"
+    },
+    {
+      "message": "Project updated: E-commerce Website",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "ykR-_qW"
+    },
+    {
+      "message": "Project created: aaaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "POGfx2V"
+    },
+    {
+      "message": "Project updated: aaaaaaaabbbbbb",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "NBIoqkt"
+    },
+    {
+      "message": "Project deleted: aaaaaaaabbbbbb",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "HS3BDhH"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

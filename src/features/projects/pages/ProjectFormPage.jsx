@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -10,12 +10,11 @@ import PageHeader from '@components/common/PageHeader';
 import { fetchClients, selectAllClients } from '@features/clients';
 
 import ProjectForm from '../components/ProjectForm';
+import useProjectForm from '../hooks/useProjectForm';
 import {
   selectIsProjectDetailsLoading,
   selectIsProjectSaving,
-  selectProjectCreateError,
   selectProjectDetailsError,
-  selectProjectUpdateError,
   selectSelectedProject,
 } from '../projectsSelectors';
 import {
@@ -30,17 +29,6 @@ function ProjectFormPage() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    clientId: '',
-    description: '',
-    status: 'planning',
-    startDate: '',
-    deadline: '',
-    budget: '',
-  });
-  const [formError, setFormError] = useState('');
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -48,9 +36,24 @@ function ProjectFormPage() {
   const selectedProject = useSelector(selectSelectedProject);
   const isDetailsLoading = useSelector(selectIsProjectDetailsLoading);
   const detailsError = useSelector(selectProjectDetailsError);
-  const createError = useSelector(selectProjectCreateError);
-  const updateError = useSelector(selectProjectUpdateError);
   const isSaving = useSelector(selectIsProjectSaving);
+
+  const currentProject =
+    selectedProject && String(selectedProject.id) === String(id)
+      ? selectedProject
+      : null;
+
+  const {
+    formData,
+    fieldErrors,
+    submissionError,
+    handleChange,
+    validateAndBuildProjectData,
+    setSubmissionError,
+  } = useProjectForm({
+    project: currentProject,
+    isEditMode,
+  });
 
   useEffect(() => {
     dispatch(clearProjectMessages());
@@ -63,114 +66,42 @@ function ProjectFormPage() {
     }
   }, [dispatch, id, isEditMode]);
 
-  useEffect(() => {
-    const isCurrentProject =
-      selectedProject && String(selectedProject.id) === String(id);
-
-    if (isEditMode && isCurrentProject) {
-      setFormData({
-        title: selectedProject.title || '',
-        clientId: String(selectedProject.clientId || ''),
-        description: selectedProject.description || '',
-        status: selectedProject.status || 'planning',
-        startDate: selectedProject.startDate || '',
-        deadline: selectedProject.deadline || '',
-        budget: String(selectedProject.budget || ''),
-      });
-    }
-  }, [id, isEditMode, selectedProject]);
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((currentFormData) => ({
-      ...currentFormData,
-      [name]: value,
-    }));
-  }
-
-  function validateForm() {
-    if (!formData.title.trim()) {
-      return 'Project title is required';
-    }
-
-    if (!formData.clientId) {
-      return 'Please select a client';
-    }
-
-    if (!formData.description.trim()) {
-      return 'Project description is required';
-    }
-
-    if (!formData.startDate) {
-      return 'Start date is required';
-    }
-
-    if (!formData.deadline) {
-      return 'Deadline is required';
-    }
-
-    if (new Date(formData.deadline) < new Date(formData.startDate)) {
-      return 'Deadline cannot be before start date';
-    }
-
-    if (!formData.budget) {
-      return 'Budget is required';
-    }
-
-    if (Number(formData.budget) <= 0) {
-      return 'Budget must be greater than 0';
-    }
-
-    return '';
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationError = validateForm();
+    const projectData = validateAndBuildProjectData();
 
-    if (validationError) {
-      setFormError(validationError);
+    if (!projectData) {
       return;
     }
 
-    setFormError('');
-
-    const projectData = {
-      title: formData.title,
-      clientId: formData.clientId,
-      description: formData.description,
-      status: formData.status,
-      startDate: formData.startDate,
-      deadline: formData.deadline,
-      budget: Number(formData.budget),
-    };
-
     try {
       if (isEditMode) {
-        await dispatch(editProject({ id, projectData })).unwrap();
+        await dispatch(
+          editProject({
+            id,
+            projectData,
+          }),
+        ).unwrap();
       } else {
         await dispatch(addProject(projectData)).unwrap();
       }
 
       navigate('/projects');
     } catch (error) {
-      setFormError(error);
+      setSubmissionError(error);
     }
   }
 
-  if (isEditMode && isDetailsLoading && !selectedProject) {
+  if (isEditMode && isDetailsLoading && !currentProject) {
     return <Loading />;
   }
 
-  if (isEditMode && detailsError && !selectedProject) {
+  if (isEditMode && detailsError && !currentProject) {
     return <ErrorMessage message={detailsError} />;
   }
 
-  const submissionError = isEditMode ? updateError : createError;
-
-  const title = isEditMode ? 'Edit project' : 'Add Project';
+  const title = isEditMode ? 'Edit Project' : 'Add Project';
 
   const description = isEditMode
     ? 'Update the selected project details.'
@@ -182,13 +113,12 @@ function ProjectFormPage() {
         <BackLink to='/projects'>Back to Projects</BackLink>
       </PageHeader>
 
-      {submissionError && <ErrorMessage message={submissionError} />}
-
       <div className='max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
         <ProjectForm
           formData={formData}
-          formError={formError}
-          loading={isSaving}
+          fieldErrors={fieldErrors}
+          submissionError={submissionError}
+          isSubmitting={isSaving}
           clients={clients}
           isEditMode={isEditMode}
           onChange={handleChange}
