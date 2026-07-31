@@ -8,13 +8,12 @@ import Button from '@components/common/Button';
 import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
 import PageHeader from '@components/common/PageHeader';
-import ProgressBar from '@components/common/ProgressBar';
-import SectionCard from '@components/common/SectionCard';
 
 import { fetchClients } from '@features/clients';
 import { fetchTasks } from '@features/tasks/tasksSlice';
 
 import ProjectOverviewCard from '../components/ProjectOverviewCard';
+import ProjectProgressCard from '../components/ProjectProgressCard';
 import {
   selectIsProjectDeleting,
   selectIsProjectDetailsLoading,
@@ -106,7 +105,7 @@ function ProjectDetailsPage() {
     (task) => task.status === 'in-progress',
   );
 
-  const progress =
+  const progressPercentage =
     projectTasks.length > 0
       ? Math.round((completedTasks.length / projectTasks.length) * 100)
       : 0;
@@ -154,39 +153,12 @@ function ProjectDetailsPage() {
       <div className='grid gap-4 lg:grid-cols-2'>
         <ProjectOverviewCard project={selectedProject} />
 
-        <SectionCard title='Project Progress'>
-          <div className='mb-3 flex items-center justify-between text-sm'>
-            <span className='text-slate-600'>
-              {completedTasks.length} of {projectTasks.length} tasks completed
-            </span>
-          </div>
-
-          <ProgressBar value={progress} height='large' showLabel />
-
-          <div className='mt-4 grid grid-cols-3 gap-3 text-center text-sm'>
-            <div className='rounded bg-slate-100 p-3'>
-              <p className='font-bold text-slate-900'>{projectTasks.length}</p>
-
-              <p className='text-slate-500'>Total</p>
-            </div>
-
-            <div className='rounded bg-slate-100 p-3'>
-              <p className='font-bold text-slate-900'>
-                {inProgressTasks.length}
-              </p>
-
-              <p className='text-slate-500'>Progress</p>
-            </div>
-
-            <div className='rounded bg-slate-100 p-3'>
-              <p className='font-bold text-slate-900'>
-                {completedTasks.length}
-              </p>
-
-              <p className='text-slate-500'>Done</p>
-            </div>
-          </div>
-        </SectionCard>
+        <ProjectProgressCard
+          totalTasks={projectTasks.length}
+          completedTasks={completedTasks.length}
+          inProgressTasks={inProgressTasks.length}
+          progressPercentage={progressPercentage}
+        />
       </div>
     </div>
   );
