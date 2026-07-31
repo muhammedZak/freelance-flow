@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import ActionLink from '@components/common/ActionLink';
 import BackLink from '@components/common/BackLink';
-import Button from '@components/common/Button';
 import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
 import PageHeader from '@components/common/PageHeader';
@@ -12,6 +10,7 @@ import PageHeader from '@components/common/PageHeader';
 import { fetchClients } from '@features/clients';
 import { fetchTasks } from '@features/tasks/tasksSlice';
 
+import ProjectDetailsActions from '../components/ProjectDetailsActions';
 import ProjectOverviewCard from '../components/ProjectOverviewCard';
 import ProjectProgressCard from '../components/ProjectProgressCard';
 import {
@@ -39,9 +38,13 @@ function ProjectDetailsPage() {
   const { tasks } = useSelector((state) => state.tasks);
 
   const selectedProject = useSelector(selectSelectedProject);
+
   const isDetailsLoading = useSelector(selectIsProjectDetailsLoading);
+
   const detailsError = useSelector(selectProjectDetailsError);
+
   const isDeleting = useSelector(selectIsProjectDeleting);
+
   const deleteError = useSelector(selectProjectDeleteError);
 
   const canManageProjects =
@@ -119,29 +122,12 @@ function ProjectDetailsPage() {
       <PageHeader
         title={selectedProject.title}
         description={`Client: ${getClientName(selectedProject.clientId)}`}>
-        <Link
-          to={`/projects/${selectedProject.id}/tasks`}
-          className='rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-500'>
-          View Tasks
-        </Link>
-
-        {canManageProjects && (
-          <>
-            <ActionLink
-              to={`/projects/${selectedProject.id}/edit`}
-              variant='success'
-              className='bg-green-600 text-white hover:bg-green-500 hover:text-white'>
-              Edit
-            </ActionLink>
-
-            <Button
-              variant='danger'
-              disabled={isDeleting}
-              onClick={handleDelete}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </Button>
-          </>
-        )}
+        <ProjectDetailsActions
+          projectId={selectedProject.id}
+          canManageProjects={canManageProjects}
+          isDeleting={isDeleting}
+          onDelete={handleDelete}
+        />
       </PageHeader>
 
       {deleteError && (
