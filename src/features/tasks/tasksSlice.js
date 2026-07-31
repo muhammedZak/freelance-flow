@@ -1,8 +1,12 @@
-import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 
-import getApiErrorMessage from '@/shared/api/getApiErrorMessage';
-
-import tasksService from './tasksService';
+import {
+  addTask,
+  editTask,
+  fetchTasks,
+  fetchTasksByProject,
+  removeTask,
+} from './tasksThunks';
 
 const ASYNC_STATUS = Object.freeze({
   IDLE: 'idle',
@@ -29,18 +33,17 @@ const initialState = {
   tasks: [],
 
   /*
-   * Backward-compatible fetch-only flag.
+   * Fetch-only compatibility flag.
    *
-   * Create, update, and delete operations do not set
-   * this flag, preventing them from activating initial
-   * Task-list loading layouts.
+   * Task mutations do not set this flag, so creating,
+   * updating, or deleting a Task cannot activate the
+   * initial Task-list loading layout.
    */
   loading: false,
 
   /*
-   * Shared mutation flag for forms and Task controls.
-   * Later selectors and orchestration Hooks can consume
-   * this independently from fetch loading.
+   * Shared mutation flag used by Task forms and
+   * Task-level mutation controls.
    */
   mutationLoading: false,
 
@@ -60,14 +63,6 @@ const initialState = {
     delete: createOperationState(),
   },
 };
-
-function rejectRequest(rejectWithValue, error, fallbackMessage) {
-  return rejectWithValue(getApiErrorMessage(error, fallbackMessage));
-}
-
-function isAbortError(error, signal) {
-  return signal?.aborted || error?.name === 'AbortError';
-}
 
 function startOperation(operation) {
   operation.status = ASYNC_STATUS.LOADING;
@@ -122,96 +117,6 @@ function decrementPendingMutations(state) {
 
   state.mutationLoading = state.pendingMutationCount > 0;
 }
-
-export const fetchTasks = createAsyncThunk(
-  'tasks/fetchTasks',
-  async (_, { rejectWithValue, signal }) => {
-    try {
-      return await tasksService.getTasks({
-        signal,
-      });
-    } catch (error) {
-      if (isAbortError(error, signal)) {
-        throw error;
-      }
-
-      return rejectRequest(rejectWithValue, error, 'Unable to load tasks.');
-    }
-  },
-  {
-    condition: (_, { getState }) => {
-      const status = getState().tasks?.operations?.fetchAll?.status;
-
-      return status !== ASYNC_STATUS.LOADING;
-    },
-  },
-);
-
-export const fetchTasksByProject = createAsyncThunk(
-  'tasks/fetchTasksByProject',
-  async (projectId, { rejectWithValue, signal }) => {
-    try {
-      return await tasksService.getTasksByProject(projectId, {
-        signal,
-      });
-    } catch (error) {
-      if (isAbortError(error, signal)) {
-        throw error;
-      }
-
-      return rejectRequest(
-        rejectWithValue,
-        error,
-        'Unable to load project tasks.',
-      );
-    }
-  },
-);
-
-export const addTask = createAsyncThunk(
-  'tasks/addTask',
-  async (taskData, { rejectWithValue }) => {
-    try {
-      return await tasksService.createTask(taskData);
-    } catch (error) {
-      return rejectRequest(
-        rejectWithValue,
-        error,
-        'Unable to create the task.',
-      );
-    }
-  },
-);
-
-export const editTask = createAsyncThunk(
-  'tasks/editTask',
-  async ({ id, taskData }, { rejectWithValue }) => {
-    try {
-      return await tasksService.updateTask(id, taskData);
-    } catch (error) {
-      return rejectRequest(
-        rejectWithValue,
-        error,
-        'Unable to update the task.',
-      );
-    }
-  },
-);
-
-export const removeTask = createAsyncThunk(
-  'tasks/removeTask',
-  async (id, { rejectWithValue }) => {
-    try {
-      return await tasksService.deleteTask(id);
-    } catch (error) {
-      return rejectRequest(
-        rejectWithValue,
-        error,
-        'Unable to delete the task.',
-      );
-    }
-  },
-);
 
 const isTaskFetchPending = isAnyOf(
   fetchTasks.pending,
@@ -446,5 +351,13 @@ const tasksSlice = createSlice({
 });
 
 export const { clearTaskMessages } = tasksSlice.actions;
+
+/*
+ * Temporary compatibility exports for internal feature
+ * modules that previously imported thunks directly from
+ * tasksSlice. The public Tasks API exports the thunks
+ * directly from tasksThunks.js.
+ */
+export { addTask, editTask, fetchTasks, fetchTasksByProject, removeTask };
 
 export default tasksSlice.reducer;

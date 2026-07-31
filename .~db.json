@@ -700,6 +700,12 @@
       "type": "task",
       "createdAt": "2026-07-31",
       "id": "AHfwdBO"
+    },
+    {
+      "message": "Task deleted: qqqqqqqqqqqqqqqqq",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "A0URL4v"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
