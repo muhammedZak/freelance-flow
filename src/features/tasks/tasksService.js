@@ -5,39 +5,79 @@ function getCurrentDate() {
   return new Date().toISOString().split('T')[0];
 }
 
-async function getTasks() {
-  const response = await fetch(`${API_URL}/tasks`);
-
+async function readJsonResponse(response, fallbackMessage) {
   if (!response.ok) {
-    throw new Error('Failed to fetch tasks');
+    let errorMessage = fallbackMessage;
+
+    try {
+      const errorData = await response.json();
+
+      errorMessage = errorData?.message || errorData?.error || fallbackMessage;
+    } catch {
+      /*
+       * The response did not contain JSON error data.
+       * Keep the provided fallback message.
+       */
+    }
+
+    throw new Error(errorMessage);
   }
 
-  return await response.json();
+  return response.json();
 }
 
-async function getTasksByProject(projectId) {
-  const response = await fetch(`${API_URL}/tasks`);
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch project tasks');
+async function logTaskActivity(message) {
+  try {
+    await activitiesService.addActivity({
+      message,
+      type: 'task',
+      createdAt: getCurrentDate(),
+    });
+  } catch (error) {
+    console.error(
+      'Task operation succeeded, but activity logging failed:',
+      error,
+    );
   }
-
-  const tasks = await response.json();
-
-  return tasks.filter((task) => String(task.projectId) === String(projectId));
 }
 
-async function getTaskById(id) {
-  const response = await fetch(`${API_URL}/tasks/${id}`);
+/*
+ * Retained for compatibility with the existing fetchTasks
+ * thunk and Tasks feature public API.
+ */
+export async function getTasks({ signal } = {}) {
+  const response = await fetch(`${API_URL}/tasks`, {
+    signal,
+  });
 
-  if (!response.ok) {
-    throw new Error('Task not found');
-  }
-
-  return await response.json();
+  return readJsonResponse(response, 'Failed to fetch tasks');
 }
 
-async function createTask(taskData) {
+export async function getTasksByProject(projectId, { signal } = {}) {
+  const normalizedProjectId = String(projectId);
+
+  const query = new URLSearchParams({
+    projectId: normalizedProjectId,
+  });
+
+  const response = await fetch(`${API_URL}/tasks?${query.toString()}`, {
+    signal,
+  });
+
+  return readJsonResponse(response, 'Failed to fetch project tasks');
+}
+
+async function getTaskById(id, { signal } = {}) {
+  const normalizedTaskId = String(id);
+
+  const response = await fetch(`${API_URL}/tasks/${normalizedTaskId}`, {
+    signal,
+  });
+
+  return readJsonResponse(response, 'Task not found');
+}
+
+export async function createTask(taskData) {
   const newTask = {
     ...taskData,
     id: Date.now().toString(),
@@ -53,22 +93,16 @@ async function createTask(taskData) {
     body: JSON.stringify(newTask),
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to create task');
-  }
+  const savedTask = await readJsonResponse(response, 'Failed to create task');
 
-  const savedTask = await response.json();
-
-  await activitiesService.addActivity({
-    message: `Task created: ${savedTask.title}`,
-    type: 'task',
-    createdAt: getCurrentDate(),
-  });
+  await logTaskActivity(`Task created: ${savedTask.title}`);
 
   return savedTask;
 }
 
-async function updateTask(id, taskData) {
+export async function updateTask(id, taskData) {
+  const normalizedTaskId = String(id);
+
   const updatedData = {
     ...taskData,
   };
@@ -77,7 +111,7 @@ async function updateTask(id, taskData) {
     updatedData.projectId = String(updatedData.projectId);
   }
 
-  const response = await fetch(`${API_URL}/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/tasks/${normalizedTaskId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -85,25 +119,19 @@ async function updateTask(id, taskData) {
     body: JSON.stringify(updatedData),
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to update task');
-  }
+  const updatedTask = await readJsonResponse(response, 'Failed to update task');
 
-  const updatedTask = await response.json();
-
-  await activitiesService.addActivity({
-    message: `Task updated: ${updatedTask.title}`,
-    type: 'task',
-    createdAt: getCurrentDate(),
-  });
+  await logTaskActivity(`Task updated: ${updatedTask.title}`);
 
   return updatedTask;
 }
 
-async function deleteTask(id) {
-  const task = await getTaskById(id);
+export async function deleteTask(id) {
+  const normalizedTaskId = String(id);
 
-  const response = await fetch(`${API_URL}/tasks/${id}`, {
+  const task = await getTaskById(normalizedTaskId);
+
+  const response = await fetch(`${API_URL}/tasks/${normalizedTaskId}`, {
     method: 'DELETE',
   });
 
@@ -111,13 +139,9 @@ async function deleteTask(id) {
     throw new Error('Failed to delete task');
   }
 
-  await activitiesService.addActivity({
-    message: `Task deleted: ${task.title}`,
-    type: 'task',
-    createdAt: getCurrentDate(),
-  });
+  await logTaskActivity(`Task deleted: ${task.title}`);
 
-  return String(id);
+  return normalizedTaskId;
 }
 
 const tasksService = {
