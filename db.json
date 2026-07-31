@@ -213,7 +213,7 @@
       "projectId": "4",
       "title": "Prepare product card layout",
       "description": "Create a simple product card design.",
-      "status": "completed",
+      "status": "todo",
       "priority": "high",
       "dueDate": "2026-07-25",
       "createdAt": "2026-07-17"
@@ -223,7 +223,7 @@
       "projectId": "4",
       "title": "Design cart page",
       "description": "Create a basic cart page layout.",
-      "status": "in-progress",
+      "status": "completed",
       "priority": "high",
       "dueDate": "2026-07-30",
       "createdAt": "2026-07-17"
@@ -676,6 +676,18 @@
       "type": "task",
       "createdAt": "2026-07-31",
       "id": "0BdJcSC"
+    },
+    {
+      "message": "Task updated: Prepare product card layout",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "hVcib7L"
+    },
+    {
+      "message": "Task updated: Design cart page",
+      "type": "task",
+      "createdAt": "2026-07-31",
+      "id": "8N_wZs3"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

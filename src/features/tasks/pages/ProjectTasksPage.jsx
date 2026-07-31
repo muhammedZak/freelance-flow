@@ -4,13 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import BackLink from '@components/common/BackLink';
 import Button from '@components/common/Button';
-import EmptyState from '@components/common/EmptyState';
 import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
 import PageHeader from '@components/common/PageHeader';
-import ProgressBar from '@components/common/ProgressBar';
-import FilterSelect from '@components/forms/FilterSelect';
-import SearchInput from '@components/forms/SearchInput';
 
 import {
   clearProjectMessages,
@@ -21,19 +17,11 @@ import {
   selectSelectedProject,
 } from '@features/projects';
 
-import { formatDate } from '@/utils/formatDate';
-
+import TaskFilters from '../components/TaskFilters';
 import TaskForm from '../components/TaskForm';
-import {
-  getTaskPriorityClasses,
-  getTaskStatusClasses,
-  getTaskStatusLabel,
-  TASK_PRIORITY,
-  TASK_PRIORITY_OPTIONS,
-  TASK_SORT_OPTIONS,
-  TASK_STATUS,
-  TASK_STATUS_OPTIONS,
-} from '../tasks.constants';
+import TaskList from '../components/TaskList';
+import TaskProgressCard from '../components/TaskProgressCard';
+import { TASK_PRIORITY, TASK_STATUS } from '../tasks.constants';
 import {
   addTask,
   clearTaskMessages,
@@ -41,22 +29,6 @@ import {
   fetchTasksByProject,
   removeTask,
 } from '../tasksSlice';
-
-const taskStatusFilterOptions = [
-  {
-    value: 'all',
-    label: 'All Statuses',
-  },
-  ...TASK_STATUS_OPTIONS,
-];
-
-const taskPriorityFilterOptions = [
-  {
-    value: 'all',
-    label: 'All Priorities',
-  },
-  ...TASK_PRIORITY_OPTIONS,
-];
 
 function ProjectTasksPage() {
   const { id } = useParams();
@@ -326,212 +298,39 @@ function ProjectTasksPage() {
         />
       )}
 
-      <div className='mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-        <div className='mb-3 flex items-center justify-between gap-3'>
-          <h2 className='text-lg font-bold text-slate-900'>Project Progress</h2>
-        </div>
+      <TaskProgressCard
+        totalTasks={projectTasks.length}
+        todoTasks={todoTasks.length}
+        inProgressTasks={inProgressTasks.length}
+        completedTasks={completedTasks.length}
+        progressPercentage={progress}
+      />
 
-        <ProgressBar value={progress} height='medium' showLabel />
+      <TaskFilters
+        searchText={searchText}
+        statusFilter={statusFilter}
+        priorityFilter={priorityFilter}
+        sortBy={sortBy}
+        filteredCount={filteredTasks.length}
+        totalCount={projectTasks.length}
+        hasActiveFilters={Boolean(hasActiveFilters)}
+        onSearchChange={(value) => updateSearchParams('search', value)}
+        onStatusChange={(value) => updateSearchParams('status', value)}
+        onPriorityChange={(value) => updateSearchParams('priority', value)}
+        onSortChange={(value) => updateSearchParams('sort', value)}
+        onClear={clearFilters}
+      />
 
-        <p className='mt-2 text-sm text-slate-500'>
-          {completedTasks.length} of {projectTasks.length} tasks completed
-        </p>
-
-        <div className='mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4'>
-          <div className='rounded bg-slate-100 p-3 text-center'>
-            <p className='text-xl font-bold text-slate-900'>
-              {projectTasks.length}
-            </p>
-
-            <p className='text-sm text-slate-500'>Total</p>
-          </div>
-
-          <div className='rounded bg-slate-100 p-3 text-center'>
-            <p className='text-xl font-bold text-slate-900'>
-              {todoTasks.length}
-            </p>
-
-            <p className='text-sm text-slate-500'>To Do</p>
-          </div>
-
-          <div className='rounded bg-slate-100 p-3 text-center'>
-            <p className='text-xl font-bold text-slate-900'>
-              {inProgressTasks.length}
-            </p>
-
-            <p className='text-sm text-slate-500'>In Progress</p>
-          </div>
-
-          <div className='rounded bg-slate-100 p-3 text-center'>
-            <p className='text-xl font-bold text-slate-900'>
-              {completedTasks.length}
-            </p>
-
-            <p className='text-sm text-slate-500'>Completed</p>
-          </div>
-        </div>
-      </div>
-
-      <div className='mb-4'>
-        <div className='mb-3'>
-          <h2 className='text-xl font-bold text-slate-900'>Task List</h2>
-
-          <p className='text-sm text-slate-500'>
-            Search, filter, and sort project tasks.
-          </p>
-        </div>
-
-        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-2 xl:grid'>
-          <SearchInput
-            value={searchText}
-            onChange={(event) =>
-              updateSearchParams('search', event.target.value)
-            }
-            placeholder='Search tasks'
-            ariaLabel='Search project tasks'
-          />
-
-          <FilterSelect
-            value={statusFilter}
-            onChange={(event) =>
-              updateSearchParams('status', event.target.value)
-            }
-            options={taskStatusFilterOptions}
-            ariaLabel='Filter tasks by status'
-          />
-
-          <FilterSelect
-            value={priorityFilter}
-            onChange={(event) =>
-              updateSearchParams('priority', event.target.value)
-            }
-            options={taskPriorityFilterOptions}
-            ariaLabel='Filter tasks by priority'
-          />
-
-          <FilterSelect
-            value={sortBy}
-            onChange={(event) => updateSearchParams('sort', event.target.value)}
-            options={TASK_SORT_OPTIONS}
-            ariaLabel='Sort tasks'
-          />
-        </div>
-
-        <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
-          <p className='text-slate-500'>
-            Showing {filteredTasks.length} of {projectTasks.length} tasks
-          </p>
-
-          {hasActiveFilters && (
-            <button
-              type='button'
-              onClick={clearFilters}
-              className='self-start text-blue-600 sm:self-auto'>
-              Clear Filters
-            </button>
-          )}
-        </div>
-      </div>
-
-      {taskLoading && projectTasks.length === 0 ? (
-        <Loading />
-      ) : filteredTasks.length === 0 ? (
-        <EmptyState
-          message={
-            projectTasks.length === 0
-              ? 'No tasks have been added to this project.'
-              : 'No tasks match the selected filters.'
-          }
-        />
-      ) : (
-        <div className='space-y-4'>
-          {filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-              <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
-                <div className='flex-1'>
-                  <div className='mb-2 flex flex-wrap items-center gap-2'>
-                    <h3 className='text-lg font-bold text-slate-900'>
-                      {task.title}
-                    </h3>
-
-                    <span
-                      className={`rounded px-2 py-1 text-xs ${getTaskStatusClasses(
-                        task.status,
-                      )}`}>
-                      {getTaskStatusLabel(task.status)}
-                    </span>
-
-                    <span
-                      className={`rounded px-2 py-1 text-xs capitalize ${getTaskPriorityClasses(
-                        task.priority,
-                      )}`}>
-                      {task.priority} priority
-                    </span>
-                  </div>
-
-                  <p className='mb-3 text-sm text-slate-600'>
-                    {task.description}
-                  </p>
-
-                  <div className='flex flex-wrap gap-4 text-sm text-slate-500'>
-                    <p>
-                      <span className='font-medium text-slate-700'>Due:</span>{' '}
-                      {formatDate(task.dueDate)}
-                    </p>
-
-                    <p>
-                      <span className='font-medium text-slate-700'>
-                        Created:
-                      </span>{' '}
-                      {formatDate(task.createdAt)}
-                    </p>
-                  </div>
-                </div>
-
-                {canManageTasks && (
-                  <div className='flex flex-col gap-3 sm:flex-row md:flex-col'>
-                    <select
-                      value={task.status}
-                      onChange={(event) =>
-                        handleStatusChange(task, event.target.value)
-                      }
-                      disabled={taskLoading}
-                      className='rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900 disabled:opacity-60'>
-                      {TASK_STATUS_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-
-                    <div className='flex gap-3'>
-                      <button
-                        type='button'
-                        onClick={() => openEditTaskForm(task)}
-                        className='text-sm text-green-600'>
-                        Edit
-                      </button>
-
-                      <button
-                        type='button'
-                        onClick={() => handleDeleteTask(task)}
-                        className='text-sm text-red-600'>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {taskLoading && (
-            <p className='text-sm text-slate-500'>Updating tasks...</p>
-          )}
-        </div>
-      )}
+      <TaskList
+        tasks={filteredTasks}
+        totalTaskCount={projectTasks.length}
+        isInitialLoading={taskLoading && projectTasks.length === 0}
+        canManageTasks={canManageTasks}
+        isUpdating={taskLoading}
+        onEdit={openEditTaskForm}
+        onDelete={handleDeleteTask}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   );
 }
