@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import BackLink from '@components/common/BackLink';
@@ -21,6 +21,7 @@ import TaskFilters from '../components/TaskFilters';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import TaskProgressCard from '../components/TaskProgressCard';
+import useTaskFilters from '../hooks/useTaskFilters';
 import { TASK_PRIORITY, TASK_STATUS } from '../tasks.constants';
 import {
   addTask,
@@ -34,17 +35,20 @@ function ProjectTasksPage() {
   const { id } = useParams();
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    searchText,
+    statusFilter,
+    priorityFilter,
+    sortBy,
+    hasActiveFilters,
 
-  const searchText = searchParams.get('search') || '';
-
-  const statusFilter = searchParams.get('status') || 'all';
-
-  const priorityFilter = searchParams.get('priority') || 'all';
-
-  const sortBy = searchParams.get('sort') || 'due-date';
+    setSearchText,
+    setStatusFilter,
+    setPriorityFilter,
+    setSortBy,
+    clearFilters,
+  } = useTaskFilters();
 
   const [showTaskForm, setShowTaskForm] = useState(false);
 
@@ -84,24 +88,6 @@ function ProjectTasksPage() {
       dispatch(clearSelectedProject());
     };
   }, [dispatch, id]);
-
-  function updateSearchParams(key, value) {
-    const newParams = new URLSearchParams(searchParams);
-
-    const isDefaultValue = !value || value === 'all' || value === 'due-date';
-
-    if (isDefaultValue) {
-      newParams.delete(key);
-    } else {
-      newParams.set(key, value);
-    }
-
-    setSearchParams(newParams);
-  }
-
-  function clearFilters() {
-    setSearchParams({});
-  }
 
   const projectTasks = tasks.filter(
     (task) => String(task.projectId) === String(id),
@@ -163,12 +149,6 @@ function ProjectTasksPage() {
 
       return new Date(firstTask.dueDate) - new Date(secondTask.dueDate);
     });
-
-  const hasActiveFilters =
-    searchText ||
-    statusFilter !== 'all' ||
-    priorityFilter !== 'all' ||
-    sortBy !== 'due-date';
 
   function openAddTaskForm() {
     dispatch(clearTaskMessages());
@@ -313,11 +293,11 @@ function ProjectTasksPage() {
         sortBy={sortBy}
         filteredCount={filteredTasks.length}
         totalCount={projectTasks.length}
-        hasActiveFilters={Boolean(hasActiveFilters)}
-        onSearchChange={(value) => updateSearchParams('search', value)}
-        onStatusChange={(value) => updateSearchParams('status', value)}
-        onPriorityChange={(value) => updateSearchParams('priority', value)}
-        onSortChange={(value) => updateSearchParams('sort', value)}
+        hasActiveFilters={hasActiveFilters}
+        onSearchChange={setSearchText}
+        onStatusChange={setStatusFilter}
+        onPriorityChange={setPriorityFilter}
+        onSortChange={setSortBy}
         onClear={clearFilters}
       />
 
