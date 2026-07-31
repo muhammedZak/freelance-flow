@@ -1,30 +1,17 @@
-import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import BackLink from '@components/common/BackLink';
 import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
 import PageHeader from '@components/common/PageHeader';
 
-import { fetchClients } from '@features/clients';
-import { fetchTasks } from '@features/tasks/tasksSlice';
-
 import ProjectDetailsActions from '../components/ProjectDetailsActions';
 import ProjectOverviewCard from '../components/ProjectOverviewCard';
 import ProjectProgressCard from '../components/ProjectProgressCard';
 import useProjectDetails from '../hooks/useProjectDetails';
-import {
-  clearProjectMessages,
-  clearSelectedProject,
-  fetchProjectById,
-  removeProject,
-} from '../projectsSlice';
 
 function ProjectDetailsPage() {
   const { id } = useParams();
-
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const {
@@ -44,18 +31,9 @@ function ProjectDetailsPage() {
     detailsError,
     isDeleting,
     deleteError,
+
+    deleteProject,
   } = useProjectDetails(id);
-
-  useEffect(() => {
-    dispatch(clearProjectMessages());
-    dispatch(fetchProjectById(id));
-    dispatch(fetchClients());
-    dispatch(fetchTasks());
-
-    return () => {
-      dispatch(clearSelectedProject());
-    };
-  }, [dispatch, id]);
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -67,10 +45,13 @@ function ProjectDetailsPage() {
     }
 
     try {
-      await dispatch(removeProject(id)).unwrap();
+      await deleteProject();
       navigate('/projects');
-    } catch (error) {
-      console.error(error);
+    } catch {
+      /*
+       * The rejected delete error is stored in the
+       * Projects delete operation and rendered below.
+       */
     }
   }
 

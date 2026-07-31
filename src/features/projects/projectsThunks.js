@@ -8,6 +8,10 @@ function rejectRequest(rejectWithValue, error, fallbackMessage) {
   return rejectWithValue(getApiErrorMessage(error, fallbackMessage));
 }
 
+function isAbortError(error, signal) {
+  return signal?.aborted || error?.name === 'AbortError';
+}
+
 export const fetchProjects = createAsyncThunk(
   'projects/fetchProjects',
   async (_, { rejectWithValue }) => {
@@ -28,10 +32,14 @@ export const fetchProjects = createAsyncThunk(
 
 export const fetchProjectById = createAsyncThunk(
   'projects/fetchProjectById',
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, signal }) => {
     try {
-      return await projectsService.getProjectById(id);
+      return await projectsService.getProjectById(id, { signal });
     } catch (error) {
+      if (isAbortError(error, signal)) {
+        throw error;
+      }
+
       return rejectRequest(
         rejectWithValue,
         error,

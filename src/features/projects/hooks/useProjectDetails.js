@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { selectAllClients } from '@features/clients';
+import { fetchClients, selectAllClients } from '@features/clients';
+import { fetchTasks } from '@features/tasks/tasksSlice';
 
 import {
   selectIsProjectDeleting,
@@ -10,6 +11,12 @@ import {
   selectProjectDetailsError,
   selectSelectedProject,
 } from '../projectsSelectors';
+import {
+  clearProjectMessages,
+  clearSelectedProject,
+  fetchProjectById,
+  removeProject,
+} from '../projectsSlice';
 
 const EMPTY_TASKS = [];
 
@@ -18,7 +25,12 @@ const selectCurrentUser = (state) => state.auth?.user ?? null;
 const selectAllTasks = (state) => state.tasks?.tasks ?? EMPTY_TASKS;
 
 function checkProjectAccess(user, projectId) {
-  if (!user) {
+  if (
+    !user ||
+    projectId === undefined ||
+    projectId === null ||
+    projectId === ''
+  ) {
     return false;
   }
 
@@ -36,6 +48,8 @@ function checkProjectManagementPermission(user) {
 }
 
 function useProjectDetails(projectId) {
+  const dispatch = useDispatch();
+
   const user = useSelector(selectCurrentUser);
   const clients = useSelector(selectAllClients);
   const tasks = useSelector(selectAllTasks);
@@ -59,6 +73,26 @@ function useProjectDetails(projectId) {
   );
 
   const project = isCurrentProject ? selectedProject : null;
+
+  useEffect(() => {
+    dispatch(clearProjectMessages());
+
+    if (!hasAccess) {
+      dispatch(clearSelectedProject());
+
+      return undefined;
+    }
+
+    const projectRequest = dispatch(fetchProjectById(projectId));
+
+    dispatch(fetchClients());
+    dispatch(fetchTasks());
+
+    return () => {
+      projectRequest.abort();
+      dispatch(clearSelectedProject());
+    };
+  }, [dispatch, hasAccess, projectId]);
 
   const clientName = useMemo(() => {
     if (!project) {
@@ -111,6 +145,18 @@ function useProjectDetails(projectId) {
     return metrics;
   }, [project, tasks]);
 
+  const deleteProject = useCallback(async () => {
+    if (!hasAccess) {
+      throw new Error('You do not have access to this project.');
+    }
+
+    if (!canManageProjects) {
+      throw new Error('You do not have permission to delete this project.');
+    }
+
+    return dispatch(removeProject(projectId)).unwrap();
+  }, [canManageProjects, dispatch, hasAccess, projectId]);
+
   const isLoading = isDetailsLoading && !isCurrentProject;
 
   return {
@@ -130,6 +176,8 @@ function useProjectDetails(projectId) {
     detailsError,
     isDeleting,
     deleteError,
+
+    deleteProject,
   };
 }
 

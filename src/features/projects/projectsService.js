@@ -27,18 +27,21 @@ async function getProjects() {
     throw new Error('Failed to fetch projects');
   }
 
-  return await response.json();
+  return response.json();
 }
 
-async function getProjectById(id) {
+async function getProjectById(id, { signal } = {}) {
   const projectId = String(id);
-  const response = await fetch(`${API_URL}/projects/${projectId}`);
+
+  const response = await fetch(`${API_URL}/projects/${projectId}`, {
+    signal,
+  });
 
   if (!response.ok) {
     throw new Error('Project not found');
   }
 
-  return await response.json();
+  return response.json();
 }
 
 async function createProject(projectData) {
@@ -68,6 +71,7 @@ async function createProject(projectData) {
 
 async function updateProject(id, projectData) {
   const projectId = String(id);
+
   const response = await fetch(`${API_URL}/projects/${projectId}`, {
     method: 'PATCH',
     headers: {
@@ -89,6 +93,7 @@ async function updateProject(id, projectData) {
 
 async function deleteProject(id) {
   const deletedProjectId = String(id);
+
   const project = await getProjectById(deletedProjectId);
 
   const response = await fetch(`${API_URL}/projects/${deletedProjectId}`, {
