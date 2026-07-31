@@ -14,6 +14,7 @@ import SectionCard from '@components/common/SectionCard';
 import { fetchClients } from '@features/clients';
 import { fetchTasks } from '@features/tasks/tasksSlice';
 
+import ProjectOverviewCard from '../components/ProjectOverviewCard';
 import {
   selectIsProjectDeleting,
   selectIsProjectDetailsLoading,
@@ -27,9 +28,6 @@ import {
   fetchProjectById,
   removeProject,
 } from '../projectsSlice';
-
-import { formatCurrency } from '@/utils/formatCurrency';
-import { formatDate } from '@/utils/formatDate';
 
 function ProjectDetailsPage() {
   const { id } = useParams();
@@ -154,36 +152,7 @@ function ProjectDetailsPage() {
       )}
 
       <div className='grid gap-4 lg:grid-cols-2'>
-        <SectionCard title='Project Details'>
-          <div className='space-y-3 text-sm'>
-            <p>
-              <span className='font-medium text-slate-700'>Description:</span>{' '}
-              {selectedProject.description}
-            </p>
-
-            <p>
-              <span className='font-medium text-slate-700'>Status:</span>{' '}
-              <span className='rounded bg-slate-100 px-2 py-1 text-xs text-slate-700'>
-                {selectedProject.status}
-              </span>
-            </p>
-
-            <p>
-              <span className='font-medium text-slate-700'>Budget:</span>{' '}
-              {formatCurrency(selectedProject.budget)}
-            </p>
-
-            <p>
-              <span className='font-medium text-slate-700'>Start Date:</span>{' '}
-              {formatDate(selectedProject.startDate)}
-            </p>
-
-            <p>
-              <span className='font-medium text-slate-700'>Deadline:</span>{' '}
-              {formatDate(selectedProject.deadline)}
-            </p>
-          </div>
-        </SectionCard>
+        <ProjectOverviewCard project={selectedProject} />
 
         <SectionCard title='Project Progress'>
           <div className='mb-3 flex items-center justify-between text-sm'>
@@ -197,6 +166,7 @@ function ProjectDetailsPage() {
           <div className='mt-4 grid grid-cols-3 gap-3 text-center text-sm'>
             <div className='rounded bg-slate-100 p-3'>
               <p className='font-bold text-slate-900'>{projectTasks.length}</p>
+
               <p className='text-slate-500'>Total</p>
             </div>
 
@@ -204,6 +174,7 @@ function ProjectDetailsPage() {
               <p className='font-bold text-slate-900'>
                 {inProgressTasks.length}
               </p>
+
               <p className='text-slate-500'>Progress</p>
             </div>
 
@@ -211,6 +182,7 @@ function ProjectDetailsPage() {
               <p className='font-bold text-slate-900'>
                 {completedTasks.length}
               </p>
+
               <p className='text-slate-500'>Done</p>
             </div>
           </div>
