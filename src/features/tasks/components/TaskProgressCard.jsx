@@ -1,4 +1,5 @@
 import ProgressBar from '@components/common/ProgressBar';
+import SectionCard from '@components/common/SectionCard';
 
 function TaskProgressCard({
   totalTasks,
@@ -8,11 +9,7 @@ function TaskProgressCard({
   progressPercentage,
 }) {
   return (
-    <div className='mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-      <div className='mb-3 flex items-center justify-between gap-3'>
-        <h2 className='text-lg font-bold text-slate-900'>Project Progress</h2>
-      </div>
-
+    <SectionCard title='Project Progress' className='mb-6'>
       <ProgressBar value={progressPercentage} height='medium' showLabel />
 
       <p className='mt-2 text-sm text-slate-500'>
@@ -44,7 +41,7 @@ function TaskProgressCard({
           <p className='text-sm text-slate-500'>Completed</p>
         </div>
       </div>
-    </div>
+    </SectionCard>
   );
 }
 

@@ -4,6 +4,7 @@ import BackLink from '@components/common/BackLink';
 import Button from '@components/common/Button';
 import ErrorMessage from '@components/common/ErrorMessage';
 import Loading from '@components/common/Loading';
+import MessageAlert from '@components/common/MessageAlert';
 import PageHeader from '@components/common/PageHeader';
 
 import TaskFilters from '../components/TaskFilters';
@@ -102,15 +103,11 @@ function ProjectTasksPage() {
         )}
       </PageHeader>
 
-      <div aria-live='polite' aria-atomic='true'>
-        {successMessage && (
-          <p
-            role='status'
-            className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
-            {successMessage}
-          </p>
-        )}
-      </div>
+      {successMessage && (
+        <div className='mb-4' aria-live='polite' aria-atomic='true'>
+          <MessageAlert message={successMessage} type='success' />
+        </div>
+      )}
 
       <div aria-live='assertive' aria-atomic='true'>
         {taskError && (

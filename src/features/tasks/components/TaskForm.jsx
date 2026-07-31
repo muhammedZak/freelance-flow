@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import Button from '@components/common/Button';
 import InputField from '@components/forms/InputField';
 import SelectField from '@components/forms/SelectField';
 import TextareaField from '@components/forms/TextareaField';
@@ -182,20 +183,17 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
       </div>
 
       <div className='mt-5 flex gap-3'>
-        <button
-          type='submit'
-          disabled={loading}
-          className='rounded bg-slate-900 px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60'>
+        <Button type='submit' disabled={loading}>
           {loading ? 'Saving...' : isEditing ? 'Update Task' : 'Add Task'}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type='button'
+          variant='secondary'
           onClick={onCancel}
-          disabled={loading}
-          className='rounded border border-slate-300 px-4 py-2 text-slate-700 disabled:cursor-not-allowed disabled:opacity-60'>
+          disabled={loading}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

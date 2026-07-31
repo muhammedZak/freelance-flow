@@ -1,3 +1,5 @@
+import Button from '@components/common/Button';
+import SectionCard from '@components/common/SectionCard';
 import FilterSelect from '@components/forms/FilterSelect';
 import SearchInput from '@components/forms/SearchInput';
 
@@ -38,16 +40,11 @@ function TaskFilters({
   onClear,
 }) {
   return (
-    <div className='mb-4'>
-      <div className='mb-3'>
-        <h2 className='text-xl font-bold text-slate-900'>Task List</h2>
-
-        <p className='text-sm text-slate-500'>
-          Search, filter, and sort project tasks.
-        </p>
-      </div>
-
-      <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-2 xl:grid'>
+    <SectionCard
+      title='Task List'
+      description='Search, filter, and sort project tasks.'
+      className='mb-4'>
+      <div className='grid gap-3 sm:grid-cols-2'>
         <SearchInput
           value={searchText}
           onChange={(event) => onSearchChange(event.target.value)}
@@ -83,15 +80,17 @@ function TaskFilters({
         </p>
 
         {hasActiveFilters && (
-          <button
+          <Button
             type='button'
+            variant='text'
+            size='small'
             onClick={onClear}
-            className='self-start text-blue-600 sm:self-auto'>
+            className='self-start sm:self-auto'>
             Clear Filters
-          </button>
+          </Button>
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }
 

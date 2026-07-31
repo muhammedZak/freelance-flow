@@ -1,3 +1,5 @@
+import Button from '@components/common/Button';
+
 function TaskFormHeader({ isEditing, loading, onCancel }) {
   return (
     <div className='mb-5 flex items-center justify-between gap-3'>
@@ -13,13 +15,14 @@ function TaskFormHeader({ isEditing, loading, onCancel }) {
         </p>
       </div>
 
-      <button
+      <Button
         type='button'
+        variant='text'
+        size='small'
         onClick={onCancel}
-        disabled={loading}
-        className='text-sm text-slate-600 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60'>
+        disabled={loading}>
         Close
-      </button>
+      </Button>
     </div>
   );
 }

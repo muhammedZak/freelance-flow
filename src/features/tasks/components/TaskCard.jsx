@@ -1,5 +1,9 @@
 import { formatDate } from '@/utils/formatDate';
 
+import Button from '@components/common/Button';
+import SectionCard from '@components/common/SectionCard';
+import FilterSelect from '@components/forms/FilterSelect';
+
 import {
   getTaskPriorityClasses,
   getTaskStatusClasses,
@@ -16,7 +20,7 @@ function TaskCard({
   onStatusChange,
 }) {
   return (
-    <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
+    <SectionCard>
       <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
         <div className='flex-1'>
           <div className='mb-2 flex flex-wrap items-center gap-2'>
@@ -53,38 +57,38 @@ function TaskCard({
         </div>
 
         {canManageTasks && (
-          <div className='flex flex-col gap-3 sm:flex-row md:flex-col'>
-            <select
+          <div className='flex w-full flex-col gap-3 sm:w-auto sm:flex-row md:w-48 md:flex-col'>
+            <FilterSelect
               value={task.status}
               onChange={(event) => onStatusChange(task, event.target.value)}
+              options={TASK_STATUS_OPTIONS}
+              ariaLabel={`Change status for ${task.title}`}
               disabled={isUpdating}
-              className='rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900 disabled:opacity-60'>
-              {TASK_STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            />
 
             <div className='flex gap-3'>
-              <button
+              <Button
                 type='button'
+                variant='success'
+                size='small'
                 onClick={() => onEdit(task)}
-                className='text-sm text-green-600'>
+                disabled={isUpdating}>
                 Edit
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type='button'
+                variant='danger'
+                size='small'
                 onClick={() => onDelete(task)}
-                className='text-sm text-red-600'>
+                disabled={isUpdating}>
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }
 
