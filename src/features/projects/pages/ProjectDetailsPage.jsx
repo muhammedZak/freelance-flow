@@ -20,7 +20,6 @@ function ProjectDetailsPage() {
 
     hasAccess,
     canManageProjects,
-    isCurrentProject,
 
     totalTaskCount,
     completedTaskCount,
@@ -28,7 +27,9 @@ function ProjectDetailsPage() {
     progressPercentage,
 
     isLoading,
+    isNotFound,
     detailsError,
+
     isDeleting,
     deleteError,
 
@@ -49,8 +50,8 @@ function ProjectDetailsPage() {
       navigate('/projects');
     } catch {
       /*
-       * The rejected delete error is stored in the
-       * Projects delete operation and rendered below.
+       * The delete operation stores its error in Redux.
+       * The error is rendered without hiding the Project.
        */
     }
   }
@@ -67,7 +68,7 @@ function ProjectDetailsPage() {
     return <ErrorMessage message={detailsError} />;
   }
 
-  if (!isCurrentProject || !project) {
+  if (isNotFound || !project) {
     return <ErrorMessage message='Project not found' />;
   }
 

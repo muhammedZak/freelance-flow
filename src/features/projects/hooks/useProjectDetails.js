@@ -6,9 +6,9 @@ import { fetchTasks } from '@features/tasks/tasksSlice';
 
 import {
   selectIsProjectDeleting,
-  selectIsProjectDetailsLoading,
   selectProjectDeleteError,
   selectProjectDetailsError,
+  selectProjectDetailsStatus,
   selectSelectedProject,
 } from '../projectsSelectors';
 import {
@@ -56,7 +56,7 @@ function useProjectDetails(projectId) {
 
   const selectedProject = useSelector(selectSelectedProject);
 
-  const isDetailsLoading = useSelector(selectIsProjectDetailsLoading);
+  const detailsStatus = useSelector(selectProjectDetailsStatus);
 
   const detailsError = useSelector(selectProjectDetailsError);
 
@@ -68,11 +68,11 @@ function useProjectDetails(projectId) {
 
   const canManageProjects = checkProjectManagementPermission(user);
 
-  const isCurrentProject = Boolean(
+  const selectedProjectMatchesRoute = Boolean(
     selectedProject && String(selectedProject.id) === String(projectId),
   );
 
-  const project = isCurrentProject ? selectedProject : null;
+  const project = selectedProjectMatchesRoute ? selectedProject : null;
 
   useEffect(() => {
     dispatch(clearProjectMessages());
@@ -157,7 +157,31 @@ function useProjectDetails(projectId) {
     return dispatch(removeProject(projectId)).unwrap();
   }, [canManageProjects, dispatch, hasAccess, projectId]);
 
-  const isLoading = isDetailsLoading && !isCurrentProject;
+  /*
+   * A route transition can temporarily leave the previous
+   * Project in Redux while the new effect has not started.
+   *
+   * Treat this state as loading instead of rendering a
+   * premature "Project not found" message.
+   */
+  const hasStaleSelectedProject = Boolean(
+    selectedProject && !selectedProjectMatchesRoute,
+  );
+
+  const isLoading =
+    hasAccess &&
+    !project &&
+    !detailsError &&
+    (detailsStatus === 'idle' ||
+      detailsStatus === 'loading' ||
+      hasStaleSelectedProject);
+
+  const isNotFound =
+    hasAccess &&
+    !project &&
+    !detailsError &&
+    !isLoading &&
+    detailsStatus === 'succeeded';
 
   return {
     project,
@@ -165,7 +189,6 @@ function useProjectDetails(projectId) {
 
     hasAccess,
     canManageProjects,
-    isCurrentProject,
 
     totalTaskCount: taskMetrics.totalTaskCount,
     completedTaskCount: taskMetrics.completedTaskCount,
@@ -173,7 +196,9 @@ function useProjectDetails(projectId) {
     progressPercentage: taskMetrics.progressPercentage,
 
     isLoading,
+    isNotFound,
     detailsError,
+
     isDeleting,
     deleteError,
 
