@@ -2,84 +2,139 @@ import { useEffect, useState } from 'react';
 
 import {
   INITIAL_TASK_FORM_VALUES,
+  TASK_PRIORITY,
   TASK_PRIORITY_OPTIONS,
+  TASK_STATUS,
   TASK_STATUS_OPTIONS,
 } from '../tasks.constants';
 
-function TaskForm({ task, loading, onSubmit, onCancel }) {
-  const [formData, setFormData] = useState(INITIAL_TASK_FORM_VALUES);
+const VALID_TASK_STATUSES = Object.freeze(Object.values(TASK_STATUS));
 
-  const [formErrors, setFormErrors] = useState({});
+const VALID_TASK_PRIORITIES = Object.freeze(Object.values(TASK_PRIORITY));
+
+function createInitialFormValues() {
+  return {
+    ...INITIAL_TASK_FORM_VALUES,
+  };
+}
+
+function mapTaskToFormValues(task) {
+  if (!task) {
+    return createInitialFormValues();
+  }
+
+  const normalizedStatus = VALID_TASK_STATUSES.includes(task.status)
+    ? task.status
+    : INITIAL_TASK_FORM_VALUES.status;
+
+  const normalizedPriority = VALID_TASK_PRIORITIES.includes(task.priority)
+    ? task.priority
+    : INITIAL_TASK_FORM_VALUES.priority;
+
+  return {
+    title: typeof task.title === 'string' ? task.title : '',
+    description: typeof task.description === 'string' ? task.description : '',
+    status: normalizedStatus,
+    priority: normalizedPriority,
+    dueDate: typeof task.dueDate === 'string' ? task.dueDate : '',
+  };
+}
+
+function validateForm(formData) {
+  const validationErrors = {};
+
+  const trimmedTitle = formData.title.trim();
+
+  const trimmedDescription = formData.description.trim();
+
+  if (!trimmedTitle) {
+    validationErrors.title = 'Task title is required';
+  }
+
+  if (!trimmedDescription) {
+    validationErrors.description = 'Task description is required';
+  }
+
+  if (!formData.dueDate) {
+    validationErrors.dueDate = 'Due date is required';
+  }
+
+  if (!VALID_TASK_STATUSES.includes(formData.status)) {
+    validationErrors.status = 'Select a valid task status';
+  }
+
+  if (!VALID_TASK_PRIORITIES.includes(formData.priority)) {
+    validationErrors.priority = 'Select a valid task priority';
+  }
+
+  return validationErrors;
+}
+
+function prepareTaskFormData(formData) {
+  return {
+    ...formData,
+    title: formData.title.trim(),
+    description: formData.description.trim(),
+  };
+}
+
+function TaskForm({ task, loading, onSubmit, onCancel }) {
+  const [formData, setFormData] = useState(() => mapTaskToFormValues(task));
+
+  const [errors, setErrors] = useState({});
 
   const isEditing = Boolean(task);
 
   useEffect(() => {
-    if (task) {
-      setFormData({
-        title: task.title || '',
-        description: task.description || '',
-        status: task.status || INITIAL_TASK_FORM_VALUES.status,
-        priority: task.priority || INITIAL_TASK_FORM_VALUES.priority,
-        dueDate: task.dueDate || '',
-      });
-    } else {
-      setFormData(INITIAL_TASK_FORM_VALUES);
-    }
+    setFormData(mapTaskToFormValues(task));
 
-    setFormErrors({});
+    setErrors({});
   }, [task]);
 
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData((currentData) => ({
-      ...currentData,
+    setFormData((currentFormData) => ({
+      ...currentFormData,
       [name]: value,
     }));
 
-    setFormErrors((currentErrors) => ({
-      ...currentErrors,
-      [name]: '',
-    }));
+    setErrors((currentErrors) => {
+      if (!currentErrors[name]) {
+        return currentErrors;
+      }
+
+      const nextErrors = {
+        ...currentErrors,
+      };
+
+      delete nextErrors[name];
+
+      return nextErrors;
+    });
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const newErrors = {};
+    const validationErrors = validateForm(formData);
 
-    if (!formData.title.trim()) {
-      newErrors.title = 'Task title is required';
-    } else if (formData.title.trim().length < 3) {
-      newErrors.title = 'Task title must contain at least 3 characters';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Task description is required';
-    } else if (formData.description.trim().length < 5) {
-      newErrors.description =
-        'Task description must contain at least 5 characters';
-    }
-
-    if (!formData.dueDate) {
-      newErrors.dueDate = 'Due date is required';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setFormErrors(newErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
-    await onSubmit({
-      ...formData,
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-    });
+    setErrors({});
+
+    const preparedFormData = prepareTaskFormData(formData);
+
+    await onSubmit(preparedFormData);
   }
 
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className='mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
       <div className='mb-5 flex items-center justify-between gap-3'>
         <div>
@@ -97,7 +152,8 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
         <button
           type='button'
           onClick={onCancel}
-          className='text-sm text-slate-600 hover:text-slate-900'>
+          disabled={loading}
+          className='text-sm text-slate-600 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60'>
           Close
         </button>
       </div>
@@ -116,12 +172,19 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             type='text'
             value={formData.title}
             onChange={handleChange}
+            aria-invalid={Boolean(errors.title)}
+            aria-describedby={errors.title ? 'title-error' : undefined}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
             placeholder='Example: Create login page'
           />
 
-          {formErrors.title && (
-            <p className='mt-1 text-sm text-red-600'>{formErrors.title}</p>
+          {errors.title && (
+            <p
+              id='title-error'
+              role='alert'
+              className='mt-1 text-sm text-red-600'>
+              {errors.title}
+            </p>
           )}
         </div>
 
@@ -138,13 +201,20 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             rows='3'
             value={formData.description}
             onChange={handleChange}
+            aria-invalid={Boolean(errors.description)}
+            aria-describedby={
+              errors.description ? 'description-error' : undefined
+            }
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
             placeholder='Enter a short task description'
           />
 
-          {formErrors.description && (
-            <p className='mt-1 text-sm text-red-600'>
-              {formErrors.description}
+          {errors.description && (
+            <p
+              id='description-error'
+              role='alert'
+              className='mt-1 text-sm text-red-600'>
+              {errors.description}
             </p>
           )}
         </div>
@@ -161,6 +231,8 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             name='status'
             value={formData.status}
             onChange={handleChange}
+            aria-invalid={Boolean(errors.status)}
+            aria-describedby={errors.status ? 'status-error' : undefined}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -168,6 +240,15 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
               </option>
             ))}
           </select>
+
+          {errors.status && (
+            <p
+              id='status-error'
+              role='alert'
+              className='mt-1 text-sm text-red-600'>
+              {errors.status}
+            </p>
+          )}
         </div>
 
         <div>
@@ -182,6 +263,8 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             name='priority'
             value={formData.priority}
             onChange={handleChange}
+            aria-invalid={Boolean(errors.priority)}
+            aria-describedby={errors.priority ? 'priority-error' : undefined}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
             {TASK_PRIORITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -189,6 +272,15 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
               </option>
             ))}
           </select>
+
+          {errors.priority && (
+            <p
+              id='priority-error'
+              role='alert'
+              className='mt-1 text-sm text-red-600'>
+              {errors.priority}
+            </p>
+          )}
         </div>
 
         <div>
@@ -204,11 +296,18 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             type='date'
             value={formData.dueDate}
             onChange={handleChange}
+            aria-invalid={Boolean(errors.dueDate)}
+            aria-describedby={errors.dueDate ? 'due-date-error' : undefined}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'
           />
 
-          {formErrors.dueDate && (
-            <p className='mt-1 text-sm text-red-600'>{formErrors.dueDate}</p>
+          {errors.dueDate && (
+            <p
+              id='due-date-error'
+              role='alert'
+              className='mt-1 text-sm text-red-600'>
+              {errors.dueDate}
+            </p>
           )}
         </div>
       </div>
@@ -224,7 +323,8 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
         <button
           type='button'
           onClick={onCancel}
-          className='rounded border border-slate-300 px-4 py-2 text-slate-700'>
+          disabled={loading}
+          className='rounded border border-slate-300 px-4 py-2 text-slate-700 disabled:cursor-not-allowed disabled:opacity-60'>
           Cancel
         </button>
       </div>
