@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 
 import {
   INITIAL_TASK_FORM_VALUES,
-  TASK_PRIORITY,
   TASK_PRIORITY_OPTIONS,
-  TASK_STATUS,
   TASK_STATUS_OPTIONS,
 } from '../tasks.constants';
+import { validateTaskForm } from '../tasksValidation';
 
-const VALID_TASK_STATUSES = Object.freeze(Object.values(TASK_STATUS));
+const VALID_TASK_STATUSES = Object.freeze(
+  TASK_STATUS_OPTIONS.map((option) => option.value),
+);
 
-const VALID_TASK_PRIORITIES = Object.freeze(Object.values(TASK_PRIORITY));
+const VALID_TASK_PRIORITIES = Object.freeze(
+  TASK_PRIORITY_OPTIONS.map((option) => option.value),
+);
 
 function createInitialFormValues() {
   return {
@@ -33,41 +36,15 @@ function mapTaskToFormValues(task) {
 
   return {
     title: typeof task.title === 'string' ? task.title : '',
+
     description: typeof task.description === 'string' ? task.description : '',
+
     status: normalizedStatus,
+
     priority: normalizedPriority,
+
     dueDate: typeof task.dueDate === 'string' ? task.dueDate : '',
   };
-}
-
-function validateForm(formData) {
-  const validationErrors = {};
-
-  const trimmedTitle = formData.title.trim();
-
-  const trimmedDescription = formData.description.trim();
-
-  if (!trimmedTitle) {
-    validationErrors.title = 'Task title is required';
-  }
-
-  if (!trimmedDescription) {
-    validationErrors.description = 'Task description is required';
-  }
-
-  if (!formData.dueDate) {
-    validationErrors.dueDate = 'Due date is required';
-  }
-
-  if (!VALID_TASK_STATUSES.includes(formData.status)) {
-    validationErrors.status = 'Select a valid task status';
-  }
-
-  if (!VALID_TASK_PRIORITIES.includes(formData.priority)) {
-    validationErrors.priority = 'Select a valid task priority';
-  }
-
-  return validationErrors;
 }
 
 function prepareTaskFormData(formData) {
@@ -117,7 +94,7 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateTaskForm(formData);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
