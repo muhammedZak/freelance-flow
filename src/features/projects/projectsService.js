@@ -1,6 +1,25 @@
 import API_URL from '../../services/api';
 import activitiesService from '../activities/activitiesService';
 
+function getActivityDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+async function logProjectActivity(message) {
+  try {
+    await activitiesService.addActivity({
+      message,
+      type: 'project',
+      createdAt: getActivityDate(),
+    });
+  } catch (error) {
+    console.error(
+      'Project operation succeeded, but activity logging failed:',
+      error,
+    );
+  }
+}
+
 async function getProjects() {
   const response = await fetch(`${API_URL}/projects`);
 
@@ -12,7 +31,8 @@ async function getProjects() {
 }
 
 async function getProjectById(id) {
-  const response = await fetch(`${API_URL}/projects/${id}`);
+  const projectId = String(id);
+  const response = await fetch(`${API_URL}/projects/${projectId}`);
 
   if (!response.ok) {
     throw new Error('Project not found');
@@ -24,7 +44,7 @@ async function getProjectById(id) {
 async function createProject(projectData) {
   const newProject = {
     ...projectData,
-    createdAt: new Date().toISOString().split('T')[0],
+    createdAt: getActivityDate(),
   };
 
   const response = await fetch(`${API_URL}/projects`, {
@@ -41,17 +61,14 @@ async function createProject(projectData) {
 
   const savedProject = await response.json();
 
-  await activitiesService.addActivity({
-    message: `Project created: ${savedProject.title}`,
-    type: 'project',
-    createdAt: new Date().toISOString().split('T')[0],
-  });
+  await logProjectActivity(`Project created: ${savedProject.title}`);
 
   return savedProject;
 }
 
 async function updateProject(id, projectData) {
-  const response = await fetch(`${API_URL}/projects/${id}`, {
+  const projectId = String(id);
+  const response = await fetch(`${API_URL}/projects/${projectId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -65,11 +82,7 @@ async function updateProject(id, projectData) {
 
   const updatedProject = await response.json();
 
-  await activitiesService.addActivity({
-    message: `Project updated: ${updatedProject.title}`,
-    type: 'project',
-    createdAt: new Date().toISOString().split('T')[0],
-  });
+  await logProjectActivity(`Project updated: ${updatedProject.title}`);
 
   return updatedProject;
 }
@@ -86,18 +99,7 @@ async function deleteProject(id) {
     throw new Error('Failed to delete project');
   }
 
-  try {
-    await activitiesService.addActivity({
-      message: `Project deleted: ${project.title}`,
-      type: 'project',
-      createdAt: new Date().toISOString().split('T')[0],
-    });
-  } catch (activityError) {
-    console.error(
-      'Activity logging failed after Project deletion:',
-      activityError,
-    );
-  }
+  await logProjectActivity(`Project deleted: ${project.title}`);
 
   return deletedProjectId;
 }

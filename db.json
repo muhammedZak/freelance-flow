@@ -568,6 +568,18 @@
       "type": "project",
       "createdAt": "2026-07-31",
       "id": "d-3znZ0"
+    },
+    {
+      "message": "Project created: aaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "v0omMCf"
+    },
+    {
+      "message": "Project deleted: aaaaaaa",
+      "type": "project",
+      "createdAt": "2026-07-31",
+      "id": "DtPvwgB"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

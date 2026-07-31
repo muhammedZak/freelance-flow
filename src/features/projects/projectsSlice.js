@@ -1,17 +1,28 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import projectsService from './projectsService';
+import {
+  addProject,
+  editProject,
+  fetchProjectById,
+  fetchProjects,
+  removeProject,
+} from './projectsThunks';
 
-const ASYNC_STATUS = {
+const ASYNC_STATUS = Object.freeze({
   IDLE: 'idle',
   LOADING: 'loading',
   SUCCEEDED: 'succeeded',
   FAILED: 'failed',
-};
+});
 
 const createOperationState = () => ({
   status: ASYNC_STATUS.IDLE,
   error: null,
+});
+
+const createDetailsOperationState = () => ({
+  ...createOperationState(),
+  currentRequestId: null,
 });
 
 const initialState = {
@@ -20,7 +31,7 @@ const initialState = {
 
   operations: {
     fetchList: createOperationState(),
-    fetchDetails: createOperationState(),
+    fetchDetails: createDetailsOperationState(),
     create: createOperationState(),
     update: createOperationState(),
     delete: createOperationState(),
@@ -54,67 +65,11 @@ function resetOperationErrors(operations) {
   });
 }
 
-export const fetchProjects = createAsyncThunk(
-  'projects/fetchProjects',
-  async (_, thunkAPI) => {
-    try {
-      return await projectsService.getProjects();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  },
-  {
-    condition: (_, { getState }) => {
-      const status = getState().projects?.operations?.fetchList?.status;
-
-      return status !== ASYNC_STATUS.LOADING;
-    },
-  },
-);
-
-export const fetchProjectById = createAsyncThunk(
-  'projects/fetchProjectById',
-  async (id, thunkAPI) => {
-    try {
-      return await projectsService.getProjectById(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  },
-);
-
-export const addProject = createAsyncThunk(
-  'projects/addProject',
-  async (projectData, thunkAPI) => {
-    try {
-      return await projectsService.createProject(projectData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  },
-);
-
-export const editProject = createAsyncThunk(
-  'projects/editProject',
-  async ({ id, projectData }, thunkAPI) => {
-    try {
-      return await projectsService.updateProject(id, projectData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  },
-);
-
-export const removeProject = createAsyncThunk(
-  'projects/removeProject',
-  async (id, thunkAPI) => {
-    try {
-      return await projectsService.deleteProject(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  },
-);
+function isCurrentDetailsRequest(state, action) {
+  return (
+    state.operations.fetchDetails.currentRequestId === action.meta.requestId
+  );
+}
 
 const projectsSlice = createSlice({
   name: 'projects',
@@ -128,7 +83,7 @@ const projectsSlice = createSlice({
 
     clearSelectedProject: (state) => {
       state.selectedProject = null;
-      state.operations.fetchDetails = createOperationState();
+      state.operations.fetchDetails = createDetailsOperationState();
     },
   },
 
@@ -148,23 +103,40 @@ const projectsSlice = createSlice({
 
         failOperation(
           state.operations.fetchList,
-          action.payload || 'Failed to fetch projects',
+          action.payload || 'Unable to load projects.',
         );
       })
 
-      .addCase(fetchProjectById.pending, (state) => {
+      .addCase(fetchProjectById.pending, (state, action) => {
         startOperation(state.operations.fetchDetails);
+        state.operations.fetchDetails.currentRequestId = action.meta.requestId;
         state.selectedProject = null;
       })
       .addCase(fetchProjectById.fulfilled, (state, action) => {
+        if (!isCurrentDetailsRequest(state, action)) {
+          return;
+        }
+
         completeOperation(state.operations.fetchDetails);
+        state.operations.fetchDetails.currentRequestId = null;
         state.selectedProject = action.payload;
       })
       .addCase(fetchProjectById.rejected, (state, action) => {
+        if (!isCurrentDetailsRequest(state, action)) {
+          return;
+        }
+
+        if (action.meta.aborted) {
+          state.operations.fetchDetails = createDetailsOperationState();
+          state.selectedProject = null;
+          return;
+        }
+
         failOperation(
           state.operations.fetchDetails,
-          action.payload || 'Failed to fetch project',
+          action.payload || 'Unable to load the project.',
         );
+        state.operations.fetchDetails.currentRequestId = null;
         state.selectedProject = null;
       })
 
@@ -180,7 +152,7 @@ const projectsSlice = createSlice({
       .addCase(addProject.rejected, (state, action) => {
         failOperation(
           state.operations.create,
-          action.payload || 'Failed to create project',
+          action.payload || 'Unable to create the project.',
         );
       })
 
@@ -203,7 +175,7 @@ const projectsSlice = createSlice({
       .addCase(editProject.rejected, (state, action) => {
         failOperation(
           state.operations.update,
-          action.payload || 'Failed to update project',
+          action.payload || 'Unable to update the project.',
         );
       })
 
@@ -212,7 +184,7 @@ const projectsSlice = createSlice({
         state.successMessage = '';
       })
       .addCase(removeProject.fulfilled, (state, action) => {
-        state.loading = false;
+        completeOperation(state.operations.delete);
 
         const deletedProjectId = String(action.payload);
 
@@ -232,11 +204,19 @@ const projectsSlice = createSlice({
       .addCase(removeProject.rejected, (state, action) => {
         failOperation(
           state.operations.delete,
-          action.payload || 'Failed to delete project',
+          action.payload || 'Unable to delete the project.',
         );
       });
   },
 });
+
+export {
+  addProject,
+  editProject,
+  fetchProjectById,
+  fetchProjects,
+  removeProject,
+} from './projectsThunks';
 
 export const { clearProjectMessages, clearSelectedProject } =
   projectsSlice.actions;
