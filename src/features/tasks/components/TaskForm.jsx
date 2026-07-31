@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 
-const emptyFormData = {
-  title: '',
-  description: '',
-  status: 'todo',
-  priority: 'medium',
-  dueDate: '',
-};
+import {
+  INITIAL_TASK_FORM_VALUES,
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_OPTIONS,
+} from '../tasks.constants';
 
 function TaskForm({ task, loading, onSubmit, onCancel }) {
-  const [formData, setFormData] = useState(emptyFormData);
+  const [formData, setFormData] = useState(INITIAL_TASK_FORM_VALUES);
 
   const [formErrors, setFormErrors] = useState({});
 
@@ -20,12 +18,12 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        status: task.status || 'todo',
-        priority: task.priority || 'medium',
+        status: task.status || INITIAL_TASK_FORM_VALUES.status,
+        priority: task.priority || INITIAL_TASK_FORM_VALUES.priority,
         dueDate: task.dueDate || '',
       });
     } else {
-      setFormData(emptyFormData);
+      setFormData(INITIAL_TASK_FORM_VALUES);
     }
 
     setFormErrors({});
@@ -164,11 +162,11 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             value={formData.status}
             onChange={handleChange}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='todo'>To Do</option>
-
-            <option value='in-progress'>In Progress</option>
-
-            <option value='completed'>Completed</option>
+            {TASK_STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -185,11 +183,11 @@ function TaskForm({ task, loading, onSubmit, onCancel }) {
             value={formData.priority}
             onChange={handleChange}
             className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-            <option value='low'>Low</option>
-
-            <option value='medium'>Medium</option>
-
-            <option value='high'>High</option>
+            {TASK_PRIORITY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 

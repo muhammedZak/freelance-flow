@@ -25,6 +25,16 @@ import { formatDate } from '@/utils/formatDate';
 
 import TaskForm from '../components/TaskForm';
 import {
+  getTaskPriorityClasses,
+  getTaskStatusClasses,
+  getTaskStatusLabel,
+  TASK_PRIORITY,
+  TASK_PRIORITY_OPTIONS,
+  TASK_SORT_OPTIONS,
+  TASK_STATUS,
+  TASK_STATUS_OPTIONS,
+} from '../tasks.constants';
+import {
   addTask,
   clearTaskMessages,
   editTask,
@@ -32,61 +42,20 @@ import {
   removeTask,
 } from '../tasksSlice';
 
-const taskStatusOptions = [
+const taskStatusFilterOptions = [
   {
     value: 'all',
     label: 'All Statuses',
   },
-  {
-    value: 'todo',
-    label: 'To Do',
-  },
-  {
-    value: 'in-progress',
-    label: 'In Progress',
-  },
-  {
-    value: 'completed',
-    label: 'Completed',
-  },
+  ...TASK_STATUS_OPTIONS,
 ];
 
-const taskPriorityOptions = [
+const taskPriorityFilterOptions = [
   {
     value: 'all',
     label: 'All Priorities',
   },
-  {
-    value: 'low',
-    label: 'Low',
-  },
-  {
-    value: 'medium',
-    label: 'Medium',
-  },
-  {
-    value: 'high',
-    label: 'High',
-  },
-];
-
-const taskSortOptions = [
-  {
-    value: 'due-date',
-    label: 'Due Date',
-  },
-  {
-    value: 'newest',
-    label: 'Newest First',
-  },
-  {
-    value: 'title',
-    label: 'Title A-Z',
-  },
-  {
-    value: 'priority',
-    label: 'Priority High to Low',
-  },
+  ...TASK_PRIORITY_OPTIONS,
 ];
 
 function ProjectTasksPage() {
@@ -167,14 +136,16 @@ function ProjectTasksPage() {
   );
 
   const completedTasks = projectTasks.filter(
-    (task) => task.status === 'completed',
+    (task) => task.status === TASK_STATUS.COMPLETED,
   );
 
   const inProgressTasks = projectTasks.filter(
-    (task) => task.status === 'in-progress',
+    (task) => task.status === TASK_STATUS.IN_PROGRESS,
   );
 
-  const todoTasks = projectTasks.filter((task) => task.status === 'todo');
+  const todoTasks = projectTasks.filter(
+    (task) => task.status === TASK_STATUS.TODO,
+  );
 
   const progress =
     projectTasks.length > 0
@@ -208,9 +179,9 @@ function ProjectTasksPage() {
 
       if (sortBy === 'priority') {
         const priorityOrder = {
-          high: 1,
-          medium: 2,
-          low: 3,
+          [TASK_PRIORITY.HIGH]: 1,
+          [TASK_PRIORITY.MEDIUM]: 2,
+          [TASK_PRIORITY.LOW]: 3,
         };
 
         return (
@@ -304,42 +275,6 @@ function ProjectTasksPage() {
     } catch (error) {
       console.log(error);
     }
-  }
-
-  function getStatusText(status) {
-    if (status === 'in-progress') {
-      return 'In Progress';
-    }
-
-    if (status === 'completed') {
-      return 'Completed';
-    }
-
-    return 'To Do';
-  }
-
-  function getStatusClasses(status) {
-    if (status === 'completed') {
-      return 'bg-green-100 text-green-700';
-    }
-
-    if (status === 'in-progress') {
-      return 'bg-blue-100 text-blue-700';
-    }
-
-    return 'bg-slate-100 text-slate-700';
-  }
-
-  function getPriorityClasses(priority) {
-    if (priority === 'high') {
-      return 'bg-red-100 text-red-700';
-    }
-
-    if (priority === 'medium') {
-      return 'bg-yellow-100 text-yellow-700';
-    }
-
-    return 'bg-green-100 text-green-700';
   }
 
   if (!clientHasAccess) {
@@ -461,7 +396,7 @@ function ProjectTasksPage() {
             onChange={(event) =>
               updateSearchParams('status', event.target.value)
             }
-            options={taskStatusOptions}
+            options={taskStatusFilterOptions}
             ariaLabel='Filter tasks by status'
           />
 
@@ -470,14 +405,14 @@ function ProjectTasksPage() {
             onChange={(event) =>
               updateSearchParams('priority', event.target.value)
             }
-            options={taskPriorityOptions}
+            options={taskPriorityFilterOptions}
             ariaLabel='Filter tasks by priority'
           />
 
           <FilterSelect
             value={sortBy}
             onChange={(event) => updateSearchParams('sort', event.target.value)}
-            options={taskSortOptions}
+            options={TASK_SORT_OPTIONS}
             ariaLabel='Sort tasks'
           />
         </div>
@@ -522,14 +457,14 @@ function ProjectTasksPage() {
                     </h3>
 
                     <span
-                      className={`rounded px-2 py-1 text-xs ${getStatusClasses(
+                      className={`rounded px-2 py-1 text-xs ${getTaskStatusClasses(
                         task.status,
                       )}`}>
-                      {getStatusText(task.status)}
+                      {getTaskStatusLabel(task.status)}
                     </span>
 
                     <span
-                      className={`rounded px-2 py-1 text-xs capitalize ${getPriorityClasses(
+                      className={`rounded px-2 py-1 text-xs capitalize ${getTaskPriorityClasses(
                         task.priority,
                       )}`}>
                       {task.priority} priority
@@ -564,11 +499,11 @@ function ProjectTasksPage() {
                       }
                       disabled={taskLoading}
                       className='rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-900 disabled:opacity-60'>
-                      <option value='todo'>To Do</option>
-
-                      <option value='in-progress'>In Progress</option>
-
-                      <option value='completed'>Completed</option>
+                      {TASK_STATUS_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
 
                     <div className='flex gap-3'>
