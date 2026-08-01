@@ -1,6 +1,5 @@
 import apiClient from '@/api/apiClient';
 
-const USERS_ENDPOINT = '/users';
 const AUTH_SESSION_STORAGE_KEY = 'freelanceflow_auth_session';
 const LEGACY_USER_STORAGE_KEY = 'freelanceflow_user';
 
@@ -11,18 +10,30 @@ function sanitizeUser(user) {
 
   const safeUser = { ...user };
   delete safeUser.password;
+
   return safeUser;
 }
 
-function createSession(user, accessToken = null) {
+function createEmptySession() {
   return {
-    user: sanitizeUser(user),
-    accessToken: accessToken || null,
+    user: null,
+    accessToken: null,
   };
 }
 
-function readJsonStorageValue(key) {
-  const storedValue = localStorage.getItem(key);
+function createSession(user, accessToken) {
+  return {
+    user: sanitizeUser(user),
+    accessToken,
+  };
+}
+
+function readStoredSession() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedValue = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
 
   if (!storedValue) {
     return null;
@@ -31,100 +42,109 @@ function readJsonStorageValue(key) {
   try {
     return JSON.parse(storedValue);
   } catch {
-    localStorage.removeItem(key);
+    window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
     return null;
   }
 }
 
-function isStoredSession(value) {
+function isValidStoredSession(session) {
   return Boolean(
-    value &&
-    typeof value === 'object' &&
-    value.user &&
-    typeof value.user === 'object',
+    session &&
+    typeof session === 'object' &&
+    session.user &&
+    typeof session.user === 'object' &&
+    typeof session.accessToken === 'string' &&
+    session.accessToken.trim(),
   );
 }
 
 function persistSession(session) {
-  localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
-  localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.setItem(
+    AUTH_SESSION_STORAGE_KEY,
+    JSON.stringify(session),
+  );
+
+  window.localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+}
+
+function clearStoredSession() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+  window.localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
 }
 
 async function checkAuth() {
-  const storedSession = readJsonStorageValue(AUTH_SESSION_STORAGE_KEY);
+  const storedSession = readStoredSession();
 
-  if (isStoredSession(storedSession)) {
-    return createSession(storedSession.user, storedSession.accessToken);
+  if (!isValidStoredSession(storedSession)) {
+    clearStoredSession();
+
+    return createEmptySession();
   }
 
-  const legacyUser = readJsonStorageValue(LEGACY_USER_STORAGE_KEY);
-
-  if (legacyUser && typeof legacyUser === 'object') {
-    const migratedSession = createSession(legacyUser);
-    persistSession(migratedSession);
-    return migratedSession;
-  }
-
-  return createSession(null);
+  return createSession(storedSession.user, storedSession.accessToken.trim());
 }
 
 async function login(credentials) {
-  const email = String(credentials.email ?? '')
-    .trim()
-    .toLowerCase();
-  const password = String(credentials.password ?? '');
+  const payload = {
+    email: String(credentials.email ?? '')
+      .trim()
+      .toLowerCase(),
+    password: String(credentials.password ?? ''),
+  };
 
-  const response = await apiClient.get(USERS_ENDPOINT, {
-    params: { email },
-  });
+  const response = await apiClient.post('/login', payload);
 
-  const user = response.data.find(
-    (candidate) => candidate.email?.toLowerCase() === email,
-  );
+  const { accessToken, user } = response.data ?? {};
 
-  if (!user || user.password !== password) {
-    throw new Error('Invalid email or password');
+  if (
+    typeof accessToken !== 'string' ||
+    !accessToken.trim() ||
+    !user ||
+    typeof user !== 'object'
+  ) {
+    throw new Error('The authentication server returned an invalid session.');
   }
 
-  const session = createSession(user);
+  const session = createSession(user, accessToken.trim());
+
   persistSession(session);
 
   return session;
 }
 
 async function register(userData) {
-  const email = String(userData.email ?? '')
-    .trim()
-    .toLowerCase();
-
-  const existingUsersResponse = await apiClient.get(USERS_ENDPOINT, {
-    params: { email },
-  });
-
-  const emailAlreadyExists = existingUsersResponse.data.some(
-    (user) => user.email?.toLowerCase() === email,
-  );
-
-  if (emailAlreadyExists) {
-    throw new Error('Email already exists');
-  }
-
-  const newUser = {
+  const payload = {
     name: String(userData.name ?? '').trim(),
-    email,
+    email: String(userData.email ?? '')
+      .trim()
+      .toLowerCase(),
     password: String(userData.password ?? ''),
     role: String(userData.role ?? 'freelancer'),
     assignedProjectIds: [],
   };
 
-  const response = await apiClient.post(USERS_ENDPOINT, newUser);
+  const response = await apiClient.post('/register', payload);
 
-  return sanitizeUser(response.data);
+  const user = sanitizeUser(response.data?.user);
+
+  if (!user) {
+    throw new Error('The authentication server returned an invalid user.');
+  }
+
+  return user;
 }
 
 async function logout() {
-  localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
-  localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+  clearStoredSession();
+
   return true;
 }
 

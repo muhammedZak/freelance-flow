@@ -1,29 +1,15 @@
-import API_URL from '../../services/api';
+import apiClient from '../../api/apiClient';
 
 async function getActivities() {
-  const res = await fetch(`${API_URL}/activities`);
+  const { data } = await apiClient.get('/activities');
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch activities');
-  }
-
-  return await res.json();
+  return data;
 }
 
 async function addActivity(activityData) {
-  const res = await fetch(`${API_URL}/activities`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(activityData),
-  });
+  const { data } = await apiClient.post('/activities', activityData);
 
-  if (!res.ok) {
-    throw new Error('Failed to add activity');
-  }
-
-  return await res.json();
+  return data;
 }
 
 const activitiesService = {

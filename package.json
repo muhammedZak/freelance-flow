@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "json-server --watch db.json --port 3000",
+    "server": "npm run auth:migrate && json-server-auth db.json --watch --port 3000 -r routes.json",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "auth:migrate": "node scripts/migrateAuthPasswords.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
@@ -23,11 +24,13 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "bcryptjs": "^2.4.3",
     "eslint": "^10.6.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
     "json-server": "0.17.4",
+    "json-server-auth": "^2.1.0",
     "tailwindcss": "^4.3.2",
     "vite": "^8.1.1"
   }

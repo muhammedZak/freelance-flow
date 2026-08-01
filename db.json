@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Zak Freelancer",
       "email": "freelancer@example.com",
-      "password": "123456",
+      "password": "$2a$10$aNQ7sV5EG9yNN351mqqdbu5qE/DONvH3p0AuCeqpg0CqhtudHuW8O",
       "role": "freelancer",
       "assignedProjectIds": []
     },
@@ -12,7 +12,7 @@
       "id": "2",
       "name": "Client User",
       "email": "client@example.com",
-      "password": "123456",
+      "password": "$2a$10$Tk3yn4Kbp6.ilhEzv6kt9OqBHYtRAsQAmJAtfYzE.t1PpTbQ5dh9m",
       "role": "client",
       "assignedProjectIds": [
         "1",
@@ -23,14 +23,14 @@
       "id": "3",
       "name": "Admin User",
       "email": "admin@example.com",
-      "password": "123456",
+      "password": "$2a$10$2YHyisuC2YNFVBww8JkeqeO.gSu0B3y1t5yD3giqf1O722xlI0MFG",
       "role": "admin",
       "assignedProjectIds": []
     },
     {
       "name": "Muhammed Zakariya",
       "email": "zakariya.zaku018@gmail.com",
-      "password": "123456",
+      "password": "$2a$10$iVtq6j64YqEaai4YCxcU8.3zhRIeX.l7qxVjZ7MR32WNd9HJJ7KQ6",
       "role": "freelancer",
       "assignedProjectIds": [],
       "id": "qvAZQj98TcU"
@@ -38,25 +38,18 @@
     {
       "name": "Muhammed Zakariya",
       "email": "zakariya.zaku018@gamail.com",
-      "password": "123456",
+      "password": "$2a$10$CRdUYdMxCeCUavqX9do/i.taWORiaR7CTlOHKqJ0LycHLG1zsphrm",
       "role": "freelancer",
       "assignedProjectIds": [],
       "id": "vFuQVL_v_Vk"
     },
     {
-      "id": "m-hkd2N"
-    },
-    {
-      "id": "O_Cw_y-"
-    },
-    {
-      "id": "NxYPG3e"
-    },
-    {
-      "id": "kY1JtZO"
-    },
-    {
-      "id": "_SvUSas"
+      "name": "zakariya zaku",
+      "email": "jishar@gmail.com",
+      "password": "$2a$10$y.CkVS7Apg4scoC4MPfrZekleM5UC9F7IY4Pq2G6y7Lv1dowBoBFC",
+      "role": "freelancer",
+      "assignedProjectIds": [],
+      "id": "pCyRujV"
     }
   ],
   "clients": [

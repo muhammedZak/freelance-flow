@@ -41,6 +41,7 @@ const initialState = {
     user: null,
     accessToken: null,
   },
+
   checkAuth: createOperationState(),
   login: createOperationState(),
   registration: createOperationState(),
@@ -49,7 +50,9 @@ const initialState = {
 
 const authSlice = createSlice({
   name: 'auth',
+
   initialState,
+
   reducers: {
     clearAuthErrors: (state) => {
       state.checkAuth.error = null;
@@ -77,15 +80,21 @@ const authSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      // -------------------------
+      // Check authentication
+      // -------------------------
       .addCase(checkAuth.pending, (state) => {
         startOperation(state.checkAuth);
       })
+
       .addCase(checkAuth.fulfilled, (state, action) => {
         completeOperation(state.checkAuth);
 
         state.session.user = action.payload.user;
+
         state.session.accessToken = action.payload.accessToken;
       })
+
       .addCase(checkAuth.rejected, (state, action) => {
         failOperation(
           state.checkAuth,
@@ -96,15 +105,21 @@ const authSlice = createSlice({
         state.session.accessToken = null;
       })
 
+      // -------------------------
+      // Login
+      // -------------------------
       .addCase(loginUser.pending, (state) => {
         startOperation(state.login);
       })
+
       .addCase(loginUser.fulfilled, (state, action) => {
         completeOperation(state.login);
 
         state.session.user = action.payload.user;
+
         state.session.accessToken = action.payload.accessToken;
       })
+
       .addCase(loginUser.rejected, (state, action) => {
         failOperation(state.login, action.payload || 'Unable to log in.');
 
@@ -112,12 +127,17 @@ const authSlice = createSlice({
         state.session.accessToken = null;
       })
 
+      // -------------------------
+      // Registration
+      // -------------------------
       .addCase(registerUser.pending, (state) => {
         startOperation(state.registration);
       })
+
       .addCase(registerUser.fulfilled, (state) => {
         completeOperation(state.registration);
       })
+
       .addCase(registerUser.rejected, (state, action) => {
         failOperation(
           state.registration,
@@ -125,17 +145,24 @@ const authSlice = createSlice({
         );
       })
 
+      // -------------------------
+      // Logout
+      // -------------------------
       .addCase(logoutUser.pending, (state) => {
         startOperation(state.logout);
       })
+
       .addCase(logoutUser.fulfilled, (state) => {
         completeOperation(state.logout);
 
         state.session.user = null;
         state.session.accessToken = null;
+
         state.login = createOperationState();
+
         state.registration = createOperationState();
       })
+
       .addCase(logoutUser.rejected, (state, action) => {
         failOperation(
           state.logout,
@@ -144,7 +171,9 @@ const authSlice = createSlice({
 
         state.session.user = null;
         state.session.accessToken = null;
+
         state.login = createOperationState();
+
         state.registration = createOperationState();
       });
   },

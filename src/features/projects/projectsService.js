@@ -1,4 +1,4 @@
-import API_URL from '../../services/api';
+import apiClient from '../../api/apiClient';
 import activitiesService from '../activities/activitiesService';
 
 function getActivityDate() {
@@ -21,27 +21,19 @@ async function logProjectActivity(message) {
 }
 
 async function getProjects() {
-  const response = await fetch(`${API_URL}/projects`);
+  const { data } = await apiClient.get('/projects');
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch projects');
-  }
-
-  return response.json();
+  return data;
 }
 
 async function getProjectById(id, { signal } = {}) {
   const projectId = String(id);
 
-  const response = await fetch(`${API_URL}/projects/${projectId}`, {
+  const { data } = await apiClient.get(`/projects/${projectId}`, {
     signal,
   });
 
-  if (!response.ok) {
-    throw new Error('Project not found');
-  }
-
-  return response.json();
+  return data;
 }
 
 async function createProject(projectData) {
@@ -50,19 +42,7 @@ async function createProject(projectData) {
     createdAt: getActivityDate(),
   };
 
-  const response = await fetch(`${API_URL}/projects`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newProject),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create project');
-  }
-
-  const savedProject = await response.json();
+  const { data: savedProject } = await apiClient.post('/projects', newProject);
 
   await logProjectActivity(`Project created: ${savedProject.title}`);
 
@@ -72,19 +52,10 @@ async function createProject(projectData) {
 async function updateProject(id, projectData) {
   const projectId = String(id);
 
-  const response = await fetch(`${API_URL}/projects/${projectId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(projectData),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to update project');
-  }
-
-  const updatedProject = await response.json();
+  const { data: updatedProject } = await apiClient.patch(
+    `/projects/${projectId}`,
+    projectData,
+  );
 
   await logProjectActivity(`Project updated: ${updatedProject.title}`);
 
@@ -96,13 +67,7 @@ async function deleteProject(id) {
 
   const project = await getProjectById(deletedProjectId);
 
-  const response = await fetch(`${API_URL}/projects/${deletedProjectId}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to delete project');
-  }
+  await apiClient.delete(`/projects/${deletedProjectId}`);
 
   await logProjectActivity(`Project deleted: ${project.title}`);
 

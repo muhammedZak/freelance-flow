@@ -1,4 +1,4 @@
-import API_URL from '../../../services/api';
+import apiClient from '../../../api/apiClient';
 import activitiesService from '../../activities/activitiesService';
 
 function getCurrentDate() {
@@ -6,23 +6,15 @@ function getCurrentDate() {
 }
 
 async function getInvoices() {
-  const response = await fetch(`${API_URL}/invoices`);
+  const { data } = await apiClient.get('/invoices');
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch invoices');
-  }
-
-  return await response.json();
+  return data;
 }
 
 async function getInvoiceById(id) {
-  const response = await fetch(`${API_URL}/invoices/${id}`);
+  const { data } = await apiClient.get(`/invoices/${id}`);
 
-  if (!response.ok) {
-    throw new Error('Invoice not found');
-  }
-
-  return await response.json();
+  return data;
 }
 
 async function createInvoice(invoiceData) {
@@ -37,19 +29,7 @@ async function createInvoice(invoiceData) {
     createdAt: getCurrentDate(),
   };
 
-  const response = await fetch(`${API_URL}/invoices`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newInvoice),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create invoice');
-  }
-
-  const savedInvoice = await response.json();
+  const { data: savedInvoice } = await apiClient.post('/invoices', newInvoice);
 
   await activitiesService.addActivity({
     message: `Invoice created: ${savedInvoice.invoiceNumber}`,
@@ -85,19 +65,10 @@ async function updateInvoice(id, invoiceData) {
     updatedData.total = Number(updatedData.total);
   }
 
-  const response = await fetch(`${API_URL}/invoices/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedData),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to update invoice');
-  }
-
-  const updatedInvoice = await response.json();
+  const { data: updatedInvoice } = await apiClient.patch(
+    `/invoices/${id}`,
+    updatedData,
+  );
 
   await activitiesService.addActivity({
     message: `Invoice updated: ${updatedInvoice.invoiceNumber}`,
@@ -111,13 +82,7 @@ async function updateInvoice(id, invoiceData) {
 async function deleteInvoice(id) {
   const invoice = await getInvoiceById(id);
 
-  const response = await fetch(`${API_URL}/invoices/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to delete invoice');
-  }
+  await apiClient.delete(`/invoices/${id}`);
 
   await activitiesService.addActivity({
     message: `Invoice deleted: ${invoice.invoiceNumber}`,

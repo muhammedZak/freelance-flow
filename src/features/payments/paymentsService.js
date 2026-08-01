@@ -1,55 +1,28 @@
-import API_URL from '../../services/api';
+import apiClient from '../../api/apiClient';
 
 async function getPayments() {
-  const response = await fetch(`${API_URL}/payments`);
+  const { data } = await apiClient.get('/payments');
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch payments.');
-  }
-
-  return response.json();
+  return data;
 }
 
 async function createPayment(paymentData) {
-  const response = await fetch(`${API_URL}/payments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(paymentData),
-  });
+  const { data } = await apiClient.post('/payments', paymentData);
 
-  if (!response.ok) {
-    throw new Error('Failed to add payment.');
-  }
-
-  return response.json();
+  return data;
 }
 
 async function updatePayment(id, paymentData) {
-  const response = await fetch(`${API_URL}/payments/${String(id)}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(paymentData),
-  });
+  const { data } = await apiClient.patch(
+    `/payments/${String(id)}`,
+    paymentData,
+  );
 
-  if (!response.ok) {
-    throw new Error('Failed to update payment.');
-  }
-
-  return response.json();
+  return data;
 }
 
 async function deletePayment(id) {
-  const response = await fetch(`${API_URL}/payments/${String(id)}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to delete payment.');
-  }
+  await apiClient.delete(`/payments/${String(id)}`);
 
   return String(id);
 }
@@ -61,19 +34,9 @@ async function createPaymentActivity(message) {
     createdAt: new Date().toISOString(),
   };
 
-  const response = await fetch(`${API_URL}/activities`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(activityData),
-  });
+  const { data } = await apiClient.post('/activities', activityData);
 
-  if (!response.ok) {
-    throw new Error('Failed to create payment activity.');
-  }
-
-  return response.json();
+  return data;
 }
 
 const paymentService = {
