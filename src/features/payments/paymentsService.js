@@ -54,22 +54,6 @@ async function deletePayment(id) {
   return String(id);
 }
 
-async function updateRelatedInvoiceStatus(invoiceId, status) {
-  const response = await fetch(`${API_URL}/invoices/${String(invoiceId)}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to update the related invoice.');
-  }
-
-  return response.json();
-}
-
 async function createPaymentActivity(message) {
   const activityData = {
     message,
@@ -97,7 +81,6 @@ const paymentService = {
   createPayment,
   updatePayment,
   deletePayment,
-  updateRelatedInvoiceStatus,
   createPaymentActivity,
 };
 

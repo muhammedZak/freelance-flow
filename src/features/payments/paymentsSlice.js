@@ -1,4 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+import {
+  editInvoice,
+  INVOICE_STATUS,
+  selectAllInvoices,
+} from '@features/invoices';
+
 import paymentService from './paymentsService';
 
 function findInvoiceById(invoices, invoiceId) {
@@ -27,24 +34,49 @@ function amountsAreEqual(firstAmount, secondAmount) {
   return Number(firstAmount).toFixed(2) === Number(secondAmount).toFixed(2);
 }
 
+function getErrorMessage(error, fallbackMessage) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === 'string' && error.trim()) {
+    return error;
+  }
+
+  return fallbackMessage;
+}
+
+async function synchronizeInvoiceStatus(dispatch, invoiceId, status) {
+  await dispatch(
+    editInvoice({
+      id: String(invoiceId),
+      invoiceData: {
+        status,
+      },
+    }),
+  ).unwrap();
+}
+
 export const fetchPayments = createAsyncThunk(
   'payments/fetchPayments',
   async (_, { rejectWithValue }) => {
     try {
       return await paymentService.getPayments();
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        getErrorMessage(error, 'Failed to fetch payments.'),
+      );
     }
   },
 );
 
 export const addPayment = createAsyncThunk(
   'payments/addPayment',
-  async (paymentData, { getState, rejectWithValue }) => {
+  async (paymentData, { dispatch, getState, rejectWithValue }) => {
     try {
       const state = getState();
 
-      const invoices = state.invoices.invoices;
+      const invoices = selectAllInvoices(state);
       const payments = state.payments.payments;
 
       const invoice = findInvoiceById(invoices, paymentData.invoiceId);
@@ -56,7 +88,7 @@ export const addPayment = createAsyncThunk(
       const amount = Number(paymentData.amount);
       const invoiceTotal = Number(invoice.total);
 
-      if (amount <= 0) {
+      if (!Number.isFinite(amount) || amount <= 0) {
         return rejectWithValue('Payment amount must be greater than zero.');
       }
 
@@ -82,7 +114,7 @@ export const addPayment = createAsyncThunk(
 
       if (
         paymentData.status === 'completed' &&
-        (invoice.status === 'paid' || completedPaymentExists)
+        (invoice.status === INVOICE_STATUS.PAID || completedPaymentExists)
       ) {
         return rejectWithValue('This invoice already has a completed payment.');
       }
@@ -99,9 +131,10 @@ export const addPayment = createAsyncThunk(
       const newPayment = await paymentService.createPayment(newPaymentData);
 
       if (newPayment.status === 'completed') {
-        await paymentService.updateRelatedInvoiceStatus(
-          String(newPayment.invoiceId),
-          'paid',
+        await synchronizeInvoiceStatus(
+          dispatch,
+          newPayment.invoiceId,
+          INVOICE_STATUS.PAID,
         );
       }
 
@@ -111,19 +144,19 @@ export const addPayment = createAsyncThunk(
 
       return newPayment;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(getErrorMessage(error, 'Failed to add payment.'));
     }
   },
 );
 
 export const changePaymentStatus = createAsyncThunk(
   'payments/changePaymentStatus',
-  async ({ id, status }, { getState, rejectWithValue }) => {
+  async ({ id, status }, { dispatch, getState, rejectWithValue }) => {
     try {
       const state = getState();
 
       const payments = state.payments.payments;
-      const invoices = state.invoices.invoices;
+      const invoices = selectAllInvoices(state);
 
       const payment = findPaymentById(payments, id);
 
@@ -165,17 +198,19 @@ export const changePaymentStatus = createAsyncThunk(
         status,
       });
 
+      let nextInvoiceStatus = null;
+
       if (status === 'completed') {
-        await paymentService.updateRelatedInvoiceStatus(
-          String(payment.invoiceId),
-          'paid',
-        );
+        nextInvoiceStatus = INVOICE_STATUS.PAID;
+      } else if (previousStatus === 'completed' && status !== 'completed') {
+        nextInvoiceStatus = INVOICE_STATUS.UNPAID;
       }
 
-      if (previousStatus === 'completed' && status !== 'completed') {
-        await paymentService.updateRelatedInvoiceStatus(
-          String(payment.invoiceId),
-          'unpaid',
+      if (nextInvoiceStatus) {
+        await synchronizeInvoiceStatus(
+          dispatch,
+          payment.invoiceId,
+          nextInvoiceStatus,
         );
       }
 
@@ -185,19 +220,21 @@ export const changePaymentStatus = createAsyncThunk(
 
       return updatedPayment;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        getErrorMessage(error, 'Failed to update payment status.'),
+      );
     }
   },
 );
 
 export const removePayment = createAsyncThunk(
   'payments/removePayment',
-  async (id, { getState, rejectWithValue }) => {
+  async (id, { dispatch, getState, rejectWithValue }) => {
     try {
       const state = getState();
 
       const payments = state.payments.payments;
-      const invoices = state.invoices.invoices;
+      const invoices = selectAllInvoices(state);
 
       const payment = findPaymentById(payments, id);
 
@@ -210,9 +247,10 @@ export const removePayment = createAsyncThunk(
       await paymentService.deletePayment(String(id));
 
       if (payment.status === 'completed' && invoice) {
-        await paymentService.updateRelatedInvoiceStatus(
-          String(payment.invoiceId),
-          'unpaid',
+        await synchronizeInvoiceStatus(
+          dispatch,
+          payment.invoiceId,
+          INVOICE_STATUS.UNPAID,
         );
       }
 
@@ -224,7 +262,9 @@ export const removePayment = createAsyncThunk(
 
       return String(id);
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        getErrorMessage(error, 'Failed to delete payment.'),
+      );
     }
   },
 );
@@ -238,13 +278,16 @@ const initialState = {
 
 const paymentsSlice = createSlice({
   name: 'payments',
+
   initialState,
+
   reducers: {
     clearPaymentMessages: (state) => {
       state.error = null;
       state.successMessage = '';
     },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchPayments.pending, (state) => {
@@ -267,11 +310,14 @@ const paymentsSlice = createSlice({
       })
       .addCase(addPayment.fulfilled, (state, action) => {
         state.loading = false;
+
         state.payments.push(action.payload);
+
         state.successMessage = 'Payment added successfully.';
       })
       .addCase(addPayment.rejected, (state, action) => {
         state.loading = false;
+
         state.error = action.payload || 'Failed to add payment.';
       })
 
@@ -295,6 +341,7 @@ const paymentsSlice = createSlice({
       })
       .addCase(changePaymentStatus.rejected, (state, action) => {
         state.loading = false;
+
         state.error = action.payload || 'Failed to update payment status.';
       })
 
@@ -314,6 +361,7 @@ const paymentsSlice = createSlice({
       })
       .addCase(removePayment.rejected, (state, action) => {
         state.loading = false;
+
         state.error = action.payload || 'Failed to delete payment.';
       });
   },
