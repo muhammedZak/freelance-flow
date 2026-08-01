@@ -10,7 +10,7 @@ import useInvoiceForm from '../hooks/useInvoiceForm';
 function InvoiceFormPage() {
   const {
     formData,
-    formError,
+    formErrors,
     clients,
     clientProjects,
     invoiceTotal,
@@ -47,7 +47,7 @@ function InvoiceFormPage() {
       <div className='max-w-3xl'>
         <InvoiceForm
           formData={formData}
-          formError={formError}
+          errors={formErrors}
           loading={invoiceLoading}
           clients={clients}
           projects={clientProjects}

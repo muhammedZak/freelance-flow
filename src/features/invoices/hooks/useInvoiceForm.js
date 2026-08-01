@@ -41,7 +41,7 @@ function useInvoiceForm() {
     ...INITIAL_INVOICE_FORM_VALUES,
   }));
 
-  const [formError, setFormError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
   const clients = useSelector(selectAllClients);
   const clientsLoading = useSelector(selectClientsLoading);
@@ -79,8 +79,42 @@ function useInvoiceForm() {
 
   const dataError = clientsError || projectsError;
 
+  function clearChangedFieldErrors(fieldName) {
+    setFormErrors((currentErrors) => {
+      const fieldsToClear = [fieldName];
+
+      if (fieldName === 'clientId') {
+        fieldsToClear.push('projectId');
+      }
+
+      if (fieldName === 'issueDate') {
+        fieldsToClear.push('dueDate');
+      }
+
+      const hasErrorToClear = fieldsToClear.some((field) =>
+        Boolean(currentErrors[field]),
+      );
+
+      if (!hasErrorToClear) {
+        return currentErrors;
+      }
+
+      const nextErrors = {
+        ...currentErrors,
+      };
+
+      fieldsToClear.forEach((field) => {
+        delete nextErrors[field];
+      });
+
+      return nextErrors;
+    });
+  }
+
   function handleChange(event) {
     const { name, value } = event.target;
+
+    clearChangedFieldErrors(name);
 
     setFormData((currentFormData) => {
       if (name === 'clientId') {
@@ -101,14 +135,14 @@ function useInvoiceForm() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationError = validateInvoiceForm(formData, projects);
+    const validationErrors = validateInvoiceForm(formData, projects);
 
-    if (validationError) {
-      setFormError(validationError);
+    if (Object.keys(validationErrors).length > 0) {
+      setFormErrors(validationErrors);
       return;
     }
 
-    setFormError('');
+    setFormErrors({});
 
     const invoiceData = mapInvoiceFormToPayload(formData, invoiceTotal);
 
@@ -117,17 +151,13 @@ function useInvoiceForm() {
 
       navigate(`/invoices/${savedInvoice.id}`);
     } catch (error) {
-      setFormError(
-        typeof error === 'string'
-          ? error
-          : error?.message || 'Unable to create invoice',
-      );
+      console.log(error);
     }
   }
 
   return {
     formData,
-    formError,
+    formErrors,
 
     clients,
     clientProjects,

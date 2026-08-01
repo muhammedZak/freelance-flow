@@ -2,86 +2,94 @@ import { INVOICE_STATUS } from '../constants/invoices.constants';
 
 const VALID_INVOICE_STATUSES = Object.freeze(Object.values(INVOICE_STATUS));
 
+function isEmptyValue(value) {
+  return value === '' || value === null || value === undefined;
+}
+
 export function validateInvoiceForm(formData, projects = []) {
+  const errors = {};
+
   const invoiceNumber = String(formData?.invoiceNumber ?? '').trim();
 
   if (!invoiceNumber) {
-    return 'Invoice number is required';
+    errors.invoiceNumber = 'Invoice number is required';
   }
 
   if (!formData?.clientId) {
-    return 'Please select a client';
+    errors.clientId = 'Please select a client';
   }
 
   if (!formData?.projectId) {
-    return 'Please select a project';
+    errors.projectId = 'Please select a project';
   }
 
-  const selectedProject = projects.find(
-    (project) => String(project.id) === String(formData.projectId),
-  );
+  if (formData?.clientId && formData?.projectId) {
+    const selectedProject = projects.find(
+      (project) => String(project.id) === String(formData.projectId),
+    );
 
-  if (
-    !selectedProject ||
-    String(selectedProject.clientId) !== String(formData.clientId)
-  ) {
-    return 'The selected project does not belong to this client';
+    if (
+      !selectedProject ||
+      String(selectedProject.clientId) !== String(formData.clientId)
+    ) {
+      errors.projectId = 'The selected project does not belong to this client';
+    }
   }
 
-  if (
-    formData.hoursWorked === '' ||
-    formData.hoursWorked === null ||
-    formData.hoursWorked === undefined
-  ) {
-    return 'Hours worked is required';
+  if (isEmptyValue(formData?.hoursWorked)) {
+    errors.hoursWorked = 'Hours worked is required';
+  } else {
+    const hoursWorked = Number(formData.hoursWorked);
+
+    if (!Number.isFinite(hoursWorked) || hoursWorked <= 0) {
+      errors.hoursWorked = 'Hours worked must be greater than 0';
+    }
   }
 
-  const hoursWorked = Number(formData.hoursWorked);
+  if (isEmptyValue(formData?.hourlyRate)) {
+    errors.hourlyRate = 'Hourly rate is required';
+  } else {
+    const hourlyRate = Number(formData.hourlyRate);
 
-  if (!Number.isFinite(hoursWorked) || hoursWorked <= 0) {
-    return 'Hours worked must be greater than 0';
+    if (!Number.isFinite(hourlyRate) || hourlyRate <= 0) {
+      errors.hourlyRate = 'Hourly rate must be greater than 0';
+    }
   }
 
-  if (
-    formData.hourlyRate === '' ||
-    formData.hourlyRate === null ||
-    formData.hourlyRate === undefined
-  ) {
-    return 'Hourly rate is required';
+  let issueDate = null;
+  let dueDate = null;
+
+  if (!formData?.issueDate) {
+    errors.issueDate = 'Issue date is required';
+  } else {
+    issueDate = new Date(formData.issueDate);
+
+    if (Number.isNaN(issueDate.getTime())) {
+      errors.issueDate = 'Please enter a valid issue date';
+    }
   }
 
-  const hourlyRate = Number(formData.hourlyRate);
+  if (!formData?.dueDate) {
+    errors.dueDate = 'Due date is required';
+  } else {
+    dueDate = new Date(formData.dueDate);
 
-  if (!Number.isFinite(hourlyRate) || hourlyRate <= 0) {
-    return 'Hourly rate must be greater than 0';
+    if (Number.isNaN(dueDate.getTime())) {
+      errors.dueDate = 'Please enter a valid due date';
+    }
   }
 
-  if (!formData.issueDate) {
-    return 'Issue date is required';
+  const hasValidIssueDate = issueDate && !Number.isNaN(issueDate.getTime());
+
+  const hasValidDueDate = dueDate && !Number.isNaN(dueDate.getTime());
+
+  if (hasValidIssueDate && hasValidDueDate && dueDate < issueDate) {
+    errors.dueDate = 'Due date cannot be before issue date';
   }
 
-  if (!formData.dueDate) {
-    return 'Due date is required';
+  if (!formData?.status || !VALID_INVOICE_STATUSES.includes(formData.status)) {
+    errors.status = 'Please select a valid invoice status';
   }
 
-  const issueDate = new Date(formData.issueDate);
-  const dueDate = new Date(formData.dueDate);
-
-  if (Number.isNaN(issueDate.getTime())) {
-    return 'Please enter a valid issue date';
-  }
-
-  if (Number.isNaN(dueDate.getTime())) {
-    return 'Please enter a valid due date';
-  }
-
-  if (dueDate < issueDate) {
-    return 'Due date cannot be before issue date';
-  }
-
-  if (!VALID_INVOICE_STATUSES.includes(formData.status)) {
-    return 'Please select a valid invoice status';
-  }
-
-  return '';
+  return errors;
 }

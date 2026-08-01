@@ -712,6 +712,12 @@
       "type": "invoice",
       "createdAt": "2026-08-01",
       "id": "IHke0iZ"
+    },
+    {
+      "message": "Invoice deleted: ERTER",
+      "type": "invoice",
+      "createdAt": "2026-08-01",
+      "id": "UsH9Cv8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,12 +1,11 @@
 import Button from '@components/common/Button';
-import MessageAlert from '@components/common/MessageAlert';
 
 import InvoiceInformationFormCard from './InvoiceInformationFormCard';
 import InvoiceCalculationFormCard from './InvoiceCalculationFormCard';
 
 function InvoiceForm({
   formData,
-  formError,
+  errors = {},
   loading,
   clients,
   projects,
@@ -15,17 +14,14 @@ function InvoiceForm({
   onSubmit,
 }) {
   return (
-    <form onSubmit={onSubmit} className='space-y-6' aria-busy={loading}>
-      {formError && (
-        <MessageAlert
-          type='error'
-          title='Please check the invoice form'
-          message={formError}
-        />
-      )}
-
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className='space-y-6'
+      aria-busy={loading}>
       <InvoiceInformationFormCard
         formData={formData}
+        errors={errors}
         clients={clients}
         projects={projects}
         onChange={onChange}
@@ -33,6 +29,7 @@ function InvoiceForm({
 
       <InvoiceCalculationFormCard
         formData={formData}
+        errors={errors}
         invoiceTotal={invoiceTotal}
         onChange={onChange}
       />

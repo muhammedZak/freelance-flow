@@ -4,7 +4,12 @@ import InputField from '@components/forms/InputField';
 
 import { formatCurrency } from '@/utils/formatCurrency';
 
-function InvoiceCalculationFormCard({ formData, invoiceTotal, onChange }) {
+function InvoiceCalculationFormCard({
+  formData,
+  errors = {},
+  invoiceTotal,
+  onChange,
+}) {
   return (
     <SectionCard
       title='Billing Calculation'
@@ -21,6 +26,8 @@ function InvoiceCalculationFormCard({ formData, invoiceTotal, onChange }) {
             value={formData.hoursWorked}
             onChange={onChange}
             placeholder='20'
+            error={errors.hoursWorked || ''}
+            required
           />
 
           <InputField
@@ -32,6 +39,8 @@ function InvoiceCalculationFormCard({ formData, invoiceTotal, onChange }) {
             value={formData.hourlyRate}
             onChange={onChange}
             placeholder='800'
+            error={errors.hourlyRate || ''}
+            required
           />
         </div>
 

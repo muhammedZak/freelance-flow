@@ -6,7 +6,13 @@ import SelectField from '@components/forms/SelectField';
 
 import { INVOICE_STATUS_OPTIONS } from '../constants/invoices.constants';
 
-function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
+function InvoiceInformationFormCard({
+  formData,
+  errors = {},
+  clients,
+  projects,
+  onChange,
+}) {
   const clientOptions = [
     {
       value: '',
@@ -44,6 +50,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
           value={formData.invoiceNumber}
           onChange={onChange}
           placeholder='Example: INV-005'
+          error={errors.invoiceNumber || ''}
+          required
         />
 
         <div className='grid gap-5 sm:grid-cols-2'>
@@ -54,6 +62,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
             value={formData.clientId}
             onChange={onChange}
             options={clientOptions}
+            error={errors.clientId || ''}
+            required
           />
 
           <SelectField
@@ -64,6 +74,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
             onChange={onChange}
             options={projectOptions}
             disabled={!formData.clientId}
+            error={errors.projectId || ''}
+            required
           />
         </div>
 
@@ -83,6 +95,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
             type='date'
             value={formData.issueDate}
             onChange={onChange}
+            error={errors.issueDate || ''}
+            required
           />
 
           <InputField
@@ -92,6 +106,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
             type='date'
             value={formData.dueDate}
             onChange={onChange}
+            error={errors.dueDate || ''}
+            required
           />
         </div>
 
@@ -102,6 +118,8 @@ function InvoiceInformationFormCard({ formData, clients, projects, onChange }) {
           value={formData.status}
           onChange={onChange}
           options={INVOICE_STATUS_OPTIONS}
+          error={errors.status || ''}
+          required
         />
       </div>
     </SectionCard>
