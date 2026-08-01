@@ -17,6 +17,14 @@ export {
 // moves inside the invoices feature.
 export { default as InvoiceForm } from './InvoiceForm';
 
+// Transitional list presentation exports.
+// These will become private when InvoicesPage moves inside
+// the invoices feature in Step 9.
+export { default as InvoiceSummaryCards } from './components/InvoiceSummaryCards';
+export { default as InvoiceFilters } from './components/InvoiceFilters';
+export { default as InvoiceCard } from './components/InvoiceCard';
+export { default as InvoiceList } from './components/InvoiceList';
+
 // Constants
 export {
   INVOICE_STATUS,

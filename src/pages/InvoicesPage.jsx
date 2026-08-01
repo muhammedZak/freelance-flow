@@ -1,14 +1,10 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
-import EmptyState from '../components/common/EmptyState';
 import PageHeader from '../components/common/PageHeader';
 import ActionLink from '../components/common/ActionLink';
-import SearchInput from '../components/forms/SearchInput';
-import FilterSelect from '../components/forms/FilterSelect';
 
 import {
   fetchClients,
@@ -29,17 +25,15 @@ import {
   fetchInvoices,
   removeInvoice,
   INVOICE_STATUS,
-  INVOICE_FILTER_STATUS_OPTIONS,
-  INVOICE_SORT_OPTIONS,
   selectAllInvoices,
   selectInvoicesSuccessMessage,
   selectInvoicesListError,
   selectIsInvoicesListLoading,
   useInvoiceFilters,
+  InvoiceSummaryCards,
+  InvoiceFilters,
+  InvoiceList,
 } from '@features/invoices';
-
-import { formatCurrency } from '../utils/formatCurrency';
-import { formatDate } from '../utils/formatDate';
 
 function InvoicesPage() {
   const dispatch = useDispatch();
@@ -56,9 +50,7 @@ function InvoicesPage() {
   const clientsError = useSelector(selectClientsError);
 
   const projects = useSelector(selectAllProjects);
-
   const projectsLoading = useSelector(selectIsProjectsListLoading);
-
   const projectsError = useSelector(selectProjectsListError);
 
   const canManageInvoices =
@@ -118,18 +110,6 @@ function InvoicesPage() {
     clearFilters,
   } = useInvoiceFilters(visibleInvoices, clients, projects);
 
-  function getStatusClasses(status) {
-    if (status === INVOICE_STATUS.PAID) {
-      return 'bg-green-100 text-green-700';
-    }
-
-    if (status === INVOICE_STATUS.OVERDUE) {
-      return 'bg-red-100 text-red-700';
-    }
-
-    return 'bg-yellow-100 text-yellow-700';
-  }
-
   const paidAmount = visibleInvoices
     .filter((invoice) => invoice.status === INVOICE_STATUS.PAID)
     .reduce((total, invoice) => total + Number(invoice.total), 0);
@@ -169,143 +149,34 @@ function InvoicesPage() {
         </p>
       )}
 
-      <div className='mb-6 grid gap-4 sm:grid-cols-3'>
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm text-slate-500'>Total Invoices</p>
+      <InvoiceSummaryCards
+        totalInvoices={visibleInvoices.length}
+        paidAmount={paidAmount}
+        outstandingAmount={outstandingAmount}
+      />
 
-          <p className='mt-2 text-2xl font-bold text-slate-900'>
-            {visibleInvoices.length}
-          </p>
-        </div>
+      <InvoiceFilters
+        searchText={searchText}
+        statusFilter={statusFilter}
+        sortBy={sortBy}
+        filteredCount={filteredCount}
+        totalCount={totalCount}
+        hasActiveFilters={hasActiveFilters}
+        onSearchChange={updateSearchText}
+        onStatusChange={updateStatusFilter}
+        onSortChange={updateSortBy}
+        onClearFilters={clearFilters}
+      />
 
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm text-slate-500'>Paid Amount</p>
-
-          <p className='mt-2 text-2xl font-bold text-green-700'>
-            {formatCurrency(paidAmount)}
-          </p>
-        </div>
-
-        <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-          <p className='text-sm text-slate-500'>Outstanding Amount</p>
-
-          <p className='mt-2 text-2xl font-bold text-red-700'>
-            {formatCurrency(outstandingAmount)}
-          </p>
-        </div>
-      </div>
-
-      <div className='mb-6'>
-        <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-4'>
-          <div className='sm:col-span-2'>
-            <SearchInput
-              value={searchText}
-              onChange={(event) => updateSearchText(event.target.value)}
-              placeholder='Search invoice number or client'
-              ariaLabel='Search invoices'
-            />
-          </div>
-
-          <FilterSelect
-            value={statusFilter}
-            onChange={(event) => updateStatusFilter(event.target.value)}
-            options={INVOICE_FILTER_STATUS_OPTIONS}
-            ariaLabel='Filter invoices by status'
-          />
-
-          <FilterSelect
-            value={sortBy}
-            onChange={(event) => updateSortBy(event.target.value)}
-            options={INVOICE_SORT_OPTIONS}
-            ariaLabel='Sort invoices'
-          />
-        </div>
-
-        <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
-          <p className='text-slate-500'>
-            Showing {filteredCount} of {totalCount} invoices
-          </p>
-
-          {hasActiveFilters && (
-            <button
-              type='button'
-              onClick={clearFilters}
-              className='self-start text-blue-600 sm:self-auto'>
-              Clear Filters
-            </button>
-          )}
-        </div>
-      </div>
-
-      {filteredInvoices.length === 0 ? (
-        <EmptyState message={emptyMessage} />
-      ) : (
-        <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-          {filteredInvoices.map((invoice) => (
-            <div
-              key={invoice.id}
-              className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-              <div className='mb-4 flex items-start justify-between gap-3'>
-                <div>
-                  <h2 className='text-lg font-bold text-slate-900'>
-                    {invoice.invoiceNumber}
-                  </h2>
-
-                  <p className='text-sm text-slate-500'>
-                    {getClientName(invoice.clientId)}
-                  </p>
-                </div>
-
-                <span
-                  className={`rounded px-2 py-1 text-xs capitalize ${getStatusClasses(
-                    invoice.status,
-                  )}`}>
-                  {invoice.status}
-                </span>
-              </div>
-
-              <p className='mb-4 text-sm text-slate-600'>
-                {getProjectTitle(invoice.projectId)}
-              </p>
-
-              <p className='mb-4 text-2xl font-bold text-slate-900'>
-                {formatCurrency(invoice.total)}
-              </p>
-
-              <div className='space-y-2 text-sm text-slate-600'>
-                <p>
-                  <span className='font-medium'>Issue Date:</span>{' '}
-                  {formatDate(invoice.issueDate)}
-                </p>
-
-                <p>
-                  <span className='font-medium'>Due Date:</span>{' '}
-                  {formatDate(invoice.dueDate)}
-                </p>
-              </div>
-
-              <div className='mt-5 flex gap-4 text-sm'>
-                <Link to={`/invoices/${invoice.id}`} className='text-blue-600'>
-                  View Details
-                </Link>
-
-                {canManageInvoices && (
-                  <button
-                    type='button'
-                    onClick={() => handleDelete(invoice)}
-                    className='text-red-600'>
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <p className='text-sm text-slate-500'>Updating invoices...</p>
-          )}
-        </div>
-      )}
+      <InvoiceList
+        invoices={filteredInvoices}
+        emptyMessage={emptyMessage}
+        loading={loading}
+        canManageInvoices={canManageInvoices}
+        getClientName={getClientName}
+        getProjectTitle={getProjectTitle}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
