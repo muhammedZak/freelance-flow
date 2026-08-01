@@ -25,6 +25,12 @@ export { default as InvoiceFilters } from './components/InvoiceFilters';
 export { default as InvoiceCard } from './components/InvoiceCard';
 export { default as InvoiceList } from './components/InvoiceList';
 
+// Transitional details presentation exports.
+// These will become private when InvoiceDetailsPage moves
+// inside the invoices feature in Step 9.
+export { default as InvoiceInformationCard } from './components/InvoiceInformationCard';
+export { default as InvoiceCalculationCard } from './components/InvoiceCalculationCard';
+
 // Constants
 export {
   INVOICE_STATUS,
@@ -65,3 +71,4 @@ export {
 export { default as useInvoiceFilters } from './hooks/useInvoiceFilters';
 export { default as useInvoicesList } from './hooks/useInvoicesList';
 export { default as useInvoiceForm } from './hooks/useInvoiceForm';
+export { default as useInvoiceDetails } from './hooks/useInvoiceDetails';
