@@ -1,12 +1,37 @@
-import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+
+import Loading from '@components/common/Loading';
+
+import {
+  selectAuthUser,
+  selectIsAuthenticated,
+  selectIsAuthInitialized,
+} from '@features/auth';
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const isAuthInitialized = useSelector(selectIsAuthInitialized);
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const user = useSelector(selectAuthUser);
+
   const location = useLocation();
 
+  if (!isAuthInitialized) {
+    return <Loading message='Restoring your session...' />;
+  }
+
   if (!isAuthenticated) {
-    return <Navigate to='/login' replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to='/login'
+        replace
+        state={{
+          from: location,
+        }}
+      />
+    );
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role)) {

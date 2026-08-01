@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import authReducer from '../features/auth/authSlice';
+import { authReducer, checkAuth } from '@features/auth';
 import { clientsReducer } from '@features/clients';
+import { invoicesReducer } from '@features/invoices';
 import { projectsReducer } from '@features/projects';
 import { tasksReducer } from '@features/tasks';
-import { invoicesReducer } from '@features/invoices';
+
 import activitiesReducer from '../features/activities/activitiesSlice';
 import paymentsReducer from '../features/payments/paymentsSlice';
 
@@ -19,3 +20,5 @@ export const store = configureStore({
     payments: paymentsReducer,
   },
 });
+
+store.dispatch(checkAuth());

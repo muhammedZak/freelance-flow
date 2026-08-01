@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux';
 
 import { navigationLinks } from '../../utils/navigationLinks';
 
+import { selectAuthUser } from '@features/auth';
+
 function Sidebar() {
-  const { user } = useSelector((state) => state.auth);
+  const user = useSelector(selectAuthUser);
 
   const visibleLinks = navigationLinks.filter((link) =>
     link.roles.includes(user?.role),
