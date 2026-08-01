@@ -59,7 +59,8 @@ export {
   selectIsInvoiceDeleting,
 } from './invoicesSelectors';
 
-// Transitional public hook export.
-// This will become private when InvoicesPage moves inside
+// Transitional public hook exports.
+// These will become private when InvoicesPage moves inside
 // the invoices feature in Step 9.
 export { default as useInvoiceFilters } from './hooks/useInvoiceFilters';
+export { default as useInvoicesList } from './hooks/useInvoicesList';
