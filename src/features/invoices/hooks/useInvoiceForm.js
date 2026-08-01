@@ -16,17 +16,21 @@ import {
   selectProjectsListError,
 } from '@features/projects';
 
-import { addInvoice, clearInvoiceMessages } from '../invoicesSlice';
+import { clearInvoiceMessages } from '../slices/invoicesSlice';
+
+import { addInvoice } from '../thunks/invoicesThunks';
 
 import {
   selectInvoiceCreateError,
   selectIsInvoiceCreating,
-} from '../invoicesSelectors';
+} from '../selectors/invoicesSelectors';
 
 import { INITIAL_INVOICE_FORM_VALUES } from '../invoices.constants';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
+
 import { mapInvoiceFormToPayload } from '../utils/invoiceMappers';
+
 import { validateInvoiceForm } from '../validation/invoiceValidation';
 
 function useInvoiceForm() {

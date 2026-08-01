@@ -15,18 +15,18 @@ import {
   selectProjectsListError,
 } from '@features/projects';
 
-import {
-  clearInvoiceMessages,
-  fetchInvoices,
-  removeInvoice,
-} from '../invoicesSlice';
+import { clearInvoiceMessages } from '../slices/invoicesSlice';
+
+import { fetchInvoices, removeInvoice } from '../thunks/invoicesThunks';
 
 import {
   selectAllInvoices,
-  selectInvoicesSuccessMessage,
+  selectInvoiceDeleteError,
   selectInvoicesListError,
+  selectInvoicesSuccessMessage,
+  selectIsInvoiceDeleting,
   selectIsInvoicesListLoading,
-} from '../invoicesSelectors';
+} from '../selectors/invoicesSelectors';
 
 import { INVOICE_STATUS } from '../invoices.constants';
 
@@ -39,6 +39,9 @@ function useInvoicesList() {
   const invoicesLoading = useSelector(selectIsInvoicesListLoading);
   const invoicesError = useSelector(selectInvoicesListError);
   const successMessage = useSelector(selectInvoicesSuccessMessage);
+
+  const invoiceDeleting = useSelector(selectIsInvoiceDeleting);
+  const invoiceDeleteError = useSelector(selectInvoiceDeleteError);
 
   const clients = useSelector(selectAllClients);
   const clientsLoading = useSelector(selectClientsLoading);
@@ -81,11 +84,13 @@ function useInvoicesList() {
     .filter((invoice) => invoice.status !== INVOICE_STATUS.PAID)
     .reduce((total, invoice) => total + Number(invoice.total), 0);
 
-  const loading = invoicesLoading || clientsLoading || projectsLoading;
+  const loading =
+    invoicesLoading || invoiceDeleting || clientsLoading || projectsLoading;
 
-  const error = invoicesError || clientsError || projectsError;
+  const error =
+    invoicesError || invoiceDeleteError || clientsError || projectsError;
 
-  const initialLoading = loading && invoices.length === 0;
+  const initialLoading = invoicesLoading && invoices.length === 0;
 
   async function handleDelete(invoice) {
     const confirmDelete = window.confirm(

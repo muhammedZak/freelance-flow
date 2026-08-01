@@ -19,10 +19,13 @@ import {
 import {
   clearInvoiceMessages,
   clearSelectedInvoice,
+} from '../slices/invoicesSlice';
+
+import {
   editInvoice,
   fetchInvoiceById,
   removeInvoice,
-} from '../invoicesSlice';
+} from '../thunks/invoicesThunks';
 
 import {
   selectSelectedInvoice,
@@ -33,7 +36,7 @@ import {
   selectIsInvoiceDetailsLoading,
   selectIsInvoiceUpdating,
   selectIsInvoiceDeleting,
-} from '../invoicesSelectors';
+} from '../selectors/invoicesSelectors';
 
 import { INVOICE_STATUS } from '../invoices.constants';
 
@@ -58,11 +61,15 @@ function useInvoiceDetails() {
   const selectedInvoice = useSelector(selectSelectedInvoice);
 
   const detailsLoading = useSelector(selectIsInvoiceDetailsLoading);
+
   const updating = useSelector(selectIsInvoiceUpdating);
+
   const deleting = useSelector(selectIsInvoiceDeleting);
 
   const detailsError = useSelector(selectInvoiceDetailsError);
+
   const updateError = useSelector(selectInvoiceUpdateError);
+
   const deleteError = useSelector(selectInvoiceDeleteError);
 
   const successMessage = useSelector(selectInvoicesSuccessMessage);
