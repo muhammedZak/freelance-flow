@@ -27,7 +27,7 @@ import {
   clearInvoiceMessages,
   fetchInvoices,
   removeInvoice,
-} from '../features/invoices/invoicesSlice';
+} from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';

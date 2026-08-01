@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
-import InvoiceForm from '../features/invoices/InvoiceForm';
 
 import { fetchClients } from '@features/clients';
 import {
@@ -15,9 +14,10 @@ import {
 } from '@features/projects';
 
 import {
+  InvoiceForm,
   addInvoice,
   clearInvoiceMessages,
-} from '../features/invoices/invoicesSlice';
+} from '@features/invoices';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
 import PageHeader from '../components/common/PageHeader';

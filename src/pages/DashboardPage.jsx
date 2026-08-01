@@ -14,7 +14,7 @@ import {
   selectProjectsListError,
 } from '@features/projects';
 import { fetchTasks } from '@features/tasks';
-import { fetchInvoices } from '../features/invoices/invoicesSlice';
+import { fetchInvoices } from '@features/invoices';
 import { fetchActivities } from '../features/activities/activitiesSlice';
 
 import { formatCurrency } from '../utils/formatCurrency';

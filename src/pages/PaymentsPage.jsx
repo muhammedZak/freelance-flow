@@ -13,7 +13,7 @@ import FilterSelect from '../components/forms/FilterSelect';
 import PaymentForm from '../features/payments/PaymentForm';
 
 import { fetchClients } from '@features/clients';
-import { fetchInvoices } from '../features/invoices/invoicesSlice';
+import { fetchInvoices } from '@features/invoices';
 import {
   addPayment,
   changePaymentStatus,
