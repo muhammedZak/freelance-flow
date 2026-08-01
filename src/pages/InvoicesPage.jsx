@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '../components/common/Loading';
@@ -29,15 +29,13 @@ import {
   fetchInvoices,
   removeInvoice,
   INVOICE_STATUS,
-  INVOICE_SORT,
-  INVOICE_FILTER_PARAMS,
-  INVOICE_FILTER_DEFAULTS,
   INVOICE_FILTER_STATUS_OPTIONS,
   INVOICE_SORT_OPTIONS,
   selectAllInvoices,
   selectInvoicesSuccessMessage,
   selectInvoicesListError,
   selectIsInvoicesListLoading,
+  useInvoiceFilters,
 } from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
@@ -45,20 +43,6 @@ import { formatDate } from '../utils/formatDate';
 
 function InvoicesPage() {
   const dispatch = useDispatch();
-
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const searchText =
-    searchParams.get(INVOICE_FILTER_PARAMS.SEARCH) ||
-    INVOICE_FILTER_DEFAULTS.search;
-
-  const statusFilter =
-    searchParams.get(INVOICE_FILTER_PARAMS.STATUS) ||
-    INVOICE_FILTER_DEFAULTS.status;
-
-  const sortBy =
-    searchParams.get(INVOICE_FILTER_PARAMS.SORT) ||
-    INVOICE_FILTER_DEFAULTS.sort;
 
   const { user } = useSelector((state) => state.auth);
 
@@ -91,55 +75,6 @@ function InvoicesPage() {
     };
   }, [dispatch]);
 
-  function updateSearchParams(key, value) {
-    const newParams = new URLSearchParams(searchParams);
-
-    const isDefaultValue =
-      !value ||
-      value === INVOICE_FILTER_DEFAULTS.status ||
-      value === INVOICE_FILTER_DEFAULTS.sort;
-
-    if (isDefaultValue) {
-      newParams.delete(key);
-    } else {
-      newParams.set(key, value);
-    }
-
-    setSearchParams(newParams);
-  }
-
-  function clearFilters() {
-    setSearchParams({});
-  }
-
-  function getClientName(clientId) {
-    const client = clients.find(
-      (client) => String(client.id) === String(clientId),
-    );
-
-    return client ? client.name : 'Unknown Client';
-  }
-
-  function getProjectTitle(projectId) {
-    const project = projects.find(
-      (project) => String(project.id) === String(projectId),
-    );
-
-    return project ? project.title : 'Unknown Project';
-  }
-
-  function getStatusClasses(status) {
-    if (status === INVOICE_STATUS.PAID) {
-      return 'bg-green-100 text-green-700';
-    }
-
-    if (status === INVOICE_STATUS.OVERDUE) {
-      return 'bg-red-100 text-red-700';
-    }
-
-    return 'bg-yellow-100 text-yellow-700';
-  }
-
   async function handleDelete(invoice) {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${invoice.invoiceNumber}?`,
@@ -166,47 +101,34 @@ function InvoicesPage() {
         )
       : invoices;
 
-  const filteredInvoices = visibleInvoices
-    .filter((invoice) => {
-      const searchValue = searchText.toLowerCase();
+  const {
+    searchText,
+    statusFilter,
+    sortBy,
+    filteredInvoices,
+    filteredCount,
+    totalCount,
+    hasActiveFilters,
+    emptyMessage,
+    getClientName,
+    getProjectTitle,
+    updateSearchText,
+    updateStatusFilter,
+    updateSortBy,
+    clearFilters,
+  } = useInvoiceFilters(visibleInvoices, clients, projects);
 
-      const clientName = getClientName(invoice.clientId).toLowerCase();
+  function getStatusClasses(status) {
+    if (status === INVOICE_STATUS.PAID) {
+      return 'bg-green-100 text-green-700';
+    }
 
-      const projectTitle = getProjectTitle(invoice.projectId).toLowerCase();
+    if (status === INVOICE_STATUS.OVERDUE) {
+      return 'bg-red-100 text-red-700';
+    }
 
-      const matchesSearch =
-        invoice.invoiceNumber.toLowerCase().includes(searchValue) ||
-        clientName.includes(searchValue) ||
-        projectTitle.includes(searchValue);
-
-      const matchesStatus =
-        statusFilter === INVOICE_FILTER_DEFAULTS.status ||
-        invoice.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    })
-    .sort((firstInvoice, secondInvoice) => {
-      if (sortBy === INVOICE_SORT.DUE_DATE) {
-        return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
-      }
-
-      if (sortBy === INVOICE_SORT.AMOUNT_HIGH) {
-        return Number(secondInvoice.total) - Number(firstInvoice.total);
-      }
-
-      if (sortBy === INVOICE_SORT.AMOUNT_LOW) {
-        return Number(firstInvoice.total) - Number(secondInvoice.total);
-      }
-
-      return (
-        new Date(secondInvoice.issueDate) - new Date(firstInvoice.issueDate)
-      );
-    });
-
-  const hasActiveFilters =
-    searchText ||
-    statusFilter !== INVOICE_FILTER_DEFAULTS.status ||
-    sortBy !== INVOICE_FILTER_DEFAULTS.sort;
+    return 'bg-yellow-100 text-yellow-700';
+  }
 
   const paidAmount = visibleInvoices
     .filter((invoice) => invoice.status === INVOICE_STATUS.PAID)
@@ -278,12 +200,7 @@ function InvoicesPage() {
           <div className='sm:col-span-2'>
             <SearchInput
               value={searchText}
-              onChange={(event) =>
-                updateSearchParams(
-                  INVOICE_FILTER_PARAMS.SEARCH,
-                  event.target.value,
-                )
-              }
+              onChange={(event) => updateSearchText(event.target.value)}
               placeholder='Search invoice number or client'
               ariaLabel='Search invoices'
             />
@@ -291,21 +208,14 @@ function InvoicesPage() {
 
           <FilterSelect
             value={statusFilter}
-            onChange={(event) =>
-              updateSearchParams(
-                INVOICE_FILTER_PARAMS.STATUS,
-                event.target.value,
-              )
-            }
+            onChange={(event) => updateStatusFilter(event.target.value)}
             options={INVOICE_FILTER_STATUS_OPTIONS}
             ariaLabel='Filter invoices by status'
           />
 
           <FilterSelect
             value={sortBy}
-            onChange={(event) =>
-              updateSearchParams(INVOICE_FILTER_PARAMS.SORT, event.target.value)
-            }
+            onChange={(event) => updateSortBy(event.target.value)}
             options={INVOICE_SORT_OPTIONS}
             ariaLabel='Sort invoices'
           />
@@ -313,8 +223,7 @@ function InvoicesPage() {
 
         <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
           <p className='text-slate-500'>
-            Showing {filteredInvoices.length} of {visibleInvoices.length}{' '}
-            invoices
+            Showing {filteredCount} of {totalCount} invoices
           </p>
 
           {hasActiveFilters && (
@@ -329,13 +238,7 @@ function InvoicesPage() {
       </div>
 
       {filteredInvoices.length === 0 ? (
-        <EmptyState
-          message={
-            visibleInvoices.length === 0
-              ? 'No invoices have been added.'
-              : 'No invoices match the selected filters.'
-          }
-        />
+        <EmptyState message={emptyMessage} />
       ) : (
         <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
           {filteredInvoices.map((invoice) => (
