@@ -4,7 +4,6 @@ import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 import HomePage from './pages/HomePage';
-
 import { LoginPage, RegisterPage } from '@features/auth';
 import DashboardPage from './pages/DashboardPage';
 

@@ -28,12 +28,14 @@ import {
   selectIsInvoicesListLoading,
 } from '../selectors/invoicesSelectors';
 
+import { selectAuthUser } from '@/features/auth';
+
 import { INVOICE_STATUS } from '../constants/invoices.constants';
 
 function useInvoicesList() {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => state.auth);
+  const user = useSelector(selectAuthUser);
 
   const invoices = useSelector(selectAllInvoices);
   const invoicesLoading = useSelector(selectIsInvoicesListLoading);

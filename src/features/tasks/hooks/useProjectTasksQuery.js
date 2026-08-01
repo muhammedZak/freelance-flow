@@ -20,8 +20,7 @@ import {
 } from '../tasksSelectors';
 import { clearTaskMessages } from '../tasksSlice';
 import { fetchTasksByProject } from '../tasksThunks';
-
-const selectCurrentUser = (state) => state.auth?.user ?? null;
+import { selectAuthUser } from '@/features/auth';
 
 function hasValidProjectId(projectId) {
   return projectId !== undefined && projectId !== null && projectId !== '';
@@ -58,7 +57,7 @@ function useProjectTasksQuery(projectId, filters = TASK_FILTER_DEFAULTS) {
     sortBy = TASK_FILTER_DEFAULTS.sortBy,
   } = filters ?? TASK_FILTER_DEFAULTS;
 
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector(selectAuthUser);
 
   const selectedProject = useSelector(selectSelectedProject);
 

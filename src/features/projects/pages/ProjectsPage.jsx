@@ -24,11 +24,12 @@ import {
   fetchProjects,
   removeProject,
 } from '../projectsSlice';
+import { selectAuthUser } from '@/features/auth';
 
 function ProjectsPage() {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => state.auth);
+  const user = useSelector(selectAuthUser);
   const projects = useSelector(selectAllProjects);
   const isListLoading = useSelector(selectIsProjectsListLoading);
   const listError = useSelector(selectProjectsListError);

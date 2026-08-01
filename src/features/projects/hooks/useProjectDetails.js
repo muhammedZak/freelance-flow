@@ -17,10 +17,9 @@ import {
   fetchProjectById,
   removeProject,
 } from '../projectsSlice';
+import { selectAuthUser } from '@/features/auth';
 
 const EMPTY_TASKS = [];
-
-const selectCurrentUser = (state) => state.auth?.user ?? null;
 
 const selectAllTasks = (state) => state.tasks?.tasks ?? EMPTY_TASKS;
 
@@ -50,7 +49,7 @@ function checkProjectManagementPermission(user) {
 function useProjectDetails(projectId) {
   const dispatch = useDispatch();
 
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector(selectAuthUser);
   const clients = useSelector(selectAllClients);
   const tasks = useSelector(selectAllTasks);
 
