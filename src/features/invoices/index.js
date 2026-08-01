@@ -1,6 +1,11 @@
 // Redux reducer
 export { default as invoicesReducer } from './invoicesSlice';
 
+// Route pages
+export { default as InvoicesPage } from './pages/InvoicesPage';
+export { default as InvoiceFormPage } from './pages/InvoiceFormPage';
+export { default as InvoiceDetailsPage } from './pages/InvoiceDetailsPage';
+
 // Redux thunks and actions
 export {
   fetchInvoices,
@@ -11,25 +16,6 @@ export {
   clearInvoiceMessages,
   clearSelectedInvoice,
 } from './invoicesSlice';
-
-// Transitional public component export.
-// This will become private later when InvoiceFormPage
-// moves inside the invoices feature.
-export { default as InvoiceForm } from './InvoiceForm';
-
-// Transitional list presentation exports.
-// These will become private when InvoicesPage moves inside
-// the invoices feature in Step 9.
-export { default as InvoiceSummaryCards } from './components/InvoiceSummaryCards';
-export { default as InvoiceFilters } from './components/InvoiceFilters';
-export { default as InvoiceCard } from './components/InvoiceCard';
-export { default as InvoiceList } from './components/InvoiceList';
-
-// Transitional details presentation exports.
-// These will become private when InvoiceDetailsPage moves
-// inside the invoices feature in Step 9.
-export { default as InvoiceInformationCard } from './components/InvoiceInformationCard';
-export { default as InvoiceCalculationCard } from './components/InvoiceCalculationCard';
 
 // Constants
 export {
@@ -64,11 +50,3 @@ export {
   selectIsInvoiceUpdating,
   selectIsInvoiceDeleting,
 } from './invoicesSelectors';
-
-// Transitional public hook exports.
-// These will become private when the Invoice pages move inside
-// the invoices feature in Step 9.
-export { default as useInvoiceFilters } from './hooks/useInvoiceFilters';
-export { default as useInvoicesList } from './hooks/useInvoicesList';
-export { default as useInvoiceForm } from './hooks/useInvoiceForm';
-export { default as useInvoiceDetails } from './hooks/useInvoiceDetails';
