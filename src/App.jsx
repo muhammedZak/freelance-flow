@@ -7,20 +7,27 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+
 import {
   ClientsPage,
   ClientDetailesPage,
   ClientFormPage,
 } from '@features/clients';
+
 import {
   ProjectsPage,
   ProjectDetailsPage,
   ProjectFormPage,
 } from '@features/projects';
+
 import { ProjectTasksPage } from '@features/tasks';
-import InvoicesPage from './pages/InvoicesPage';
-import InvoiceFormPage from './pages/InvoiceFormPage';
-import InvoiceDetailsPage from './pages/InvoiceDetailsPage';
+
+import {
+  InvoicesPage,
+  InvoiceFormPage,
+  InvoiceDetailsPage,
+} from '@features/invoices';
+
 import PaymentsPage from './pages/PaymentsPage';
 import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
