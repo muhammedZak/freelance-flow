@@ -13,7 +13,14 @@ import FilterSelect from '../components/forms/FilterSelect';
 import PaymentForm from '../features/payments/PaymentForm';
 
 import { fetchClients } from '@features/clients';
-import { fetchInvoices } from '@features/invoices';
+
+import {
+  fetchInvoices,
+  selectAllInvoices,
+  selectIsInvoicesListLoading,
+  selectInvoicesListError,
+} from '@features/invoices';
+
 import {
   addPayment,
   changePaymentStatus,
@@ -21,6 +28,7 @@ import {
   fetchPayments,
   removePayment,
 } from '../features/payments/paymentsSlice';
+
 import {
   fetchProjects,
   selectAllProjects,
@@ -114,11 +122,9 @@ function PaymentsPage() {
     successMessage,
   } = useSelector((state) => state.payments);
 
-  const {
-    invoices,
-    loading: invoiceLoading,
-    error: invoiceError,
-  } = useSelector((state) => state.invoices);
+  const invoices = useSelector(selectAllInvoices);
+  const invoiceLoading = useSelector(selectIsInvoicesListLoading);
+  const invoiceError = useSelector(selectInvoicesListError);
 
   const {
     clients,

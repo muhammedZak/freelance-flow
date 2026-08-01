@@ -17,6 +17,10 @@ import {
   removeInvoice,
   INVOICE_STATUS,
   INVOICE_STATUS_OPTIONS,
+  selectSelectedInvoice,
+  selectInvoicesSuccessMessage,
+  selectInvoiceDetailsError,
+  selectIsInvoiceDetailsLoading,
 } from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
@@ -32,9 +36,10 @@ function InvoiceDetailsPage() {
   const { clients } = useSelector((state) => state.clients);
   const projects = useSelector(selectAllProjects);
 
-  const { selectedInvoice, loading, error, successMessage } = useSelector(
-    (state) => state.invoices,
-  );
+  const selectedInvoice = useSelector(selectSelectedInvoice);
+  const loading = useSelector(selectIsInvoiceDetailsLoading);
+  const error = useSelector(selectInvoiceDetailsError);
+  const successMessage = useSelector(selectInvoicesSuccessMessage);
 
   const canManageInvoices =
     user?.role === 'freelancer' || user?.role === 'admin';

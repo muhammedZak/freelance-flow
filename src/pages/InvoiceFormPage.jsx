@@ -6,6 +6,7 @@ import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 
 import { fetchClients } from '@features/clients';
+
 import {
   fetchProjects,
   selectAllProjects,
@@ -18,6 +19,8 @@ import {
   addInvoice,
   clearInvoiceMessages,
   INITIAL_INVOICE_FORM_VALUES,
+  selectInvoiceCreateError,
+  selectIsInvoiceCreating,
 } from '@features/invoices';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
@@ -46,9 +49,8 @@ function InvoiceFormPage() {
 
   const projectsError = useSelector(selectProjectsListError);
 
-  const { loading: invoiceLoading, error: invoiceError } = useSelector(
-    (state) => state.invoices,
-  );
+  const invoiceLoading = useSelector(selectIsInvoiceCreating);
+  const invoiceError = useSelector(selectInvoiceCreateError);
 
   useEffect(() => {
     dispatch(clearInvoiceMessages());

@@ -16,6 +16,7 @@ import {
   selectClientsLoading,
   selectClientsError,
 } from '@features/clients';
+
 import {
   fetchProjects,
   selectAllProjects,
@@ -33,6 +34,10 @@ import {
   INVOICE_FILTER_DEFAULTS,
   INVOICE_FILTER_STATUS_OPTIONS,
   INVOICE_SORT_OPTIONS,
+  selectAllInvoices,
+  selectInvoicesSuccessMessage,
+  selectInvoicesListError,
+  selectIsInvoicesListLoading,
 } from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
@@ -57,12 +62,10 @@ function InvoicesPage() {
 
   const { user } = useSelector((state) => state.auth);
 
-  const {
-    invoices,
-    loading: invoicesLoading,
-    error: invoicesError,
-    successMessage,
-  } = useSelector((state) => state.invoices);
+  const invoices = useSelector(selectAllInvoices);
+  const invoicesLoading = useSelector(selectIsInvoicesListLoading);
+  const invoicesError = useSelector(selectInvoicesListError);
+  const successMessage = useSelector(selectInvoicesSuccessMessage);
 
   const clients = useSelector(selectAllClients);
   const clientsLoading = useSelector(selectClientsLoading);
@@ -126,13 +129,13 @@ function InvoicesPage() {
   }
 
   function getStatusClasses(status) {
-   if (status === INVOICE_STATUS.PAID) {
-     return 'bg-green-100 text-green-700';
-   }
+    if (status === INVOICE_STATUS.PAID) {
+      return 'bg-green-100 text-green-700';
+    }
 
-   if (status === INVOICE_STATUS.OVERDUE) {
-     return 'bg-red-100 text-red-700';
-   }
+    if (status === INVOICE_STATUS.OVERDUE) {
+      return 'bg-red-100 text-red-700';
+    }
 
     return 'bg-yellow-100 text-yellow-700';
   }
@@ -183,9 +186,9 @@ function InvoicesPage() {
       return matchesSearch && matchesStatus;
     })
     .sort((firstInvoice, secondInvoice) => {
-     if (sortBy === INVOICE_SORT.DUE_DATE) {
-       return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
-     }
+      if (sortBy === INVOICE_SORT.DUE_DATE) {
+        return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
+      }
 
       if (sortBy === INVOICE_SORT.AMOUNT_HIGH) {
         return Number(secondInvoice.total) - Number(firstInvoice.total);

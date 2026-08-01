@@ -7,14 +7,23 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import EmptyState from '../components/common/EmptyState';
 
 import { fetchClients } from '@features/clients';
+
 import {
   fetchProjects,
   selectAllProjects,
   selectIsProjectsListLoading,
   selectProjectsListError,
 } from '@features/projects';
+
 import { fetchTasks } from '@features/tasks';
-import { fetchInvoices } from '@features/invoices';
+
+import {
+  fetchInvoices,
+  selectAllInvoices,
+  selectIsInvoicesListLoading,
+  selectInvoicesListError,
+} from '@features/invoices';
+
 import { fetchActivities } from '../features/activities/activitiesSlice';
 
 import { formatCurrency } from '../utils/formatCurrency';
@@ -31,11 +40,11 @@ function DashboardPage() {
     error: clientsError,
   } = useSelector((state) => state.clients);
 
- const projects = useSelector(selectAllProjects);
+  const projects = useSelector(selectAllProjects);
 
- const projectsLoading = useSelector(selectIsProjectsListLoading);
+  const projectsLoading = useSelector(selectIsProjectsListLoading);
 
- const projectsError = useSelector(selectProjectsListError);
+  const projectsError = useSelector(selectProjectsListError);
 
   const {
     tasks,
@@ -43,11 +52,9 @@ function DashboardPage() {
     error: tasksError,
   } = useSelector((state) => state.tasks);
 
-  const {
-    invoices,
-    loading: invoicesLoading,
-    error: invoicesError,
-  } = useSelector((state) => state.invoices);
+  const invoices = useSelector(selectAllInvoices);
+  const invoicesLoading = useSelector(selectIsInvoicesListLoading);
+  const invoicesError = useSelector(selectInvoicesListError);
 
   const {
     activities,
