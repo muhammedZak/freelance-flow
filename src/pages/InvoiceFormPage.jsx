@@ -1,188 +1,24 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { InvoiceForm, useInvoiceForm } from '@features/invoices';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
-
-import { fetchClients } from '@features/clients';
-
-import {
-  fetchProjects,
-  selectAllProjects,
-  selectIsProjectsListLoading,
-  selectProjectsListError,
-} from '@features/projects';
-
-import {
-  InvoiceForm,
-  addInvoice,
-  clearInvoiceMessages,
-  INITIAL_INVOICE_FORM_VALUES,
-  selectInvoiceCreateError,
-  selectIsInvoiceCreating,
-} from '@features/invoices';
-
-import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
 import PageHeader from '../components/common/PageHeader';
 import BackLink from '../components/common/BackLink';
 
 function InvoiceFormPage() {
-  const [formData, setFormData] = useState(() => ({
-    ...INITIAL_INVOICE_FORM_VALUES,
-  }));
-
-  const [formError, setFormError] = useState('');
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const {
+    formData,
+    formError,
     clients,
-    loading: clientsLoading,
-    error: clientsError,
-  } = useSelector((state) => state.clients);
-
-  const projects = useSelector(selectAllProjects);
-
-  const projectsLoading = useSelector(selectIsProjectsListLoading);
-
-  const projectsError = useSelector(selectProjectsListError);
-
-  const invoiceLoading = useSelector(selectIsInvoiceCreating);
-  const invoiceError = useSelector(selectInvoiceCreateError);
-
-  useEffect(() => {
-    dispatch(clearInvoiceMessages());
-    dispatch(fetchClients());
-    dispatch(fetchProjects());
-
-    return () => {
-      dispatch(clearInvoiceMessages());
-    };
-  }, [dispatch]);
-
-  const invoiceTotal = calculateInvoiceTotal(
-    formData.hoursWorked || 0,
-    formData.hourlyRate || 0,
-  );
-
-  const clientProjects = projects.filter(
-    (project) => String(project.clientId) === String(formData.clientId),
-  );
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    if (name === 'clientId') {
-      setFormData({
-        ...formData,
-        clientId: value,
-        projectId: '',
-      });
-
-      return;
-    }
-
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  }
-
-  function validateForm() {
-    if (!formData.invoiceNumber.trim()) {
-      return 'Invoice number is required';
-    }
-
-    if (!formData.clientId) {
-      return 'Please select a client';
-    }
-
-    if (!formData.projectId) {
-      return 'Please select a project';
-    }
-
-    const selectedProject = projects.find(
-      (project) => String(project.id) === String(formData.projectId),
-    );
-
-    if (
-      !selectedProject ||
-      String(selectedProject.clientId) !== String(formData.clientId)
-    ) {
-      return 'The selected project does not belong to this client';
-    }
-
-    if (!formData.hoursWorked) {
-      return 'Hours worked is required';
-    }
-
-    if (Number(formData.hoursWorked) <= 0) {
-      return 'Hours worked must be greater than 0';
-    }
-
-    if (!formData.hourlyRate) {
-      return 'Hourly rate is required';
-    }
-
-    if (Number(formData.hourlyRate) <= 0) {
-      return 'Hourly rate must be greater than 0';
-    }
-
-    if (!formData.issueDate) {
-      return 'Issue date is required';
-    }
-
-    if (!formData.dueDate) {
-      return 'Due date is required';
-    }
-
-    if (new Date(formData.dueDate) < new Date(formData.issueDate)) {
-      return 'Due date cannot be before issue date';
-    }
-
-    return '';
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validationError = validateForm();
-
-    if (validationError) {
-      setFormError(validationError);
-      return;
-    }
-
-    setFormError('');
-
-    const invoiceData = {
-      invoiceNumber: formData.invoiceNumber.trim().toUpperCase(),
-      clientId: String(formData.clientId),
-      projectId: String(formData.projectId),
-      hoursWorked: Number(formData.hoursWorked),
-      hourlyRate: Number(formData.hourlyRate),
-      total: invoiceTotal,
-      status: formData.status,
-      issueDate: formData.issueDate,
-      dueDate: formData.dueDate,
-    };
-
-    try {
-      const savedInvoice = await dispatch(addInvoice(invoiceData)).unwrap();
-
-      navigate(`/invoices/${savedInvoice.id}`);
-    } catch (error) {
-      setFormError(error);
-    }
-  }
-
-  const loadingData =
-    (clientsLoading && clients.length === 0) ||
-    (projectsLoading && projects.length === 0);
-
-  const dataError = clientsError || projectsError;
+    clientProjects,
+    invoiceTotal,
+    invoiceLoading,
+    invoiceError,
+    loadingData,
+    dataError,
+    handleChange,
+    handleSubmit,
+  } = useInvoiceForm();
 
   if (loadingData) {
     return <Loading />;

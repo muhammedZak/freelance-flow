@@ -60,7 +60,8 @@ export {
 } from './invoicesSelectors';
 
 // Transitional public hook exports.
-// These will become private when InvoicesPage moves inside
+// These will become private when the Invoice pages move inside
 // the invoices feature in Step 9.
 export { default as useInvoiceFilters } from './hooks/useInvoiceFilters';
 export { default as useInvoicesList } from './hooks/useInvoicesList';
+export { default as useInvoiceForm } from './hooks/useInvoiceForm';
