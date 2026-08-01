@@ -1,5 +1,7 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 
+import { INVOICE_STATUS_OPTIONS } from './invoices.constants';
+
 function InvoiceForm({
   formData,
   formError,
@@ -194,9 +196,11 @@ function InvoiceForm({
           value={formData.status}
           onChange={onChange}
           className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900'>
-          <option value='unpaid'>Unpaid</option>
-          <option value='paid'>Paid</option>
-          <option value='overdue'>Overdue</option>
+          {INVOICE_STATUS_OPTIONS.map((statusOption) => (
+            <option key={statusOption.value} value={statusOption.value}>
+              {statusOption.label}
+            </option>
+          ))}
         </select>
       </div>
 

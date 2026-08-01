@@ -15,6 +15,8 @@ import {
   editInvoice,
   fetchInvoiceById,
   removeInvoice,
+  INVOICE_STATUS,
+  INVOICE_STATUS_OPTIONS,
 } from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
@@ -66,11 +68,11 @@ function InvoiceDetailsPage() {
   }
 
   function getStatusClasses(status) {
-    if (status === 'paid') {
+    if (status === INVOICE_STATUS.PAID) {
       return 'bg-green-100 text-green-700';
     }
 
-    if (status === 'overdue') {
+    if (status === INVOICE_STATUS.OVERDUE) {
       return 'bg-red-100 text-red-700';
     }
 
@@ -229,9 +231,11 @@ function InvoiceDetailsPage() {
                   onChange={handleStatusChange}
                   disabled={loading}
                   className='w-full rounded border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 disabled:opacity-60'>
-                  <option value='unpaid'>Unpaid</option>
-                  <option value='paid'>Paid</option>
-                  <option value='overdue'>Overdue</option>
+                  {INVOICE_STATUS_OPTIONS.map((statusOption) => (
+                    <option key={statusOption.value} value={statusOption.value}>
+                      {statusOption.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             )}

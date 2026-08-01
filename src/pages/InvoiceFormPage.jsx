@@ -17,6 +17,7 @@ import {
   InvoiceForm,
   addInvoice,
   clearInvoiceMessages,
+  INITIAL_INVOICE_FORM_VALUES,
 } from '@features/invoices';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
@@ -24,16 +25,9 @@ import PageHeader from '../components/common/PageHeader';
 import BackLink from '../components/common/BackLink';
 
 function InvoiceFormPage() {
-  const [formData, setFormData] = useState({
-    invoiceNumber: '',
-    clientId: '',
-    projectId: '',
-    hoursWorked: '',
-    hourlyRate: '',
-    status: 'unpaid',
-    issueDate: '',
-    dueDate: '',
-  });
+  const [formData, setFormData] = useState(() => ({
+    ...INITIAL_INVOICE_FORM_VALUES,
+  }));
 
   const [formError, setFormError] = useState('');
 

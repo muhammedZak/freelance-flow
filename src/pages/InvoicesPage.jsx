@@ -27,61 +27,33 @@ import {
   clearInvoiceMessages,
   fetchInvoices,
   removeInvoice,
+  INVOICE_STATUS,
+  INVOICE_SORT,
+  INVOICE_FILTER_PARAMS,
+  INVOICE_FILTER_DEFAULTS,
+  INVOICE_FILTER_STATUS_OPTIONS,
+  INVOICE_SORT_OPTIONS,
 } from '@features/invoices';
 
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-
-const invoiceStatusOptions = [
-  {
-    value: 'all',
-    label: 'All Statuses',
-  },
-  {
-    value: 'paid',
-    label: 'Paid',
-  },
-  {
-    value: 'unpaid',
-    label: 'Unpaid',
-  },
-  {
-    value: 'overdue',
-    label: 'Overdue',
-  },
-];
-
-const invoiceSortOptions = [
-  {
-    value: 'newest',
-    label: 'Newest First',
-  },
-  {
-    value: 'oldest',
-    label: 'Oldest First',
-  },
-  {
-    value: 'amount-high',
-    label: 'Amount: High to Low',
-  },
-  {
-    value: 'amount-low',
-    label: 'Amount: Low to High',
-  },
-  {
-    value: 'due-date',
-    label: 'Due Date',
-  },
-];
 
 function InvoicesPage() {
   const dispatch = useDispatch();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const searchText = searchParams.get('search') || '';
-  const statusFilter = searchParams.get('status') || 'all';
-  const sortBy = searchParams.get('sort') || 'newest';
+  const searchText =
+    searchParams.get(INVOICE_FILTER_PARAMS.SEARCH) ||
+    INVOICE_FILTER_DEFAULTS.search;
+
+  const statusFilter =
+    searchParams.get(INVOICE_FILTER_PARAMS.STATUS) ||
+    INVOICE_FILTER_DEFAULTS.status;
+
+  const sortBy =
+    searchParams.get(INVOICE_FILTER_PARAMS.SORT) ||
+    INVOICE_FILTER_DEFAULTS.sort;
 
   const { user } = useSelector((state) => state.auth);
 
@@ -119,7 +91,10 @@ function InvoicesPage() {
   function updateSearchParams(key, value) {
     const newParams = new URLSearchParams(searchParams);
 
-    const isDefaultValue = !value || value === 'all' || value === 'newest';
+    const isDefaultValue =
+      !value ||
+      value === INVOICE_FILTER_DEFAULTS.status ||
+      value === INVOICE_FILTER_DEFAULTS.sort;
 
     if (isDefaultValue) {
       newParams.delete(key);
@@ -151,13 +126,13 @@ function InvoicesPage() {
   }
 
   function getStatusClasses(status) {
-    if (status === 'paid') {
-      return 'bg-green-100 text-green-700';
-    }
+   if (status === INVOICE_STATUS.PAID) {
+     return 'bg-green-100 text-green-700';
+   }
 
-    if (status === 'overdue') {
-      return 'bg-red-100 text-red-700';
-    }
+   if (status === INVOICE_STATUS.OVERDUE) {
+     return 'bg-red-100 text-red-700';
+   }
 
     return 'bg-yellow-100 text-yellow-700';
   }
@@ -202,20 +177,21 @@ function InvoicesPage() {
         projectTitle.includes(searchValue);
 
       const matchesStatus =
-        statusFilter === 'all' || invoice.status === statusFilter;
+        statusFilter === INVOICE_FILTER_DEFAULTS.status ||
+        invoice.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     })
     .sort((firstInvoice, secondInvoice) => {
-      if (sortBy === 'due-date') {
-        return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
-      }
+     if (sortBy === INVOICE_SORT.DUE_DATE) {
+       return new Date(firstInvoice.dueDate) - new Date(secondInvoice.dueDate);
+     }
 
-      if (sortBy === 'amount-high') {
+      if (sortBy === INVOICE_SORT.AMOUNT_HIGH) {
         return Number(secondInvoice.total) - Number(firstInvoice.total);
       }
 
-      if (sortBy === 'amount-low') {
+      if (sortBy === INVOICE_SORT.AMOUNT_LOW) {
         return Number(firstInvoice.total) - Number(secondInvoice.total);
       }
 
@@ -225,14 +201,16 @@ function InvoicesPage() {
     });
 
   const hasActiveFilters =
-    searchText || statusFilter !== 'all' || sortBy !== 'newest';
+    searchText ||
+    statusFilter !== INVOICE_FILTER_DEFAULTS.status ||
+    sortBy !== INVOICE_FILTER_DEFAULTS.sort;
 
   const paidAmount = visibleInvoices
-    .filter((invoice) => invoice.status === 'paid')
+    .filter((invoice) => invoice.status === INVOICE_STATUS.PAID)
     .reduce((total, invoice) => total + Number(invoice.total), 0);
 
   const outstandingAmount = visibleInvoices
-    .filter((invoice) => invoice.status !== 'paid')
+    .filter((invoice) => invoice.status !== INVOICE_STATUS.PAID)
     .reduce((total, invoice) => total + Number(invoice.total), 0);
 
   const loading = invoicesLoading || clientsLoading || projectsLoading;
@@ -298,7 +276,10 @@ function InvoicesPage() {
             <SearchInput
               value={searchText}
               onChange={(event) =>
-                updateSearchParams('search', event.target.value)
+                updateSearchParams(
+                  INVOICE_FILTER_PARAMS.SEARCH,
+                  event.target.value,
+                )
               }
               placeholder='Search invoice number or client'
               ariaLabel='Search invoices'
@@ -308,18 +289,21 @@ function InvoicesPage() {
           <FilterSelect
             value={statusFilter}
             onChange={(event) =>
-              updateSearchParams('status', event.target.value, 'all')
+              updateSearchParams(
+                INVOICE_FILTER_PARAMS.STATUS,
+                event.target.value,
+              )
             }
-            options={invoiceStatusOptions}
+            options={INVOICE_FILTER_STATUS_OPTIONS}
             ariaLabel='Filter invoices by status'
           />
 
           <FilterSelect
             value={sortBy}
             onChange={(event) =>
-              updateSearchParams('sort', event.target.value, 'newest')
+              updateSearchParams(INVOICE_FILTER_PARAMS.SORT, event.target.value)
             }
-            options={invoiceSortOptions}
+            options={INVOICE_SORT_OPTIONS}
             ariaLabel='Sort invoices'
           />
         </div>
