@@ -1,112 +1,20 @@
-import { useEffect, useState } from 'react';
-
 import Button from '@components/common/Button';
 import InputField from '@components/forms/InputField';
 import SelectField from '@components/forms/SelectField';
 import TextareaField from '@components/forms/TextareaField';
 
 import TaskFormHeader from './TaskFormHeader';
-import {
-  INITIAL_TASK_FORM_VALUES,
-  TASK_PRIORITY_OPTIONS,
-  TASK_STATUS_OPTIONS,
-} from '../tasks.constants';
-import { validateTaskForm } from '../tasksValidation';
-
-const VALID_TASK_STATUSES = Object.freeze(
-  TASK_STATUS_OPTIONS.map((option) => option.value),
-);
-
-const VALID_TASK_PRIORITIES = Object.freeze(
-  TASK_PRIORITY_OPTIONS.map((option) => option.value),
-);
-
-function createInitialFormValues() {
-  return {
-    ...INITIAL_TASK_FORM_VALUES,
-  };
-}
-
-function mapTaskToFormValues(task) {
-  if (!task) {
-    return createInitialFormValues();
-  }
-
-  const normalizedStatus = VALID_TASK_STATUSES.includes(task.status)
-    ? task.status
-    : INITIAL_TASK_FORM_VALUES.status;
-
-  const normalizedPriority = VALID_TASK_PRIORITIES.includes(task.priority)
-    ? task.priority
-    : INITIAL_TASK_FORM_VALUES.priority;
-
-  return {
-    title: typeof task.title === 'string' ? task.title : '',
-    description: typeof task.description === 'string' ? task.description : '',
-    status: normalizedStatus,
-    priority: normalizedPriority,
-    dueDate: typeof task.dueDate === 'string' ? task.dueDate : '',
-  };
-}
-
-function prepareTaskFormData(formData) {
-  return {
-    ...formData,
-    title: formData.title.trim(),
-    description: formData.description.trim(),
-  };
-}
+import useTaskForm from '../hooks/useTaskForm';
+import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from '../tasks.constants';
 
 function TaskForm({ task, loading, onSubmit, onCancel }) {
-  const [formData, setFormData] = useState(() => mapTaskToFormValues(task));
-  const [errors, setErrors] = useState({});
+  const { formData, errors, handleChange, handleSubmit } = useTaskForm({
+    task,
+    loading,
+    onSubmit,
+  });
 
   const isEditing = Boolean(task);
-
-  useEffect(() => {
-    setFormData(mapTaskToFormValues(task));
-    setErrors({});
-  }, [task]);
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((currentFormData) => ({
-      ...currentFormData,
-      [name]: value,
-    }));
-
-    setErrors((currentErrors) => {
-      if (!currentErrors[name]) {
-        return currentErrors;
-      }
-
-      const nextErrors = {
-        ...currentErrors,
-      };
-
-      delete nextErrors[name];
-
-      return nextErrors;
-    });
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validationErrors = validateTaskForm(formData);
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    setErrors({});
-
-    const preparedFormData = prepareTaskFormData(formData);
-
-    await onSubmit(preparedFormData);
-  }
 
   return (
     <form

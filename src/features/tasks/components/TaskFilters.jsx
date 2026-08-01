@@ -4,26 +4,10 @@ import FilterSelect from '@components/forms/FilterSelect';
 import SearchInput from '@components/forms/SearchInput';
 
 import {
-  TASK_PRIORITY_OPTIONS,
+  TASK_PRIORITY_FILTER_OPTIONS,
   TASK_SORT_OPTIONS,
-  TASK_STATUS_OPTIONS,
+  TASK_STATUS_FILTER_OPTIONS,
 } from '../tasks.constants';
-
-const taskStatusFilterOptions = [
-  {
-    value: 'all',
-    label: 'All Statuses',
-  },
-  ...TASK_STATUS_OPTIONS,
-];
-
-const taskPriorityFilterOptions = [
-  {
-    value: 'all',
-    label: 'All Priorities',
-  },
-  ...TASK_PRIORITY_OPTIONS,
-];
 
 function TaskFilters({
   searchText,
@@ -55,14 +39,14 @@ function TaskFilters({
         <FilterSelect
           value={statusFilter}
           onChange={(event) => onStatusChange(event.target.value)}
-          options={taskStatusFilterOptions}
+          options={TASK_STATUS_FILTER_OPTIONS}
           ariaLabel='Filter tasks by status'
         />
 
         <FilterSelect
           value={priorityFilter}
           onChange={(event) => onPriorityChange(event.target.value)}
-          options={taskPriorityFilterOptions}
+          options={TASK_PRIORITY_FILTER_OPTIONS}
           ariaLabel='Filter tasks by priority'
         />
 

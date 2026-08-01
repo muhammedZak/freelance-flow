@@ -213,7 +213,7 @@
       "projectId": "4",
       "title": "Prepare product card layout",
       "description": "Create a simple product card design.",
-      "status": "todo",
+      "status": "in-progress",
       "priority": "low",
       "dueDate": "2026-07-25",
       "createdAt": "2026-07-17"
@@ -700,6 +700,12 @@
       "type": "task",
       "createdAt": "2026-07-31",
       "id": "AHfwdBO"
+    },
+    {
+      "message": "Task updated: Prepare product card layout",
+      "type": "task",
+      "createdAt": "2026-08-01",
+      "id": "0FTyKAX"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

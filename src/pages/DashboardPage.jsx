@@ -13,7 +13,7 @@ import {
   selectIsProjectsListLoading,
   selectProjectsListError,
 } from '@features/projects';
-import { fetchTasks } from '../features/tasks/tasksSlice';
+import { fetchTasks } from '@features/tasks';
 import { fetchInvoices } from '../features/invoices/invoicesSlice';
 import { fetchActivities } from '../features/activities/activitiesSlice';
 

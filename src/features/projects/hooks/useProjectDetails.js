@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchClients, selectAllClients } from '@features/clients';
-import { fetchTasks } from '@features/tasks/tasksSlice';
+import { fetchTasks } from '@features/tasks';
 
 import {
   selectIsProjectDeleting,

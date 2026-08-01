@@ -1,45 +1,42 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-const TASK_FILTER_PARAMS = Object.freeze({
-  SEARCH: 'search',
-  STATUS: 'status',
-  PRIORITY: 'priority',
-  SORT: 'sort',
-});
-
-const TASK_FILTER_DEFAULTS = Object.freeze({
-  [TASK_FILTER_PARAMS.SEARCH]: '',
-  [TASK_FILTER_PARAMS.STATUS]: 'all',
-  [TASK_FILTER_PARAMS.PRIORITY]: 'all',
-  [TASK_FILTER_PARAMS.SORT]: 'due-date',
-});
+import { TASK_FILTER_DEFAULTS, TASK_FILTER_PARAMS } from '../tasks.constants';
 
 const TASK_FILTER_PARAM_KEYS = Object.freeze(Object.values(TASK_FILTER_PARAMS));
+
+const TASK_FILTER_DEFAULTS_BY_PARAM = Object.freeze({
+  [TASK_FILTER_PARAMS.SEARCH]: TASK_FILTER_DEFAULTS.searchText,
+
+  [TASK_FILTER_PARAMS.STATUS]: TASK_FILTER_DEFAULTS.statusFilter,
+
+  [TASK_FILTER_PARAMS.PRIORITY]: TASK_FILTER_DEFAULTS.priorityFilter,
+
+  [TASK_FILTER_PARAMS.SORT]: TASK_FILTER_DEFAULTS.sortBy,
+});
 
 function useTaskFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchText =
     searchParams.get(TASK_FILTER_PARAMS.SEARCH) ??
-    TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.SEARCH];
+    TASK_FILTER_DEFAULTS.searchText;
 
   const statusFilter =
     searchParams.get(TASK_FILTER_PARAMS.STATUS) ??
-    TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.STATUS];
+    TASK_FILTER_DEFAULTS.statusFilter;
 
   const priorityFilter =
     searchParams.get(TASK_FILTER_PARAMS.PRIORITY) ??
-    TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.PRIORITY];
+    TASK_FILTER_DEFAULTS.priorityFilter;
 
   const sortBy =
-    searchParams.get(TASK_FILTER_PARAMS.SORT) ??
-    TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.SORT];
+    searchParams.get(TASK_FILTER_PARAMS.SORT) ?? TASK_FILTER_DEFAULTS.sortBy;
 
   const updateSearchParams = useCallback(
     (key, value) => {
       const isTaskFilterKey = Object.prototype.hasOwnProperty.call(
-        TASK_FILTER_DEFAULTS,
+        TASK_FILTER_DEFAULTS_BY_PARAM,
         key,
       );
 
@@ -50,7 +47,7 @@ function useTaskFilters() {
       const normalizedValue =
         value === undefined || value === null ? '' : String(value);
 
-      const defaultValue = TASK_FILTER_DEFAULTS[key];
+      const defaultValue = TASK_FILTER_DEFAULTS_BY_PARAM[key];
 
       setSearchParams((currentSearchParams) => {
         const nextSearchParams = new URLSearchParams(currentSearchParams);
@@ -109,9 +106,9 @@ function useTaskFilters() {
 
   const hasActiveFilters =
     Boolean(searchText) ||
-    statusFilter !== TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.STATUS] ||
-    priorityFilter !== TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.PRIORITY] ||
-    sortBy !== TASK_FILTER_DEFAULTS[TASK_FILTER_PARAMS.SORT];
+    statusFilter !== TASK_FILTER_DEFAULTS.statusFilter ||
+    priorityFilter !== TASK_FILTER_DEFAULTS.priorityFilter ||
+    sortBy !== TASK_FILTER_DEFAULTS.sortBy;
 
   return {
     searchText,

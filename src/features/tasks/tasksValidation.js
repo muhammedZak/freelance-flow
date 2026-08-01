@@ -1,12 +1,4 @@
-import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from './tasks.constants';
-
-const VALID_TASK_STATUSES = Object.freeze(
-  TASK_STATUS_OPTIONS.map((option) => option.value),
-);
-
-const VALID_TASK_PRIORITIES = Object.freeze(
-  TASK_PRIORITY_OPTIONS.map((option) => option.value),
-);
+import { TASK_PRIORITY_VALUES, TASK_STATUS_VALUES } from './tasks.constants';
 
 export function validateTaskForm(formData) {
   const errors = {};
@@ -34,11 +26,11 @@ export function validateTaskForm(formData) {
     errors.dueDate = 'Due date is required';
   }
 
-  if (!VALID_TASK_STATUSES.includes(formData?.status)) {
+  if (!TASK_STATUS_VALUES.includes(formData?.status)) {
     errors.status = 'Select a valid task status';
   }
 
-  if (!VALID_TASK_PRIORITIES.includes(formData?.priority)) {
+  if (!TASK_PRIORITY_VALUES.includes(formData?.priority)) {
     errors.priority = 'Select a valid task priority';
   }
 

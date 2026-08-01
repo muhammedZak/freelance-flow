@@ -35,22 +35,27 @@ const initialState = {
   /*
    * Fetch-only compatibility flag.
    *
-   * Task mutations do not set this flag, so creating,
-   * updating, or deleting a Task cannot activate the
-   * initial Task-list loading layout.
+   * Task mutations do not set this
+   * flag, so creating, updating, or
+   * deleting a Task cannot activate
+   * the initial Task-list loading
+   * layout.
    */
   loading: false,
 
   /*
-   * Shared mutation flag used by Task forms and
-   * Task-level mutation controls.
+   * Shared mutation flag used by
+   * Task forms and Task-level
+   * mutation controls.
    */
   mutationLoading: false,
 
   error: null,
+
   successMessage: '',
 
   pendingFetchCount: 0,
+
   pendingMutationCount: 0,
 
   operations: {
@@ -59,7 +64,9 @@ const initialState = {
     fetchProject: createRequestOperationState(),
 
     create: createOperationState(),
+
     update: createOperationState(),
+
     delete: createOperationState(),
   },
 };
@@ -153,6 +160,7 @@ const tasksSlice = createSlice({
   reducers: {
     clearTaskMessages: (state) => {
       state.error = null;
+
       state.successMessage = '';
 
       resetTaskOperationErrors(state.operations);
@@ -167,11 +175,13 @@ const tasksSlice = createSlice({
       .addCase(fetchTasks.pending, (state) => {
         startOperation(state.operations.fetchAll);
       })
+
       .addCase(fetchTasks.fulfilled, (state, action) => {
         completeOperation(state.operations.fetchAll);
 
         state.tasks = Array.isArray(action.payload) ? action.payload : [];
       })
+
       .addCase(fetchTasks.rejected, (state, action) => {
         if (action.meta.condition) {
           return;
@@ -201,6 +211,7 @@ const tasksSlice = createSlice({
 
         state.operations.fetchProject.currentRequestId = action.meta.requestId;
       })
+
       .addCase(fetchTasksByProject.fulfilled, (state, action) => {
         if (!isCurrentProjectRequest(state, action)) {
           return;
@@ -212,6 +223,7 @@ const tasksSlice = createSlice({
 
         state.tasks = Array.isArray(action.payload) ? action.payload : [];
       })
+
       .addCase(fetchTasksByProject.rejected, (state, action) => {
         if (!isCurrentProjectRequest(state, action)) {
           return;
@@ -241,6 +253,7 @@ const tasksSlice = createSlice({
       .addCase(addTask.pending, (state) => {
         startOperation(state.operations.create);
       })
+
       .addCase(addTask.fulfilled, (state, action) => {
         completeOperation(state.operations.create);
 
@@ -248,6 +261,7 @@ const tasksSlice = createSlice({
 
         state.successMessage = 'Task added successfully';
       })
+
       .addCase(addTask.rejected, (state, action) => {
         const errorMessage = getRejectedMessage(
           action,
@@ -265,6 +279,7 @@ const tasksSlice = createSlice({
       .addCase(editTask.pending, (state) => {
         startOperation(state.operations.update);
       })
+
       .addCase(editTask.fulfilled, (state, action) => {
         completeOperation(state.operations.update);
 
@@ -274,6 +289,7 @@ const tasksSlice = createSlice({
 
         state.successMessage = 'Task updated successfully';
       })
+
       .addCase(editTask.rejected, (state, action) => {
         const errorMessage = getRejectedMessage(
           action,
@@ -291,6 +307,7 @@ const tasksSlice = createSlice({
       .addCase(removeTask.pending, (state) => {
         startOperation(state.operations.delete);
       })
+
       .addCase(removeTask.fulfilled, (state, action) => {
         completeOperation(state.operations.delete);
 
@@ -302,6 +319,7 @@ const tasksSlice = createSlice({
 
         state.successMessage = 'Task deleted successfully';
       })
+
       .addCase(removeTask.rejected, (state, action) => {
         const errorMessage = getRejectedMessage(
           action,
@@ -318,14 +336,19 @@ const tasksSlice = createSlice({
        */
       .addMatcher(isTaskFetchPending, (state) => {
         state.pendingFetchCount += 1;
+
         state.loading = true;
+
         state.error = null;
       })
+
       .addMatcher(isTaskFetchSettled, (state, action) => {
         /*
-         * A condition-rejected fetch never emitted
-         * a pending action, so there is no pending
-         * counter to decrement.
+         * A condition-rejected
+         * fetch never emitted a
+         * pending action, so there
+         * is no pending counter to
+         * decrement.
          */
         if (action.meta?.condition) {
           return;
@@ -339,11 +362,14 @@ const tasksSlice = createSlice({
        */
       .addMatcher(isTaskMutationPending, (state) => {
         state.pendingMutationCount += 1;
+
         state.mutationLoading = true;
 
         state.error = null;
+
         state.successMessage = '';
       })
+
       .addMatcher(isTaskMutationSettled, (state) => {
         decrementPendingMutations(state);
       });
@@ -351,13 +377,5 @@ const tasksSlice = createSlice({
 });
 
 export const { clearTaskMessages } = tasksSlice.actions;
-
-/*
- * Temporary compatibility exports for internal feature
- * modules that previously imported thunks directly from
- * tasksSlice. The public Tasks API exports the thunks
- * directly from tasksThunks.js.
- */
-export { addTask, editTask, fetchTasks, fetchTasksByProject, removeTask };
 
 export default tasksSlice.reducer;

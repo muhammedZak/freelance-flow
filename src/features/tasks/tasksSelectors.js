@@ -1,6 +1,12 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import { TASK_PRIORITY, TASK_STATUS } from './tasks.constants';
+import {
+  TASK_FILTER_ALL,
+  TASK_FILTER_DEFAULTS,
+  TASK_PRIORITY,
+  TASK_SORT,
+  TASK_STATUS,
+} from './tasks.constants';
 
 const EMPTY_TASKS = Object.freeze([]);
 
@@ -9,15 +15,6 @@ const EMPTY_TASKS_STATE = Object.freeze({
   loading: false,
   error: null,
   successMessage: '',
-});
-
-const FILTER_ALL = 'all';
-
-const TASK_SORT = Object.freeze({
-  DUE_DATE: 'due-date',
-  NEWEST: 'newest',
-  TITLE: 'title',
-  PRIORITY: 'priority',
 });
 
 const TASK_PRIORITY_SORT_ORDER = Object.freeze({
@@ -34,13 +31,17 @@ const selectAllTasks = createSelector([selectTasksState], (tasksState) =>
 
 const selectProjectId = (_state, projectId) => projectId;
 
-const selectSearchText = (_state, _projectId, searchText = '') => searchText;
+const selectSearchText = (
+  _state,
+  _projectId,
+  searchText = TASK_FILTER_DEFAULTS.searchText,
+) => searchText;
 
 const selectStatusFilter = (
   _state,
   _projectId,
   _searchText,
-  statusFilter = FILTER_ALL,
+  statusFilter = TASK_FILTER_DEFAULTS.statusFilter,
 ) => statusFilter;
 
 const selectPriorityFilter = (
@@ -48,7 +49,7 @@ const selectPriorityFilter = (
   _projectId,
   _searchText,
   _statusFilter,
-  priorityFilter = FILTER_ALL,
+  priorityFilter = TASK_FILTER_DEFAULTS.priorityFilter,
 ) => priorityFilter;
 
 const selectSortBy = (
@@ -57,7 +58,7 @@ const selectSortBy = (
   _searchText,
   _statusFilter,
   _priorityFilter,
-  sortBy = TASK_SORT.DUE_DATE,
+  sortBy = TASK_FILTER_DEFAULTS.sortBy,
 ) => sortBy;
 
 export const selectProjectTasks = createSelector(
@@ -96,10 +97,10 @@ export const selectFilteredAndSortedTasks = createSelector(
         taskDescription.includes(normalizedSearchText);
 
       const matchesStatus =
-        statusFilter === FILTER_ALL || task.status === statusFilter;
+        statusFilter === TASK_FILTER_ALL || task.status === statusFilter;
 
       const matchesPriority =
-        priorityFilter === FILTER_ALL || task.priority === priorityFilter;
+        priorityFilter === TASK_FILTER_ALL || task.priority === priorityFilter;
 
       return matchesSearch && matchesStatus && matchesPriority;
     });
