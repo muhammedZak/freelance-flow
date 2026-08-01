@@ -1,5 +1,5 @@
-import API_URL from '../../services/api';
-import activitiesService from '../activities/activitiesService';
+import API_URL from '../../../services/api';
+import activitiesService from '../../activities/activitiesService';
 
 function getCurrentDate() {
   return new Date().toISOString().split('T')[0];

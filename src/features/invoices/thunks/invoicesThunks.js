@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import invoicesService from '../invoicesService';
+import invoicesService from '../services/invoicesService';
 
 function getErrorMessage(error, fallbackMessage) {
   if (error instanceof Error && error.message) {
