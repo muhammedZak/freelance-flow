@@ -1,31 +1,41 @@
+import SectionCard from '@components/common/SectionCard';
+
 import { formatCurrency } from '@/utils/formatCurrency';
+
+function InvoiceSummaryCard({
+  label,
+  value,
+  valueClassName = 'text-slate-950 dark:text-white',
+}) {
+  return (
+    <SectionCard className='h-full'>
+      <p className='text-sm font-medium text-slate-500 dark:text-slate-400'>
+        {label}
+      </p>
+
+      <p className={`mt-3 text-2xl font-bold tracking-tight ${valueClassName}`}>
+        {value}
+      </p>
+    </SectionCard>
+  );
+}
 
 function InvoiceSummaryCards({ totalInvoices, paidAmount, outstandingAmount }) {
   return (
     <div className='mb-6 grid gap-4 sm:grid-cols-3'>
-      <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-        <p className='text-sm text-slate-500'>Total Invoices</p>
+      <InvoiceSummaryCard label='Total Invoices' value={totalInvoices} />
 
-        <p className='mt-2 text-2xl font-bold text-slate-900'>
-          {totalInvoices}
-        </p>
-      </div>
+      <InvoiceSummaryCard
+        label='Paid Amount'
+        value={formatCurrency(paidAmount)}
+        valueClassName='text-green-700 dark:text-green-400'
+      />
 
-      <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-        <p className='text-sm text-slate-500'>Paid Amount</p>
-
-        <p className='mt-2 text-2xl font-bold text-green-700'>
-          {formatCurrency(paidAmount)}
-        </p>
-      </div>
-
-      <div className='rounded-lg border border-slate-200 bg-white p-5 shadow-sm'>
-        <p className='text-sm text-slate-500'>Outstanding Amount</p>
-
-        <p className='mt-2 text-2xl font-bold text-red-700'>
-          {formatCurrency(outstandingAmount)}
-        </p>
-      </div>
+      <InvoiceSummaryCard
+        label='Outstanding Amount'
+        value={formatCurrency(outstandingAmount)}
+        valueClassName='text-red-700 dark:text-red-400'
+      />
     </div>
   );
 }

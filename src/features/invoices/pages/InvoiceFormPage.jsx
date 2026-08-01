@@ -3,7 +3,8 @@ import ErrorMessage from '@components/common/ErrorMessage';
 import PageHeader from '@components/common/PageHeader';
 import BackLink from '@components/common/BackLink';
 
-import InvoiceForm from '../InvoiceForm';
+import InvoiceForm from '../components/InvoiceForm';
+
 import useInvoiceForm from '../hooks/useInvoiceForm';
 
 function InvoiceFormPage() {
@@ -37,9 +38,13 @@ function InvoiceFormPage() {
         <BackLink to='/invoices'>Back to Invoices</BackLink>
       </PageHeader>
 
-      {invoiceError && <ErrorMessage message={invoiceError} />}
+      {invoiceError && (
+        <div className='mb-4'>
+          <ErrorMessage message={invoiceError} />
+        </div>
+      )}
 
-      <div className='max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-7'>
+      <div className='max-w-3xl'>
         <InvoiceForm
           formData={formData}
           formError={formError}

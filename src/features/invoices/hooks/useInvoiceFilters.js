@@ -4,7 +4,7 @@ import {
   INVOICE_FILTER_DEFAULTS,
   INVOICE_FILTER_PARAMS,
   INVOICE_SORT,
-} from '../invoices.constants';
+} from '../constants/invoices.constants';
 
 function useInvoiceFilters(invoices = [], clients = [], projects = []) {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -28,7 +28,7 @@ import {
   selectIsInvoicesListLoading,
 } from '../selectors/invoicesSelectors';
 
-import { INVOICE_STATUS } from '../invoices.constants';
+import { INVOICE_STATUS } from '../constants/invoices.constants';
 
 function useInvoicesList() {
   const dispatch = useDispatch();

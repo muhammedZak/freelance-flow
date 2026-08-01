@@ -33,7 +33,7 @@ export {
   INVOICE_FILTER_STATUS_OPTIONS,
   INVOICE_SORT_OPTIONS,
   INITIAL_INVOICE_FORM_VALUES,
-} from './invoices.constants';
+} from './constants/invoices.constants';
 
 // Selectors
 export {

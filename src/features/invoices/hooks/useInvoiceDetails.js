@@ -38,7 +38,7 @@ import {
   selectIsInvoiceDeleting,
 } from '../selectors/invoicesSelectors';
 
-import { INVOICE_STATUS } from '../invoices.constants';
+import { INVOICE_STATUS } from '../constants/invoices.constants';
 
 const VALID_INVOICE_STATUSES = Object.freeze(Object.values(INVOICE_STATUS));
 

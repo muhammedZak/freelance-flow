@@ -25,7 +25,7 @@ import {
   selectIsInvoiceCreating,
 } from '../selectors/invoicesSelectors';
 
-import { INITIAL_INVOICE_FORM_VALUES } from '../invoices.constants';
+import { INITIAL_INVOICE_FORM_VALUES } from '../constants/invoices.constants';
 
 import { calculateInvoiceTotal } from '../utils/calculateInvoiceTotal';
 

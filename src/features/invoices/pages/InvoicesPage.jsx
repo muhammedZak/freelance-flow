@@ -1,5 +1,6 @@
 import Loading from '@components/common/Loading';
 import ErrorMessage from '@components/common/ErrorMessage';
+import MessageAlert from '@components/common/MessageAlert';
 import PageHeader from '@components/common/PageHeader';
 import ActionLink from '@components/common/ActionLink';
 
@@ -64,9 +65,9 @@ function InvoicesPage() {
       </PageHeader>
 
       {successMessage && (
-        <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
-          {successMessage}
-        </p>
+        <div className='mb-4'>
+          <MessageAlert type='success' message={successMessage} />
+        </div>
       )}
 
       <InvoiceSummaryCards

@@ -1,10 +1,13 @@
+import Button from '@components/common/Button';
+import SectionCard from '@components/common/SectionCard';
+
 import SearchInput from '@components/forms/SearchInput';
 import FilterSelect from '@components/forms/FilterSelect';
 
 import {
   INVOICE_FILTER_STATUS_OPTIONS,
   INVOICE_SORT_OPTIONS,
-} from '../invoices.constants';
+} from '../constants/invoices.constants';
 
 function InvoiceFilters({
   searchText,
@@ -19,8 +22,8 @@ function InvoiceFilters({
   onClearFilters,
 }) {
   return (
-    <div className='mb-6'>
-      <div className='grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:grid-cols-2 lg:grid-cols-4'>
+    <SectionCard className='mb-6'>
+      <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
         <div className='sm:col-span-2'>
           <SearchInput
             value={searchText}
@@ -45,21 +48,23 @@ function InvoiceFilters({
         />
       </div>
 
-      <div className='mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
-        <p className='text-slate-500'>
+      <div className='mt-4 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+        <p className='text-slate-500 dark:text-slate-400'>
           Showing {filteredCount} of {totalCount} invoices
         </p>
 
         {hasActiveFilters && (
-          <button
+          <Button
             type='button'
+            variant='text'
+            size='small'
             onClick={onClearFilters}
-            className='self-start text-blue-600 sm:self-auto'>
+            className='self-start sm:self-auto'>
             Clear Filters
-          </button>
+          </Button>
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }
 

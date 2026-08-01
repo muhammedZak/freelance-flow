@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
-
 import Loading from '@components/common/Loading';
 import ErrorMessage from '@components/common/ErrorMessage';
+import MessageAlert from '@components/common/MessageAlert';
+import PageHeader from '@components/common/PageHeader';
+import BackLink from '@components/common/BackLink';
+import Button from '@components/common/Button';
 
 import InvoiceCalculationCard from '../components/InvoiceCalculationCard';
 import InvoiceInformationCard from '../components/InvoiceInformationCard';
@@ -47,41 +49,43 @@ function InvoiceDetailsPage() {
 
   return (
     <div className='workspace-page'>
-      <div className='page-header'>
-        <Link to='/invoices' className='text-sm text-blue-600'>
-          ← Back to Invoices
-        </Link>
-
-        <div className='mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div>
-            <h1 className='text-2xl font-bold text-slate-900'>
-              {selectedInvoice.invoiceNumber}
-            </h1>
-
-            <p className='text-slate-600'>Invoice for {projectTitle}</p>
-          </div>
-
-          {canManageInvoices && (
-            <button
-              type='button'
-              onClick={handleDelete}
-              disabled={operationLoading}
-              className='rounded bg-red-600 px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60'>
-              Delete Invoice
-            </button>
-          )}
-        </div>
+      <div className='mb-3'>
+        <BackLink to='/invoices'>Back to Invoices</BackLink>
       </div>
 
+      <PageHeader
+        title={selectedInvoice.invoiceNumber}
+        description={`Invoice for ${projectTitle}`}>
+        {canManageInvoices && (
+          <Button
+            type='button'
+            variant='danger'
+            onClick={handleDelete}
+            disabled={operationLoading}>
+            Delete Invoice
+          </Button>
+        )}
+      </PageHeader>
+
       {successMessage && (
-        <p className='mb-4 rounded bg-green-100 p-3 text-sm text-green-700'>
-          {successMessage}
-        </p>
+        <div className='mb-4'>
+          <MessageAlert type='success' message={successMessage} />
+        </div>
       )}
 
       {operationError && (
         <div className='mb-4'>
           <ErrorMessage message={operationError} />
+        </div>
+      )}
+
+      {operationLoading && (
+        <div className='mb-4'>
+          <MessageAlert
+            type='info'
+            title='Updating invoice'
+            message='Please wait while the invoice changes are being saved.'
+          />
         </div>
       )}
 
@@ -97,10 +101,6 @@ function InvoiceDetailsPage() {
 
         <InvoiceCalculationCard invoice={selectedInvoice} />
       </div>
-
-      {operationLoading && (
-        <p className='mt-4 text-sm text-slate-500'>Updating invoice...</p>
-      )}
     </div>
   );
 }
