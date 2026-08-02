@@ -1,9 +1,12 @@
+// Redux reducer
 export { default as projectsReducer } from './projectsSlice';
 
+// Route pages
 export { default as ProjectsPage } from './pages/ProjectsPage';
 export { default as ProjectDetailsPage } from './pages/ProjectDetailsPage';
 export { default as ProjectFormPage } from './pages/ProjectFormPage';
 
+// Redux async thunks and synchronous actions
 export {
   fetchProjects,
   fetchProjectById,
@@ -14,9 +17,11 @@ export {
   clearSelectedProject,
 } from './projectsSlice';
 
+// Selectors
 export {
   selectAllProjects,
   selectSelectedProject,
+  selectProjectById,
   selectProjectsSuccessMessage,
   selectProjectsListStatus,
   selectProjectsListError,
@@ -34,4 +39,6 @@ export {
   selectIsProjectUpdating,
   selectIsProjectDeleting,
   selectIsProjectSaving,
-} from './projectsSelectors';
+  selectProjectsLoading,
+  selectProjectsError,
+} from './selectors/projectsSelectors';

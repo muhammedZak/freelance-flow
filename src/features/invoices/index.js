@@ -3,9 +3,7 @@ export { default as invoicesReducer } from './slices/invoicesSlice';
 
 // Route pages
 export { default as InvoicesPage } from './pages/InvoicesPage';
-
 export { default as InvoiceFormPage } from './pages/InvoiceFormPage';
-
 export { default as InvoiceDetailsPage } from './pages/InvoiceDetailsPage';
 
 // Redux async thunks
@@ -39,6 +37,7 @@ export {
 export {
   selectAllInvoices,
   selectSelectedInvoice,
+  selectInvoiceById,
   selectInvoicesSuccessMessage,
   selectInvoicesListStatus,
   selectInvoicesListError,
@@ -55,4 +54,7 @@ export {
   selectIsInvoiceCreating,
   selectIsInvoiceUpdating,
   selectIsInvoiceDeleting,
+  selectIsInvoiceSaving,
+  selectInvoicesLoading,
+  selectInvoicesError,
 } from './selectors/invoicesSelectors';

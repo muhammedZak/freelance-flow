@@ -128,7 +128,7 @@ async function register(userData) {
       .toLowerCase(),
     password: String(userData.password ?? ''),
     role: String(userData.role ?? 'freelancer'),
-    assignedProjectIds: [],
+    // assignedProjectIds: [],
   };
 
   const response = await apiClient.post('/register', payload);

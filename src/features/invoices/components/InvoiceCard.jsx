@@ -11,9 +11,49 @@ function InvoiceCard({
   invoice,
   clientName,
   projectTitle,
-  canManageInvoices,
+  isClient = false,
+  canManageInvoices = false,
   onDelete,
+  onPay,
 }) {
+  const normalizedStatus = String(invoice?.status ?? '')
+    .trim()
+    .toLowerCase();
+
+  /*
+   * Current application invoices use "unpaid".
+   * The new SaaS flow may use "pending".
+   *
+   * Supporting both keeps the UI compatible during
+   * the schema transition.
+   */
+  const isPayableInvoice =
+    normalizedStatus === 'pending' || normalizedStatus === 'unpaid';
+
+  const showPayNow = isClient && isPayableInvoice;
+
+  const showManagementActions = !isClient && canManageInvoices;
+
+  function handleDelete() {
+    if (!showManagementActions) {
+      return;
+    }
+
+    if (typeof onDelete === 'function') {
+      onDelete(invoice);
+    }
+  }
+
+  function handlePay() {
+    if (!showPayNow) {
+      return;
+    }
+
+    if (typeof onPay === 'function') {
+      onPay(invoice);
+    }
+  }
+
   return (
     <SectionCard className='h-full'>
       <div className='mb-4 flex items-start justify-between gap-3'>
@@ -59,13 +99,33 @@ function InvoiceCard({
           View Details
         </ActionLink>
 
-        {canManageInvoices && (
+        {showManagementActions && (
+          <>
+            <ActionLink
+              to={`/invoices/${invoice.id}/edit`}
+              variant='secondary'
+              size='small'>
+              Edit
+            </ActionLink>
+
+            <Button
+              type='button'
+              variant='danger'
+              size='small'
+              onClick={handleDelete}>
+              Delete
+            </Button>
+          </>
+        )}
+
+        {showPayNow && (
           <Button
             type='button'
-            variant='danger'
+            variant='success'
             size='small'
-            onClick={() => onDelete(invoice)}>
-            Delete
+            onClick={handlePay}
+            disabled={typeof onPay !== 'function'}>
+            Pay Now
           </Button>
         )}
       </div>

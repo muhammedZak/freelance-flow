@@ -1,28 +1,34 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import BackLink from '@/components/common/BackLink';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Loading from '@/components/common/Loading';
 import PageHeader from '@/components/common/PageHeader';
 
+import { selectCurrentUser } from '@features/auth';
+
 import ClientForm from '../components/ClientForm';
+
 import useClientForm from '../hooks/useClientForm';
 
 import {
-  addClient,
   clearClientMessages,
   clearSelectedClient,
+} from '../slices/clientsSlice';
+
+import {
+  addClient,
   editClient,
   fetchClientById,
-} from '../clientsSlice';
+} from '../thunks/clientsThunks';
 
 import {
   selectClientsError,
   selectClientsLoading,
   selectSelectedClient,
-} from '../clientsSelectors';
+} from '../selectors/clientsSelectors';
 
 function ClientFormPage() {
   const { id } = useParams();
@@ -32,8 +38,12 @@ function ClientFormPage() {
 
   const isEditMode = Boolean(id);
 
+  const currentUser = useSelector(selectCurrentUser);
+
   const selectedClient = useSelector(selectSelectedClient);
+
   const loading = useSelector(selectClientsLoading);
+
   const error = useSelector(selectClientsError);
 
   const {
@@ -42,7 +52,10 @@ function ClientFormPage() {
     handleChange,
     validateAndBuildClientData,
     setSubmissionError,
-  } = useClientForm({ client: selectedClient, isEditMode });
+  } = useClientForm({
+    client: selectedClient,
+    isEditMode,
+  });
 
   useEffect(() => {
     dispatch(clearClientMessages());
@@ -60,6 +73,10 @@ function ClientFormPage() {
   }, [dispatch, id, isEditMode]);
 
   function handleRetry() {
+    if (!id) {
+      return;
+    }
+
     dispatch(clearClientMessages());
     dispatch(fetchClientById(id));
   }
@@ -81,13 +98,40 @@ function ClientFormPage() {
             clientData,
           }),
         ).unwrap();
-      } else {
-        await dispatch(addClient(clientData)).unwrap();
+
+        navigate('/clients');
+
+        return;
       }
 
+      if (!currentUser || currentUser.role !== 'freelancer') {
+        setSubmissionError(
+          'You must be logged in as a freelancer to create a client.',
+        );
+
+        return;
+      }
+
+      const activeFreelancerId = String(currentUser.id ?? '').trim();
+
+      if (!activeFreelancerId) {
+        setSubmissionError(
+          'The authenticated freelancer account is missing a valid user ID.',
+        );
+
+        return;
+      }
+
+      await dispatch(
+        addClient({
+          clientData,
+          activeFreelancerId,
+        }),
+      ).unwrap();
+
       navigate('/clients');
-    } catch (error) {
-      setSubmissionError(error);
+    } catch (submissionError) {
+      setSubmissionError(submissionError);
     }
   }
 
@@ -101,7 +145,7 @@ function ClientFormPage() {
     return (
       <ErrorMessage
         title='Unable to load client'
-        message={apiError}
+        message={error}
         onRetry={handleRetry}
         retryText='Reload Client'
       />

@@ -33,7 +33,7 @@ function ClientsPage() {
   const loading = useSelector(selectClientsLoading);
   const error = useSelector(selectClientsError);
   const successMessage = useSelector(selectClientsSuccessMessage);
-
+  console.log(clients);
   const {
     searchText,
     statusFilter,
