@@ -10,21 +10,76 @@ const USER_ROLE = Object.freeze({
   CLIENT: 'client',
 });
 
+/*
+ * Normalizes database reference IDs into a canonical form.
+ *
+ * Examples:
+ *
+ * 1       -> 1
+ * "1"     -> 1
+ * " 1 "   -> 1
+ * "001"   -> 1
+ * 25      -> 25
+ * "25"    -> 25
+ *
+ * "abc"       -> "abc"
+ * "Wgqe-x5"   -> "Wgqe-x5"
+ *
+ * null        -> null
+ * undefined   -> null
+ * ""          -> null
+ *
+ * This allows json-server numeric IDs and string
+ * foreign-key references to compare correctly while
+ * still supporting alphanumeric IDs.
+ */
 function normalizeId(value) {
   if (value === null || value === undefined) {
     return null;
   }
 
-  const normalizedId = String(value).trim();
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
 
-  return normalizedId || null;
+  const normalizedValue = String(value).trim();
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  /*
+   * Only treat normal decimal numeric strings as numbers.
+   *
+   * This intentionally avoids converting unusual strings
+   * such as:
+   *
+   * "0x10"
+   * "Infinity"
+   * "NaN"
+   *
+   * into numeric IDs.
+   */
+  const isNumericString = /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(
+    normalizedValue,
+  );
+
+  if (isNumericString) {
+    const numericValue = Number(normalizedValue);
+
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+  }
+
+  return normalizedValue;
 }
 
 function idsMatch(firstId, secondId) {
   const normalizedFirstId = normalizeId(firstId);
   const normalizedSecondId = normalizeId(secondId);
 
-  if (!normalizedFirstId || !normalizedSecondId) {
+  if (normalizedFirstId === null || normalizedSecondId === null) {
     return false;
   }
 
@@ -38,7 +93,7 @@ function normalizeUserIdentity(user) {
 
   const id = normalizeId(user.id);
 
-  if (!id) {
+  if (id === null) {
     return null;
   }
 
@@ -65,6 +120,9 @@ function canUserAccessClientProfile(clientProfile, currentUser) {
     return idsMatch(clientProfile.userId, currentUser.id);
   }
 
+  /*
+   * Unknown roles fail closed.
+   */
   return false;
 }
 
@@ -79,21 +137,24 @@ function hydrateClientProfile(clientProfile, usersById, currentUser) {
 
   let userIdentity = null;
 
-  if (userId) {
+  if (userId !== null) {
     userIdentity = usersById.get(userId) ?? null;
   }
 
-  /*
-   * The current authenticated client can always
-   * hydrate their own identity from auth state,
-   * even when a separate users directory has not
-   * been loaded yet.
-   */
-  if (!userIdentity && userId && idsMatch(currentUser?.id, userId)) {
+  if (!userIdentity && userId !== null && idsMatch(currentUser?.id, userId)) {
     userIdentity = normalizeUserIdentity(currentUser);
   }
 
-  const companyName = String(clientProfile.companyName ?? '').trim();
+  const companyName = String(
+    clientProfile.companyName ?? clientProfile.company ?? '',
+  ).trim();
+
+  const status =
+    String(clientProfile.status ?? '')
+      .trim()
+      .toLowerCase() || 'active';
+
+  const createdAt = String(clientProfile.createdAt ?? '').trim();
 
   return {
     ...clientProfile,
@@ -106,22 +167,14 @@ function hydrateClientProfile(clientProfile, usersById, currentUser) {
     email: userIdentity?.email ?? '',
 
     companyName,
-
-    /*
-     * Presentation compatibility alias.
-     *
-     * Existing UI code currently reads
-     * client.company in some places.
-     *
-     * This value is derived only.
-     * It is never written back into Redux
-     * state or db.json.
-     */
     company: companyName,
 
     phone: String(clientProfile.phone ?? '').trim(),
 
     address: String(clientProfile.address ?? '').trim(),
+
+    status,
+    createdAt,
 
     identityLoaded: Boolean(userIdentity),
   };
@@ -138,7 +191,7 @@ const selectRawSelectedClient = (state) =>
 /*
  * Sanitized user-directory contract.
  *
- * Preferred future structure:
+ * Preferred structure:
  *
  * state.users.items = [
  *   {
@@ -149,12 +202,13 @@ const selectRawSelectedClient = (state) =>
  *   }
  * ]
  *
- * The fallback to state.users.users allows
- * migration without coupling hydration to
- * one temporary slice property name.
+ * Temporary compatibility structure:
  *
- * Passwords are intentionally ignored even
- * if a source object accidentally contains one.
+ * state.users.users = [...]
+ *
+ * Passwords are deliberately excluded from
+ * normalizeUserIdentity(), even if the source
+ * user objects happen to contain them.
  */
 const selectUserDirectory = (state) => {
   if (Array.isArray(state.users?.items)) {
@@ -168,6 +222,39 @@ const selectUserDirectory = (state) => {
   return EMPTY_USERS;
 };
 
+/*
+ * Builds:
+ *
+ * Map<normalizedUserId, sanitizedUserIdentity>
+ *
+ * Example:
+ *
+ * users:
+ * [
+ *   {
+ *     id: 2,
+ *     name: "Client User",
+ *     email: "client@example.com"
+ *   }
+ * ]
+ *
+ * becomes:
+ *
+ * Map {
+ *   2 => {
+ *     id: 2,
+ *     name: "Client User",
+ *     email: "client@example.com"
+ *   }
+ * }
+ *
+ * Therefore a client profile containing:
+ *
+ * userId: "2"
+ *
+ * can still resolve the same identity because
+ * normalizeId("2") returns Number 2.
+ */
 const selectUsersById = createSelector([selectUserDirectory], (users) => {
   const usersById = new Map();
 
@@ -215,16 +302,37 @@ export const selectVisibleClientProfiles = createSelector(
 export const selectHydratedClients = createSelector(
   [selectVisibleClientProfiles, selectUsersById, selectCurrentUser],
   (clientProfiles, usersById, currentUser) =>
-    clientProfiles.map((clientProfile) =>
-      hydrateClientProfile(clientProfile, usersById, currentUser),
-    ),
+    clientProfiles
+      .map((clientProfile) =>
+        hydrateClientProfile(clientProfile, usersById, currentUser),
+      )
+      .filter(Boolean),
 );
 
 /*
- * Public list selector.
+ * Public Clients list selector.
  *
- * Presentational components receive hydrated,
- * tenant-safe client UI models.
+ * Components such as ClientsPage should consume
+ * this selector instead of reading:
+ *
+ * state.clients.clients
+ *
+ * directly.
+ *
+ * Returned UI model:
+ *
+ * {
+ *   id,
+ *   userId,
+ *   freelancerId,
+ *   name,
+ *   email,
+ *   companyName,
+ *   company,
+ *   phone,
+ *   address,
+ *   identityLoaded
+ * }
  */
 export const selectAllClients = selectHydratedClients;
 

@@ -72,8 +72,8 @@ async function migratePasswords() {
   );
 }
 
-migratePasswords().catch((error) => {
-  console.error('Auth password migration failed:', error);
+// migratePasswords().catch((error) => {
+//   console.error('Auth password migration failed:', error);
 
-  process.exitCode = 1;
-});
+//   process.exitCode = 1;
+// });

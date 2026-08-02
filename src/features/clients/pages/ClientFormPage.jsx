@@ -85,6 +85,7 @@ function ClientFormPage() {
     event.preventDefault();
 
     const clientData = validateAndBuildClientData();
+    console.log(clientData);
 
     if (!clientData) {
       return;

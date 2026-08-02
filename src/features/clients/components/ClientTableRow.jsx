@@ -13,7 +13,7 @@ function ClientTableRow({ client, onDelete }) {
       </td>
 
       <td className='p-3 text-slate-600 dark:text-slate-400'>
-        {client.company}
+        {client.companyName}
       </td>
 
       <td className='p-3 text-slate-600 dark:text-slate-400'>{client.email}</td>

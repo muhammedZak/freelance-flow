@@ -1,100 +1,43 @@
 {
   "users": [
     {
-      "id": "1",
-      "name": "Zak Freelancer",
-      "email": "freelancer@example.com",
-      "password": "$2a$10$aNQ7sV5EG9yNN351mqqdbu5qE/DONvH3p0AuCeqpg0CqhtudHuW8O",
-      "role": "freelancer"
-    },
-    {
-      "id": "2",
-      "name": "Aarav Sharma",
-      "email": "aarav@example.com",
-      "password": "$2a$10$Tk3yn4Kbp6.ilhEzv6kt9OqBHYtRAsQAmJAtfYzE.t1PpTbQ5dh9m",
-      "role": "client"
-    },
-    {
       "email": "zakariya.zaku018@gmail.com",
-      "password": "$2a$10$yK7sXgbdUcq3Mgzyvj9qAujDJnu0YM9OjPpKoZ4yMM77B5xfRgPvy",
+      "password": "$2a$10$ce0jpuOpsn3aXJ4USLeuFeWE8oSLzokzJW3kUw8aeH/im.xpoG4Y2",
       "name": "Muhammed Zakariya",
       "role": "freelancer",
-      "id": "sD65HSL"
+      "id": 1
     },
     {
-      "email": "fathima@example.com",
-      "password": "$2a$10$9/5E1UgpKOXWhVvk219FteUd5z5YN2kr90plkP8zOA96wXxtzjKA2",
-      "name": "Fathima Riya",
+      "email": "zakariya@gmail.com",
+      "password": "$2a$10$rjxHwcTS5agJzcKn.NzzBeKWbD8tfH.3oBMnLoiEEvLbO22Q6iGwa",
+      "name": "zakariya zaku",
       "role": "client",
-      "id": "Wgqe-x5"
+      "id": 2
     }
   ],
   "clients": [
     {
-      "id": "1",
-      "userId": "2",
-      "freelancerId": "1",
-      "companyName": "Sharma Designs",
-      "phone": "9876543210",
-      "address": "Kochi, Kerala"
+      "userId": 2,
+      "freelancerId": 1,
+      "companyName": "Zak studio",
+      "phone": "9645019798",
+      "address": "Maliyekkal Perunthalloor\nSchool Padi",
+      "status": "inactive",
+      "createdAt": "2026-08-02",
+      "id": 1
     }
   ],
-  "projects": [
+  "projects": [],
+  "tasks": [],
+  "invoices": [],
+  "payments": [],
+  "activities": [
     {
-      "id": "1",
-      "freelancerId": "1",
-      "clientId": "1",
-      "title": "Portfolio Website",
-      "description": "Portfolio website for Sharma Designs.",
-      "status": "active",
-      "startDate": "2026-08-01",
-      "deadline": "2026-08-31",
-      "budget": 25000,
-      "createdAt": "2026-08-01"
+      "message": "Client created: Zak studio",
+      "type": "client",
+      "freelancerId": 1,
+      "createdAt": "2026-08-02",
+      "id": 1
     }
-  ],
-  "tasks": [
-    {
-      "id": "1",
-      "freelancerId": "1",
-      "clientId": "1",
-      "projectId": "1",
-      "title": "Create homepage",
-      "description": "Build the main homepage layout.",
-      "status": "todo",
-      "priority": "high",
-      "dueDate": "2026-08-10",
-      "createdAt": "2026-08-01"
-    }
-  ],
-  "invoices": [
-    {
-      "id": "1",
-      "freelancerId": "1",
-      "clientId": "1",
-      "projectId": "1",
-      "invoiceNumber": "INV-001",
-      "hoursWorked": 20,
-      "hourlyRate": 800,
-      "total": 16000,
-      "status": "unpaid",
-      "issueDate": "2026-08-15",
-      "dueDate": "2026-08-30",
-      "createdAt": "2026-08-15"
-    }
-  ],
-  "payments": [
-    {
-      "id": "1",
-      "freelancerId": "1",
-      "clientId": "1",
-      "invoiceId": "1",
-      "amount": 8000,
-      "method": "upi",
-      "paymentDate": "2026-08-20",
-      "status": "partial",
-      "createdAt": "2026-08-20"
-    }
-  ],
-  "activities": []
+  ]
 }

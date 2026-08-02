@@ -1,4 +1,7 @@
+import axios from 'axios';
+
 import apiClient from '@/api/apiClient';
+
 import activitiesService from '../../activities/activitiesService';
 
 const CLIENTS_ENDPOINT = '/clients';
@@ -9,8 +12,35 @@ const AUTH_SESSION_STORAGE_KEY = 'freelanceflow_auth_session';
 const CLIENT_ROLE = 'client';
 const FREELANCER_ROLE = 'freelancer';
 
+const DEFAULT_CLIENT_STATUS = 'active';
+const DEFAULT_REQUEST_TIMEOUT = 5000;
+
 const TEMPORARY_PASSWORD_CHARACTERS =
   'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+
+/*
+ * IMPORTANT:
+ *
+ * This Axios instance intentionally has NO interceptors.
+ *
+ * apiClient has a request interceptor that reads the token
+ * from localStorage and assigns:
+ *
+ * Authorization: Bearer <stored token>
+ *
+ * That behavior is desirable for normal authenticated API
+ * requests, but it is undesirable for this multi-request
+ * transaction because we want to freeze the authenticated
+ * freelancer credentials before POST /register happens.
+ */
+const isolatedApiClient = axios.create({
+  baseURL: apiClient.defaults.baseURL,
+  timeout: apiClient.defaults.timeout || DEFAULT_REQUEST_TIMEOUT,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
 
 function normalizeText(value) {
   return String(value ?? '').trim();
@@ -21,9 +51,33 @@ function normalizeEmail(value) {
 }
 
 function normalizeId(value) {
-  const id = normalizeText(value);
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  const id = String(value).trim();
+
+  if (!isNaN(id) && id !== '') {
+    return Number(id);
+  }
 
   return id || null;
+}
+
+function idsMatch(firstId, secondId) {
+  const normalizedFirstId = normalizeId(firstId);
+
+  const normalizedSecondId = normalizeId(secondId);
+
+  if (!normalizedFirstId || !normalizedSecondId) {
+    return false;
+  }
+
+  return normalizedFirstId === normalizedSecondId;
 }
 
 function getToday() {
@@ -72,69 +126,184 @@ function readStoredAuthSession() {
   }
 }
 
-function getStoredFreelancerId() {
-  const session = readStoredAuthSession();
-  const user = session?.user;
-
-  if (!user || typeof user !== 'object') {
-    return null;
-  }
-
-  if (user.role !== FREELANCER_ROLE) {
-    return null;
-  }
-
-  return normalizeId(user.id);
-}
-
-function resolveFreelancerId(explicitFreelancerId) {
-  const providedFreelancerId = normalizeId(explicitFreelancerId);
-
-  if (providedFreelancerId) {
-    return providedFreelancerId;
-  }
-
-  const storedFreelancerId = getStoredFreelancerId();
-
-  if (storedFreelancerId) {
-    return storedFreelancerId;
-  }
-
-  throw new Error('A logged-in freelancer is required to manage clients.');
-}
-
-function decodeJwtSubject(accessToken) {
-  if (
-    typeof accessToken !== 'string' ||
-    typeof globalThis.atob !== 'function'
-  ) {
+function decodeBase64Url(value) {
+  if (typeof value !== 'string' || typeof globalThis.atob !== 'function') {
     return null;
   }
 
   try {
-    const tokenParts = accessToken.split('.');
+    const normalizedValue = value.replace(/-/g, '+').replace(/_/g, '/');
 
-    if (tokenParts.length !== 3) {
-      return null;
-    }
-
-    const encodedPayload = tokenParts[1];
-
-    const normalizedPayload = encodedPayload
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
-    const paddedPayload = normalizedPayload.padEnd(
-      Math.ceil(normalizedPayload.length / 4) * 4,
+    const paddedValue = normalizedValue.padEnd(
+      Math.ceil(normalizedValue.length / 4) * 4,
       '=',
     );
 
-    const payload = JSON.parse(globalThis.atob(paddedPayload));
-
-    return normalizeId(payload?.sub);
+    return globalThis.atob(paddedValue);
   } catch {
     return null;
   }
+}
+
+function decodeJwtPayload(accessToken) {
+  if (typeof accessToken !== 'string') {
+    return null;
+  }
+
+  const tokenParts = accessToken.split('.');
+
+  if (tokenParts.length !== 3) {
+    return null;
+  }
+
+  const decodedPayload = decodeBase64Url(tokenParts[1]);
+
+  if (!decodedPayload) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(decodedPayload);
+  } catch {
+    return null;
+  }
+}
+
+function decodeJwtSubject(accessToken) {
+  const payload = decodeJwtPayload(accessToken);
+
+  return normalizeId(payload?.sub);
+}
+
+function isJwtExpired(accessToken) {
+  const payload = decodeJwtPayload(accessToken);
+
+  if (!payload) {
+    return false;
+  }
+
+  const expirationTime = Number(payload.exp);
+
+  if (!Number.isFinite(expirationTime)) {
+    return false;
+  }
+
+  const currentUnixTime = Math.floor(Date.now() / 1000);
+
+  return currentUnixTime >= expirationTime;
+}
+
+function getActiveFreelancerAuthorization(activeFreelancerId) {
+  const expectedFreelancerId = normalizeId(activeFreelancerId);
+
+  if (!expectedFreelancerId) {
+    throw new Error('An active freelancer ID is required to create a client.');
+  }
+
+  const session = readStoredAuthSession();
+
+  if (!session) {
+    throw new Error('No authenticated session was found. Please log in again.');
+  }
+
+  const sessionUser = session.user;
+
+  if (!sessionUser || typeof sessionUser !== 'object') {
+    throw new Error('The authenticated session does not contain a valid user.');
+  }
+
+  if (sessionUser.role !== FREELANCER_ROLE) {
+    throw new Error(
+      'Only an authenticated freelancer can create client accounts.',
+    );
+  }
+
+  const sessionFreelancerId = normalizeId(sessionUser.id);
+
+  if (!sessionFreelancerId) {
+    throw new Error(
+      'The authenticated freelancer session is missing a valid user ID.',
+    );
+  }
+
+  if (!idsMatch(sessionFreelancerId, expectedFreelancerId)) {
+    throw new Error(
+      'The active freelancer ID does not match the authenticated session.',
+    );
+  }
+
+  const accessToken = normalizeText(session.accessToken);
+
+  if (!accessToken) {
+    throw new Error(
+      'The authenticated freelancer session is missing an access token. Please log in again.',
+    );
+  }
+
+  const tokenSubject = decodeJwtSubject(accessToken);
+
+  if (!tokenSubject) {
+    throw new Error(
+      'The authenticated freelancer access token is invalid. Please log in again.',
+    );
+  }
+
+  if (!idsMatch(tokenSubject, expectedFreelancerId)) {
+    throw new Error(
+      'The freelancer access token does not belong to the active freelancer. Please log in again.',
+    );
+  }
+
+  if (isJwtExpired(accessToken)) {
+    throw new Error(
+      'The freelancer session has expired. Please log in again before creating a client.',
+    );
+  }
+
+  return {
+    freelancerId: expectedFreelancerId,
+    accessToken,
+  };
+}
+
+function createAuthorizationHeaders(accessToken) {
+  return {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${accessToken}`,
+  };
+}
+
+function createPublicRequestHeaders() {
+  return {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+}
+
+function getHttpErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data;
+
+  if (
+    typeof responseData?.message === 'string' &&
+    responseData.message.trim()
+  ) {
+    return responseData.message.trim();
+  }
+
+  if (typeof responseData?.error === 'string' && responseData.error.trim()) {
+    return responseData.error.trim();
+  }
+
+  if (typeof responseData === 'string' && responseData.trim()) {
+    return responseData.trim();
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallbackMessage;
 }
 
 function getRegisteredUserId(registrationData) {
@@ -157,10 +326,16 @@ function getRegisteredUserId(registrationData) {
 
 function validateClientCreationData(clientData) {
   const name = normalizeText(clientData?.name);
+
   const email = normalizeEmail(clientData?.email);
+
   const companyName = normalizeText(
     clientData?.companyName ?? clientData?.company,
   );
+
+  const status = normalizeText(clientData?.status) || DEFAULT_CLIENT_STATUS;
+
+  const createdAt = normalizeText(clientData?.createdAt) || getToday();
 
   if (!name) {
     throw new Error('Client name is required.');
@@ -180,14 +355,8 @@ function validateClientCreationData(clientData) {
     companyName,
     phone: normalizeText(clientData?.phone),
     address: normalizeText(clientData?.address),
-  };
-}
-
-function createBusinessFields(clientData) {
-  return {
-    companyName: normalizeText(clientData?.companyName ?? clientData?.company),
-    phone: normalizeText(clientData?.phone),
-    address: normalizeText(clientData?.address),
+    status,
+    createdAt,
   };
 }
 
@@ -214,10 +383,56 @@ function createBusinessPatch(clientData) {
   return patch;
 }
 
+async function registerClientAccount(registrationPayload) {
+  /*
+   * This request intentionally carries NO bearer token.
+   *
+   * /register is a public authentication endpoint.
+   *
+   * More importantly, using isolatedApiClient prevents
+   * apiClient's global interceptor from participating
+   * in this account-creation transaction.
+   */
+  const response = await isolatedApiClient.post(
+    REGISTER_ENDPOINT,
+    registrationPayload,
+    {
+      headers: createPublicRequestHeaders(),
+    },
+  );
+
+  return response.data ?? {};
+}
+
+async function createClientProfileAsFreelancer(
+  clientPayload,
+  freelancerAccessToken,
+) {
+  /*
+   * The original freelancer token captured BEFORE
+   * POST /register is explicitly forced onto this
+   * request.
+   *
+   * isolatedApiClient has no interceptor, so nothing
+   * can replace this Authorization value with the
+   * JWT returned by /register.
+   */
+  const response = await isolatedApiClient.post(
+    CLIENTS_ENDPOINT,
+    clientPayload,
+    {
+      headers: createAuthorizationHeaders(freelancerAccessToken),
+    },
+  );
+
+  return response.data;
+}
+
 async function getClients(filters = {}) {
   const params = {};
 
   const freelancerId = normalizeId(filters.freelancerId);
+
   const userId = normalizeId(filters.userId);
 
   if (freelancerId) {
@@ -248,10 +463,19 @@ async function getClientById(id) {
 }
 
 async function createClient(clientData, activeFreelancerId = null) {
-  const { name, email, companyName, phone, address } =
+  const { name, email, companyName, phone, address, status, createdAt } =
     validateClientCreationData(clientData);
 
-  const freelancerId = resolveFreelancerId(activeFreelancerId);
+  /*
+   * Capture and validate the freelancer credentials
+   * BEFORE creating the new client account.
+   *
+   * This prevents us from creating an orphaned client
+   * user when the freelancer session is already
+   * missing, invalid, mismatched, or expired.
+   */
+  const { freelancerId, accessToken: freelancerAccessToken } =
+    getActiveFreelancerAuthorization(activeFreelancerId);
 
   const temporaryPassword =
     normalizeText(clientData?.temporaryPassword) || generateTemporaryPassword();
@@ -263,12 +487,18 @@ async function createClient(clientData, activeFreelancerId = null) {
     role: CLIENT_ROLE,
   };
 
-  const registrationResponse = await apiClient.post(
-    REGISTER_ENDPOINT,
-    registrationPayload,
-  );
+  let registrationData;
 
-  const registrationData = registrationResponse.data ?? {};
+  try {
+    registrationData = await registerClientAccount(registrationPayload);
+  } catch (error) {
+    const errorMessage = getHttpErrorMessage(
+      error,
+      'Unable to create the client login account.',
+    );
+
+    throw new Error(errorMessage);
+  }
 
   const userId = getRegisteredUserId(registrationData);
 
@@ -278,17 +508,29 @@ async function createClient(clientData, activeFreelancerId = null) {
     companyName,
     phone,
     address,
+    status,
+    createdAt,
   };
 
   let createdClient;
 
   try {
-    const response = await apiClient.post(CLIENTS_ENDPOINT, clientPayload);
-
-    createdClient = response.data;
+    createdClient = await createClientProfileAsFreelancer(
+      clientPayload,
+      freelancerAccessToken,
+    );
   } catch (error) {
+    const statusCode = error?.response?.status;
+
+    const errorMessage = getHttpErrorMessage(
+      error,
+      'Unable to create the client profile.',
+    );
+
+    const statusMessage = statusCode ? `HTTP ${statusCode}. ` : '';
+
     throw new Error(
-      `The client login account was created, but the client profile could not be created. Registered user ID: ${userId}. ${error.message}`,
+      `The client login account was created, but the client profile could not be created. Registered user ID: ${userId}. ${statusMessage}${errorMessage}`,
     );
   }
 
@@ -302,16 +544,6 @@ async function createClient(clientData, activeFreelancerId = null) {
   return {
     ...createdClient,
 
-    /*
-     * accountSetup is response-only metadata.
-     *
-     * It is NOT sent to /clients and therefore is NOT stored
-     * in db.json.
-     *
-     * Step 2 will decide how this one-time credential data is
-     * handled by Redux without making it part of persistent
-     * client state.
-     */
     accountSetup: {
       userId,
       email,

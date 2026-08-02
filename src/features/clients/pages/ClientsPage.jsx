@@ -18,7 +18,7 @@ import {
   selectClientsError,
   selectClientsLoading,
   selectClientsSuccessMessage,
-} from '../clientsSelectors';
+} from '../selectors/clientsSelectors';
 
 import {
   clearClientMessages,

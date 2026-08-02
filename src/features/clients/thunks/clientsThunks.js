@@ -71,9 +71,16 @@ function toClientProfile(client) {
     id,
     userId,
     freelancerId,
+
     companyName: normalizeText(client.companyName),
+
     phone: normalizeText(client.phone),
+
     address: normalizeText(client.address),
+
+    status: normalizeText(client.status) || 'active',
+
+    createdAt: normalizeText(client.createdAt),
   };
 }
 
